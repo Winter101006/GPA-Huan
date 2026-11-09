@@ -32,6 +32,13 @@ import { CareerCompass } from './components/CareerCompass';
 import { CPASimulatorPlanner } from './components/CPASimulatorPlanner';
 import { AIAdvisorPanel } from './components/AIAdvisorPanel';
 import { CurrentSemesterHub } from './components/CurrentSemesterHub';
+import {
+  DEFAULT_DATABASE,
+  DEFAULT_PROGRESS,
+  loadStoredProgress,
+  saveStoredProgress,
+  LOCAL_STORAGE_KEY,
+} from './data/defaultData';
 
 type ActiveModule =
   | 'skill_tree'
@@ -42,16 +49,16 @@ type ActiveModule =
   | 'ai_advisor';
 
 export function App() {
-  const [db, setDb] = useState<AcademicDatabase | null>(null);
-  const [progress, setProgress] = useState<UserProgress | null>(null);
+  const [db, setDb] = useState<AcademicDatabase>(DEFAULT_DATABASE);
+  const [progress, setProgress] = useState<UserProgress>(loadStoredProgress);
   const [aiConfig, setAiConfig] = useState<{
     default_base_url: string;
     default_model: string;
     default_gemini_key?: string;
   }>({
-    default_base_url: 'https://agentrouter.org/v1',
-    default_model: 'gemini-3.5-flash-lite',
-    default_gemini_key: '',
+    default_base_url: import.meta.env.VITE_AI_BASE_URL || 'https://agentrouter.org/v1',
+    default_model: import.meta.env.VITE_AI_MODEL || 'gemini-3.5-flash-lite',
+    default_gemini_key: import.meta.env.VITE_GEMINI_API_KEY || '',
   });
   const [activeTab, setActiveTab] = useState<ActiveModule>('skill_tree');
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -74,14 +81,23 @@ export function App() {
   const fetchAllData = async () => {
     try {
       const res = await fetch('/api/data');
-      const data = await res.json();
-      setDb(data.database);
-      setProgress(data.user_progress);
-      if (data.ai_config) {
-        setAiConfig(data.ai_config);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.database) setDb(data.database);
+        const hasLocal = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!hasLocal && data.user_progress) {
+          setProgress(data.user_progress);
+          saveStoredProgress(data.user_progress);
+        }
+        if (data.ai_config) {
+          setAiConfig((prev) => ({
+            ...prev,
+            ...data.ai_config,
+          }));
+        }
       }
-    } catch (err) {
-      console.error('Failed to load academic data:', err);
+    } catch {
+      // Standalone mode / offline: defaults and localStorage already active
     }
   };
 
@@ -91,14 +107,15 @@ export function App() {
 
   const syncProgressToServer = async (nextProgress: UserProgress) => {
     setProgress(nextProgress);
+    saveStoredProgress(nextProgress);
     try {
       await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nextProgress),
       });
-    } catch (e) {
-      console.error('Sync progress error:', e);
+    } catch {
+      // Standalone mode: localStorage is already saved
     }
   };
 
@@ -280,48 +297,48 @@ export function App() {
   };
 
   const handleAddCustomMemory = async (topic: string, courseCode: string, content: string) => {
-    try {
-      const res = await fetch('/api/memories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, course_code: courseCode, content }),
-      });
-      const data = await res.json();
-      if (data.user_progress) {
-        setProgress(data.user_progress);
-      }
-      showToast('🧠 Đã nạp kiến thức mới vào Bộ nhớ Cố vấn AI!');
-    } catch (e) {
-      console.error(e);
-    }
+    const newMem = {
+      id: `mem-${Date.now()}`,
+      topic: topic.trim() || `Ghi chú học phần ${courseCode || 'CHUNG'}`,
+      course_code: courseCode || 'CHUNG',
+      content: content.trim(),
+      created_at: new Date().toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
+    const nextMemories = [newMem, ...(progress.custom_memories || [])];
+    const nextProgress: UserProgress = {
+      ...progress,
+      custom_memories: nextMemories,
+    };
+    syncProgressToServer(nextProgress);
+    showToast('🧠 Đã nạp kiến thức mới vào Bộ nhớ Cố vấn AI!');
   };
 
   const handleDeleteCustomMemory = async (id: string) => {
-    try {
-      const res = await fetch(`/api/memories/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (progress && data.custom_memories) {
-        setProgress({
-          ...progress,
-          custom_memories: data.custom_memories,
-        });
-      }
-      showToast('🗑️ Đã xóa ghi chú khỏi bộ nhớ!');
-    } catch (e) {
-      console.error(e);
-    }
+    const nextMemories = (progress.custom_memories || []).filter((m) => m.id !== id);
+    const nextProgress: UserProgress = {
+      ...progress,
+      custom_memories: nextMemories,
+    };
+    syncProgressToServer(nextProgress);
+    showToast('🗑️ Đã xóa ghi chú khỏi bộ nhớ!');
   };
 
   const handleResetGroundTruth = async () => {
     try {
-      const res = await fetch('/api/reset', { method: 'POST' });
-      const data = await res.json();
-      setDb(data.database);
-      setProgress(data.user_progress);
-      showToast('🔄 Đã khôi phục dữ liệu gốc 23 môn + Lịch Kỳ 5 chuẩn!');
-    } catch (e) {
-      console.error(e);
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      setDb(DEFAULT_DATABASE);
+      setProgress(DEFAULT_PROGRESS);
+      await fetch('/api/reset', { method: 'POST' });
+    } catch {
+      // offline / standalone
     }
+    showToast('🔄 Đã khôi phục dữ liệu gốc 23 môn + Lịch Kỳ 5 chuẩn!');
   };
 
   const handleExcelFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
