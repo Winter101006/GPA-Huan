@@ -192,7 +192,8 @@ export function App() {
 
   const handleUpdateCourseFullState = (
     code: string,
-    partialState: Partial<CourseUserState>
+    partialState: Partial<CourseUserState>,
+    silent = false
   ) => {
     if (!progress || !db) return;
     const baseCourse = db.courses.find((c) => c.code === code);
@@ -224,7 +225,9 @@ export function App() {
         [code]: merged,
       },
     });
-    showToast(`💾 Đã lưu cập nhật học phần ${code} lâu dài!`);
+    if (!silent) {
+      showToast(`✅ Đã lưu cập nhật học phần ${code}!`);
+    }
   };
 
   const handleToggleConditional = (code: string) => {
@@ -285,7 +288,6 @@ export function App() {
       ...progress,
       semester5_tasks: nextTasks,
     });
-    showToast('✅ Đã cập nhật danh sách Lịch thi & Bài tập Kỳ 5!');
   };
 
   const handleUpdateNlpResearch = (nextResearch: NLPResearchWorkspaceData) => {
@@ -432,9 +434,9 @@ export function App() {
     },
     {
       id: 'current_semester',
-      label: 'Kỳ 5 Đang Học & NCKH NLP',
+      label: 'Sổ Tay Kỳ 5 & NLP',
       icon: Flame,
-      badge: '16 TC + NLP',
+      badge: '16 TC',
     },
     {
       id: 'simulator',

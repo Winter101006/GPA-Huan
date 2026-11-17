@@ -152,6 +152,12 @@ export interface AcademicDatabase {
   knowledge_links: KnowledgeLink[];
 }
 
+export interface CourseLinkItem {
+  id: string;
+  title: string;
+  url: string;
+}
+
 export interface CourseUserState {
   completed: boolean;
   in_progress?: boolean;
@@ -163,6 +169,8 @@ export interface CourseUserState {
   note?: string;
   teacher_note?: string;
   schedule_info?: string;
+  detailed_notes?: string;
+  links?: CourseLinkItem[];
 }
 
 export interface UserProgress {

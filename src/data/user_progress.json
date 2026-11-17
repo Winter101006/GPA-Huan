@@ -731,6 +731,16 @@
       "note": "",
       "teacher_note": "",
       "schedule_info": ""
+    },
+    "CHUNG": {
+      "completed": false,
+      "in_progress": false,
+      "score10": null,
+      "letter": null,
+      "score4": null,
+      "semester": 5,
+      "planned_semester": 5,
+      "links": []
     }
   },
   "conditional_checklist": {
