@@ -4,40 +4,43 @@
 
 @layer base {
   body {
-    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  }
-
-  code,
-  pre,
-  .font-mono {
-    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Quiet neutral scrollbar */
+/* Custom scrollbar for Skyblue theme */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(224, 242, 254, 0.4);
+}
+.dark ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(113, 113, 122, 0.35);
-  border-radius: 4px;
+  background: #38bdf8;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(113, 113, 122, 0.55);
+  background: #0284c7;
 }
 
-/* React Flow crisp edge transitions */
+/* React Flow custom animations & styling */
 .react-flow__edge-path {
-  transition: stroke 160ms cubic-bezier(0.22, 1, 0.36, 1),
-    stroke-width 160ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45), 0 4px 15px -2px rgba(2, 132, 199, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(56, 189, 248, 0.18), 0 8px 22px -2px rgba(2, 132, 199, 0.4);
+  }
+}
+
+.ready-node-glow {
+  animation: pulseGlow 2.6s infinite ease-in-out;
 }

@@ -22,12 +22,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['"IBM Plex Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-      },
-      transitionTimingFunction: {
-        out: 'cubic-bezier(0.22, 1, 0.36, 1)',
-      },
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      }
     },
   },
   plugins: [],

@@ -3,6 +3,7 @@ import {
   Network,
   BarChart3,
   Compass,
+  Calculator,
   Bot,
   GraduationCap,
   Sun,
@@ -10,9 +11,11 @@ import {
   Upload,
   Download,
   RotateCcw,
+  Award,
+  Sparkles,
   CheckCircle2,
-  CalendarRange,
-  NotebookPen,
+  Clock,
+  Flame,
 } from 'lucide-react';
 import {
   AcademicDatabase,
@@ -163,8 +166,8 @@ export function App() {
     });
     showToast(
       completed
-        ? `Đã lưu điểm hoàn thành môn ${code} (${baseCourse?.name_vi})`
-        : `Đã cập nhật trạng thái môn ${code}`
+        ? `✅ Đã lưu điểm hoàn thành môn ${code} (${baseCourse?.name_vi})!`
+        : `↩️ Đã chuyển trạng thái môn ${code}`
     );
   };
 
@@ -223,7 +226,7 @@ export function App() {
       },
     });
     if (!silent) {
-      showToast(`Đã lưu cập nhật học phần ${code}`);
+      showToast(`✅ Đã lưu cập nhật học phần ${code}!`);
     }
   };
 
@@ -276,7 +279,7 @@ export function App() {
       ...progress,
       semester5_timetable: nextTimetable,
     });
-    showToast('Đã lưu thời khóa biểu Kỳ 5');
+    showToast('📅 Đã lưu Thời khóa biểu Kỳ 5 thành công!');
   };
 
   const handleUpdateSemester5Tasks = (nextTasks: SemesterTaskItem[]) => {
@@ -315,7 +318,7 @@ export function App() {
       custom_memories: nextMemories,
     };
     syncProgressToServer(nextProgress);
-    showToast('Đã nạp ghi chú vào bộ nhớ cố vấn');
+    showToast('🧠 Đã nạp kiến thức mới vào Bộ nhớ Cố vấn AI!');
   };
 
   const handleDeleteCustomMemory = async (id: string) => {
@@ -325,7 +328,7 @@ export function App() {
       custom_memories: nextMemories,
     };
     syncProgressToServer(nextProgress);
-    showToast('Đã xóa ghi chú khỏi bộ nhớ');
+    showToast('🗑️ Đã xóa ghi chú khỏi bộ nhớ!');
   };
 
   const handleResetGroundTruth = async () => {
@@ -337,7 +340,7 @@ export function App() {
     } catch {
       // offline / standalone
     }
-    showToast('Đã khôi phục dữ liệu gốc chuẩn QĐ 3568');
+    showToast('🔄 Đã khôi phục dữ liệu gốc 23 môn + Lịch Kỳ 5 chuẩn!');
   };
 
   const handleExcelFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -354,9 +357,9 @@ export function App() {
       if (!res.ok) throw new Error('Import failed');
       const data = await res.json();
       setProgress(data.user_progress);
-      showToast(`Đã đồng bộ ${data.imported_courses_count} học phần từ Excel`);
+      showToast(`📥 Đã đồng bộ thành công ${data.imported_courses_count} môn học từ file Excel!`);
     } catch (err) {
-      showToast('Không đọc được tệp Excel');
+      showToast('⚠️ Lỗi khi đọc file Excel.');
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -400,18 +403,18 @@ export function App() {
     a.download = `Bao_Cao_Hoc_Tap_Pham_Ngoc_Huan_HUS_CIS.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Đã xuất tệp báo cáo học tập');
+    showToast('📄 Đã xuất file Báo cáo lộ trình học tập thành công!');
   };
 
   if (!db || !progress) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-sky-50 dark:bg-slate-950">
         <div className="text-center space-y-3">
-          <div className="w-10 h-10 rounded-lg bg-sky-600 text-white flex items-center justify-center mx-auto">
-            <GraduationCap className="w-5 h-5" strokeWidth={1.5} />
+          <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center mx-auto animate-bounce shadow-lg">
+            <GraduationCap className="w-7 h-7" />
           </div>
-          <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Đang tải dữ liệu học phần HUS CIS
+          <div className="text-base font-extrabold text-slate-800 dark:text-white">
+            Đang khởi tạo HUS CIS Academic Navigator & AI Advisor...
           </div>
         </div>
       </div>
@@ -422,81 +425,78 @@ export function App() {
     id: ActiveModule;
     label: string;
     icon: React.ElementType;
+    badge?: string;
   }> = [
     {
       id: 'skill_tree',
-      label: 'Cây môn học',
+      label: 'Cây Môn Học',
       icon: Network,
     },
     {
       id: 'current_semester',
-      label: 'Sổ tay Kỳ 5',
-      icon: NotebookPen,
+      label: 'Sổ Tay Kỳ 5 & NLP',
+      icon: Flame,
+      badge: '16 TC',
     },
     {
       id: 'simulator',
-      label: 'Lộ trình & CPA',
-      icon: CalendarRange,
+      label: 'Lộ Trình Kỳ 6-8 & CPA',
+      icon: Clock,
+      badge: '0-5 Sao',
     },
     {
       id: 'dashboard',
-      label: 'Bảng điểm',
+      label: 'Dashboard & Bảng Điểm',
       icon: BarChart3,
+      badge: `${overallMetrics.totalCompletedCredits}/129 TC`,
     },
     {
       id: 'career',
-      label: 'Định hướng',
+      label: 'Định Hướng Nghề Nghiệp',
       icon: Compass,
     },
     {
       id: 'ai_advisor',
-      label: 'Cố vấn AI',
+      label: 'Cố Vấn Học Tập AI',
       icon: Bot,
+      badge: 'Gemini AI',
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-sky-50/80 via-white to-sky-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-100">
       {toast && (
-        <div className="fixed bottom-14 right-6 z-50 px-3.5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 text-xs font-medium shadow-md border border-zinc-800/10 dark:border-zinc-200/20 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" strokeWidth={1.5} />
+        <div className="fixed bottom-14 right-6 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/95 dark:bg-sky-600 text-white text-xs font-bold shadow-xl border border-sky-400/40 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-sky-300 shrink-0" />
           <span>{toast}</span>
         </div>
       )}
 
-      {/* Quiet Academic Top Bar */}
-      <header className="sticky top-0 z-30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-b border-zinc-200/80 dark:border-zinc-800">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-auto min-h-[60px] py-2 flex flex-wrap items-center justify-between gap-3">
-          {/* Brand Wordmark + Monospace Student Meta */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center shrink-0">
-              <GraduationCap className="w-4 h-4" strokeWidth={1.75} />
+      {/* ULTRA-CLEAN COMPACT HEADER (Single Unified App Bar like Notion / Duolingo / Linear) */}
+      <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-sky-200/80 dark:border-slate-800 shadow-sm">
+        <div className="max-w-[1460px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+          {/* Left: Compact Brand + Student Identity */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-600 to-sky-400 text-white flex items-center justify-center shadow-sm">
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  HUS CIS Navigator
+                <span className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white">
+                  HUS CIS NAVIGATOR
                 </span>
-                <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
-                  7480113QTD
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
+                  Phạm Ngọc Huân
                 </span>
               </div>
-              <div className="text-xs text-zinc-500 dark:text-zinc-400 hidden sm:flex items-center gap-2 tabular-nums">
-                <span>Phạm Ngọc Huân</span>
-                <span aria-hidden="true">·</span>
-                <span>
-                  CPA <span className="font-mono font-medium text-zinc-900 dark:text-zinc-200">{overallMetrics.cpa4.toFixed(2)}</span>
-                </span>
-                <span aria-hidden="true">·</span>
-                <span className="font-mono">
-                  {overallMetrics.totalCompletedCredits}/129 TC
-                </span>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
+                KHMT & Thông tin (7480113QTD) • CPA: <strong className="text-sky-600">{overallMetrics.cpa4.toFixed(2)}</strong> ({overallMetrics.cpa10.toFixed(2)}) • Đã học: <strong className="text-emerald-600">{overallMetrics.totalCompletedCredits} TC</strong> • Kỳ 5: <strong className="text-amber-600">{overallMetrics.inProgressCredits} TC</strong>
               </div>
             </div>
           </div>
 
-          {/* Segmented Navigation */}
-          <nav className="flex items-center gap-0.5 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-lg border border-zinc-200/70 dark:border-zinc-800 overflow-x-auto">
+          {/* Center: Clean Segmented Module Switcher */}
+          <nav className="flex items-center gap-1 bg-sky-50/90 dark:bg-slate-800/90 p-1 rounded-2xl border border-sky-200/70 dark:border-slate-700 overflow-x-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -505,25 +505,31 @@ export function App() {
                   key={item.id}
                   type="button"
                   onClick={() => setActiveTab(item.id)}
-                  className={`h-8 px-3 rounded-md text-xs font-medium transition-colors duration-150 flex items-center gap-1.5 shrink-0 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 shrink-0 ${
                     isActive
-                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                      ? 'bg-sky-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
                   }`}
                 >
-                  <Icon
-                    className={`w-4 h-4 shrink-0 ${
-                      isActive ? 'text-sky-600 dark:text-sky-400' : 'text-zinc-500 dark:text-zinc-400'
-                    }`}
-                    strokeWidth={1.5}
-                  />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
+                  {item.badge && (
+                    <span
+                      className={`px-1.5 py-0.5 rounded-md text-[10px] font-extrabold ${
+                        isActive
+                          ? 'bg-white text-sky-700'
+                          : 'bg-sky-100 dark:bg-slate-700 text-sky-700 dark:text-sky-300'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Compact Utility Actions */}
+          {/* Right: Compact Action Icons */}
           <div className="flex items-center gap-1.5">
             <input
               ref={fileInputRef}
@@ -535,46 +541,46 @@ export function App() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="h-8 px-2.5 rounded-lg text-xs font-medium bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 flex items-center gap-1.5 transition-colors duration-150"
-              title="Nhập bảng điểm Excel"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-sky-50 dark:bg-slate-800 hover:bg-sky-100 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-slate-700 flex items-center gap-1"
+              title="Nhập file Excel bảng điểm"
             >
-              <Upload className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
+              <Upload className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Excel</span>
             </button>
 
             <button
               type="button"
               onClick={handleExportAcademicReport}
-              className="h-8 px-3 rounded-lg text-xs font-medium bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 flex items-center gap-1.5 transition-colors duration-150"
-              title="Xuất báo cáo tiến độ"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1 shadow-sm"
+              title="Xuất báo cáo tiến độ học tập"
             >
-              <Download className="w-4 h-4" strokeWidth={1.5} />
-              <span className="hidden md:inline">Xuất báo cáo</span>
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Báo cáo</span>
             </button>
 
             <button
               type="button"
               onClick={handleResetGroundTruth}
-              className="h-8 w-8 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center transition-colors duration-150"
+              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
               title="Khôi phục dữ liệu gốc"
             >
-              <RotateCcw className="w-4 h-4" strokeWidth={1.5} />
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
 
             <button
               type="button"
               onClick={() => setDarkMode((d) => !d)}
-              className="h-8 w-8 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center transition-colors duration-150"
+              className="p-1.5 rounded-xl bg-sky-100/80 dark:bg-slate-800 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-slate-700"
               title="Chuyển giao diện Sáng / Tối"
             >
-              {darkMode ? <Sun className="w-4 h-4" strokeWidth={1.5} /> : <Moon className="w-4 h-4" strokeWidth={1.5} />}
+              {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Content Container */}
-      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-5">
+      <main className="flex-1 max-w-[1460px] w-full mx-auto px-4 py-3.5">
         {activeTab === 'skill_tree' && (
           <SkillTreeGraph
             courses={mergedCourses}
@@ -666,15 +672,15 @@ export function App() {
         )}
       </main>
 
-      {/* Quiet Hairline Footer */}
-      <footer className="mt-auto bg-white dark:bg-zinc-900 border-t border-zinc-200/80 dark:border-zinc-800 py-3 px-4 sm:px-6">
-        <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <div className="font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
-            <GraduationCap className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" strokeWidth={1.5} />
+      {/* Compact Footer */}
+      <footer className="mt-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-sky-200/80 dark:border-slate-800 py-2.5 px-4">
+        <div className="max-w-[1460px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+          <div className="font-extrabold text-sky-700 dark:text-sky-400 flex items-center gap-2">
+            <GraduationCap className="w-4 h-4" />
             <span>Nhà sáng tạo: Phạm Ngọc Huân - HUS Computer & Information Science</span>
           </div>
-          <div>
-            Ngành Khoa học máy tính và thông tin (7480113QTD) · Quyết định 3568/QĐ-ĐHKHTN
+          <div className="text-slate-500 dark:text-slate-400 font-medium">
+            Ngành Khoa học máy tính và thông tin (7480113QTD) • Quyết định 3568/QĐ-ĐHKHTN
           </div>
         </div>
       </footer>

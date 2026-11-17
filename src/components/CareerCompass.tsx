@@ -10,12 +10,14 @@ import {
 } from 'recharts';
 import {
   Compass,
+  Sparkles,
   BrainCircuit,
   Database,
   Code2,
   ShieldAlert,
   Cpu,
   Calculator,
+  Award,
   BookCheck,
 } from 'lucide-react';
 import { Course, PLODefinition } from '../types/academic';
@@ -40,39 +42,39 @@ interface CareerCompassProps {
 export const INTEREST_OPTIONS = [
   {
     id: 'ai_nlp',
-    label: 'Trí tuệ nhân tạo, Học sâu và Xử lý ngôn ngữ tự nhiên (AI / NLP / CV)',
+    label: 'Trí tuệ nhân tạo, Học sâu & Xử lý ngôn ngữ tự nhiên (AI / NLP / Computer Vision)',
     icon: BrainCircuit,
-    short: 'Trí tuệ nhân tạo và NLP',
+    short: 'Trí tuệ nhân tạo & NLP',
   },
   {
     id: 'data_science',
-    label: 'Khoa học dữ liệu, Khai phá dữ liệu và Phân tích thống kê (Data Science)',
+    label: 'Khoa học dữ liệu, Khai phá dữ liệu & Phân tích thống kê nhiều chiều (Data Science)',
     icon: Database,
-    short: 'Khoa học dữ liệu và Thống kê',
+    short: 'Khoa học dữ liệu & Thống kê',
   },
   {
     id: 'applied_math',
-    label: 'Mô hình hóa Toán học, Giải tích số và Tối ưu hóa (Quant)',
+    label: 'Mô hình hóa Toán học, Giải tích số & Tối ưu hóa (Scientific Computing & Quant)',
     icon: Calculator,
-    short: 'Toán ứng dụng và Tối ưu hóa',
+    short: 'Nghiên cứu Toán ứng dụng & Quant',
   },
   {
     id: 'web_app',
-    label: 'Phát triển Web/Mobile Full-Stack và Kỹ nghệ phần mềm',
+    label: 'Phát triển Web/Mobile Full-Stack & Kỹ nghệ phần mềm (Software Engineering)',
     icon: Code2,
-    short: 'Phát triển Web/App và PTPM',
+    short: 'Phát triển Web/App & PTPM',
   },
   {
     id: 'cyber_security',
-    label: 'Mật mã học, An toàn dữ liệu và Quản trị Linux',
+    label: 'Mật mã học, An toàn dữ liệu & Bảo mật hệ thống Linux (Cybersecurity)',
     icon: ShieldAlert,
-    short: 'An toàn thông tin và Mật mã',
+    short: 'An toàn thông tin & Mật mã',
   },
   {
     id: 'embedded_iot',
-    label: 'Hệ thống nhúng, IoT và Tính toán hiệu năng cao',
+    label: 'Hệ thống nhúng, IoT & Tính toán song song hiệu năng cao (Embedded & HPC)',
     icon: Cpu,
-    short: 'Hệ thống nhúng và HPC',
+    short: 'Hệ thống nhúng, IoT & HPC',
   },
 ];
 
@@ -82,6 +84,7 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
   selectedInterests,
   onToggleInterest,
   ploDefinitions,
+  onToggleCourseCompleted,
 }) => {
   const [subTab, setSubTab] = useState<'radar_interests' | 'career_packages' | 'plo_reference'>(
     'radar_interests'
@@ -101,33 +104,31 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
     const tracks = [
       {
         id: 'ai_nlp_scientist',
-        title: 'Kỹ sư và Nghiên cứu viên AI, Học máy, NLP / Thị giác máy tính',
+        title: 'Chuyên gia Trí tuệ Nhân tạo, Học máy & NLP / Computer Vision (AI Engineer / Researcher)',
         interestKeys: ['ai_nlp', 'applied_math'],
         baseAcademicFit: Math.round(((math * 0.3 + prob * 0.3 + eng * 0.25 + algo * 0.15) / 10) * 100),
         ploCodes: ['PK2', 'PK6', 'PS2', 'PS3', 'PS5'],
         whyFit:
-          'Phát huy trọn vẹn điểm Giải tích 1, 2, 3 (8.7, 8.7, 10.0), Xác suất thống kê (8.8 A), Cơ sở dữ liệu (8.5 A) và Tiếng Anh chuyên ngành (8.0 B+) kết hợp hai môn Trí tuệ nhân tạo và Học máy đang học ở Kỳ 5.',
+          'Phát huy trọn vẹn điểm tuyệt đối Giải tích 1, 2, 3 (8.7, 8.7, 10.0), Xác suất thống kê (8.8 A), Cơ sở dữ liệu (8.5 A) và Tiếng Anh chuyên ngành (8.0 B+) kết hợp 2 môn Trí tuệ nhân tạo + Học máy đang học ở Kỳ 5.',
         electiveV21: ['MAT3519', 'MAT3558'],
         electiveV22: ['MAT3561E', 'MAT3562E', 'MAT3534', 'MAT3538'],
-        graduationRec:
-          'MAT4080 · Khóa luận tốt nghiệp (7 TC) về Xử lý ngôn ngữ tự nhiên hoặc Học máy thống kê',
+        graduationRec: 'MAT4080 - Khóa luận tốt nghiệp (7 TC) về Mô hình Ngôn ngữ / Thị giác máy tính hoặc Học máy thống kê',
       },
       {
         id: 'data_scientist',
-        title: 'Kỹ sư Khoa học Dữ liệu và Phân tích Định lượng (Data Science / Quant)',
+        title: 'Kỹ sư Khoa học Dữ liệu, Phân tích Định lượng & Khai phá Dữ liệu (Data Scientist / Quant Analyst)',
         interestKeys: ['data_science', 'applied_math'],
         baseAcademicFit: Math.round(((prob * 0.35 + data * 0.25 + math * 0.25 + eng * 0.15) / 10) * 100),
         ploCodes: ['PK2', 'PK3', 'PK6', 'PS2', 'PS3'],
         whyFit:
-          'Khớp với kết quả Xác suất thống kê (8.8 A), Cơ sở dữ liệu (8.5 A), Nhập môn phân tích dữ liệu (8.4 B+) và Phương trình vi phân (8.5 A). Ít phụ thuộc vào điểm OOP (5.4).',
+          'Khớp hoàn hảo với cặp điểm A ở Xác suất thống kê (8.8), Cơ sở dữ liệu (8.5), Nhập môn Phân tích dữ liệu (8.4 B+) và Phương trình vi phân (8.5 A). Ít bị phụ thuộc vào điểm trũng OOP (5.4).',
         electiveV21: ['MAT3519', 'MAT3558'],
         electiveV22: ['MAT3534', 'MAT3452', 'MAT3453', 'MAT3535'],
-        graduationRec:
-          'MAT4080 · Khóa luận tốt nghiệp (7 TC) về Khai phá dữ liệu lớn và Mô hình thống kê nhiều chiều',
+        graduationRec: 'MAT4080 - Khóa luận tốt nghiệp (7 TC) về Khai phá dữ liệu lớn & Mô hình thống kê nhiều chiều',
       },
       {
         id: 'crypto_security',
-        title: 'Chuyên gia Mật mã học, An toàn Dữ liệu và Hệ thống Linux',
+        title: 'Chuyên gia Mật mã học, An toàn Dữ liệu & Quản trị Hệ thống Linux (Security & Cryptography Specialist)',
         interestKeys: ['cyber_security', 'applied_math'],
         baseAcademicFit: Math.round(((data * 0.35 + math * 0.25 + algo * 0.25 + eng * 0.15) / 10) * 100),
         ploCodes: ['PK2', 'PK4', 'PS1', 'PS2'],
@@ -135,21 +136,19 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
           'Tận dụng điểm A môn Môi trường lập trình Linux (8.7), Toán rời rạc (7.0), Đại số tuyến tính (7.1) và Mạng máy tính đang học ở Kỳ 5.',
         electiveV21: ['MAT3519', 'MAT1208'],
         electiveV22: ['MAT3539', 'MAT3148', 'MAT3534', 'MAT2034'],
-        graduationRec:
-          'Học phần thay thế KLTN (MAT1203 + MAT3377) hoặc Khóa luận về Mật mã và An toàn dữ liệu',
+        graduationRec: 'Học phần thay thế KLTN (MAT1203 + MAT3377) hoặc KLTN về Mật mã & An toàn dữ liệu',
       },
       {
         id: 'fullstack_ai_swe',
-        title: 'Kỹ sư Phát triển Ứng dụng Web/Mobile Tích hợp AI',
+        title: 'Kỹ sư Phát triển Ứng dụng Web/Mobile Tích hợp AI (AI-Powered Full-Stack Software Engineer)',
         interestKeys: ['web_app', 'ai_nlp'],
         baseAcademicFit: Math.round(((data * 0.3 + swe * 0.3 + algo * 0.2 + eng * 0.2) / 10) * 100),
         ploCodes: ['PK3', 'PK5', 'PS1', 'PS3', 'PS4'],
         whyFit:
-          'Dựa trên nền Cơ sở dữ liệu (8.5 A). Nên học cải thiện môn Lập trình hướng đối tượng (MAT1202 · D+ 5.4) trước khi học Thực tập phát triển phần mềm và Công nghệ phần mềm.',
+          'Dựa trên nền Cơ sở dữ liệu (8.5 A) vững chắc. Khuyên bạn nên học cải thiện môn Lập trình hướng đối tượng (MAT1202 - hiện tại D+ 5.4) trước khi học Thực tập PTPM & Công nghệ phần mềm.',
         electiveV21: ['MAT3558', 'MAT3560'],
         electiveV22: ['MAT3542', 'MAT3561E', 'MAT3535', 'MAT3534'],
-        graduationRec:
-          'Học phần thay thế (MAT1203 · Phân tích TK HTTT 4 TC + MAT3377 · Chuyên đề AI 3 TC)',
+        graduationRec: 'Phương án học phần thay thế (MAT1203 - Phân tích TK HTTT 4 TC + MAT3377 - Chuyên đề AI 3 TC)',
       },
     ];
 
@@ -171,106 +170,102 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
   }, [courses]);
 
   return (
-    <div className="space-y-5">
-      {/* Quiet Segmented Navigation */}
-      <div className="inline-flex flex-wrap items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-lg border border-zinc-200/70 dark:border-zinc-800">
+    <div className="space-y-4">
+      {/* Sub-Navigation Pills */}
+      <div className="bg-white/95 dark:bg-slate-900/95 rounded-2xl p-2 border border-sky-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center gap-1.5">
         <button
           type="button"
           onClick={() => setSubTab('radar_interests')}
-          className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
             subTab === 'radar_interests'
-              ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Compass className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-          <span>Năng lực 6 trục và sở thích</span>
+          <Compass className="w-4 h-4" />
+          <span>1. Biểu Đồ Radar 6 Trục Năng Lực & Sở Thích</span>
         </button>
 
         <button
           type="button"
           onClick={() => setSubTab('career_packages')}
-          className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
             subTab === 'career_packages'
-              ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-800'
           }`}
         >
-          <BrainCircuit className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-          <span>Hướng chuyên ngành và gói tự chọn 16 TC</span>
+          <BrainCircuit className="w-4 h-4" />
+          <span>2. Đề Xuất Chuyên Ngành & Gói Tự Chọn 16 TC</span>
         </button>
 
         <button
           type="button"
           onClick={() => setSubTab('plo_reference')}
-          className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
             subTab === 'plo_reference'
-              ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-800'
           }`}
         >
-          <BookCheck className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-          <span>Chuẩn đầu ra QĐ 3568</span>
+          <BookCheck className="w-4 h-4" />
+          <span>3. Chuẩn Đầu Ra QĐ 3568 (PK1-PK6, PS1-PS6)</span>
         </button>
       </div>
 
       {subTab === 'radar_interests' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-5 bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between">
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
             <div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                Biểu đồ năng lực 6 trục
-              </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Tổng hợp từ điểm số thực tế các nhóm học phần
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <Compass className="w-5 h-5 text-sky-600" />
+                Biểu đồ Radar Năng lực 6 Trục
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tính toán tự động từ điểm thực tế của Phạm Ngọc Huân
               </p>
             </div>
 
-            <div className="h-[300px] w-full my-3">
+            <div className="h-[300px] w-full my-2">
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="72%" data={radarCompetencies}>
-                  <PolarGrid stroke="#e4e4e7" />
+                <RadarChart cx="50%" cy="50%" outerRadius="74%" data={radarCompetencies}>
+                  <PolarGrid stroke="#bae6fd" />
                   <PolarAngleAxis
                     dataKey="shortName"
-                    tick={{ fill: '#52525b', fontSize: 11, fontFamily: 'IBM Plex Sans' }}
+                    tick={{ fill: '#0369a1', fontSize: 11, fontWeight: 700 }}
                   />
-                  <PolarRadiusAxis
-                    angle={30}
-                    domain={[0, 10]}
-                    tick={{ fill: '#a1a1aa', fontSize: 10, fontFamily: 'IBM Plex Mono' }}
-                    axisLine={false}
-                  />
+                  <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fontSize: 10 }} />
                   <Radar
                     name="Điểm năng lực (/10)"
                     dataKey="score"
                     stroke="#0284c7"
-                    strokeWidth={2}
-                    fill="#0284c7"
-                    fillOpacity={0.14}
+                    strokeWidth={3}
+                    fill="#38bdf8"
+                    fillOpacity={0.45}
                   />
                   <Tooltip
-                    formatter={(value: number) => [`${value} / 10.0`, 'Năng lực']}
-                    contentStyle={{
-                      borderRadius: '8px',
-                      border: '1px solid #e4e4e7',
-                      fontSize: '12px',
-                    }}
+                    formatter={(value: number) => [`${value} / 10.0`, 'Điểm năng lực']}
+                    contentStyle={{ borderRadius: '12px', border: '1px solid #38bdf8' }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
-              <span className="font-medium text-zinc-900 dark:text-zinc-100">Thế mạnh nổi bật:</span>{' '}
-              Toán Giải tích (9.1), Ngoại ngữ (9.0) và Xác suất · Dữ liệu (8.6), phù hợp với định hướng AI, Học máy và Khoa học dữ liệu.
+            <div className="p-3 rounded-xl bg-sky-50/80 dark:bg-slate-800/80 border border-sky-200/70 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300">
+              💡 <strong>Nhận định Chuyên gia:</strong> Thế mạnh mũi nhọn của Huân là{' '}
+              <strong className="text-sky-700 dark:text-sky-300">
+                Toán Giải tích (9.1) — Ngoại ngữ (9.0) — Xác suất & Dữ liệu (8.6)
+              </strong>
+              , cực kỳ phù hợp với hướng <strong>AI / Machine Learning / Data Science</strong>.
             </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-5">
-            <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800">
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-                Chi tiết 6 trục năng lực học thuật
-              </h2>
+          <div className="lg:col-span-7 space-y-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                <Award className="w-5 h-5 text-sky-600" />
+                Chi tiết 6 Trục Năng lực Học thuật
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {radarCompetencies.map((item) => {
@@ -279,27 +274,34 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
                   return (
                     <div
                       key={item.id}
-                      className="p-3.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/30"
+                      className={`p-3 rounded-xl border transition-all ${
+                        isHigh
+                          ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/70'
+                          : isLow
+                          ? 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/70'
+                          : 'bg-sky-50/50 dark:bg-slate-800/60 border-sky-100 dark:border-slate-700'
+                      }`}
                     >
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className={`w-2 h-2 rounded-full shrink-0 ${
-                              isHigh ? 'bg-emerald-600' : isLow ? 'bg-amber-600' : 'bg-sky-600'
-                            }`}
-                          />
-                          <span className="font-medium text-xs text-zinc-900 dark:text-zinc-100 truncate">
-                            {item.subject}
-                          </span>
-                        </div>
-                        <span className="font-mono text-xs font-medium text-zinc-900 dark:text-zinc-100 tabular-nums shrink-0">
-                          {item.score.toFixed(1)}/10
+                        <span className="font-bold text-xs text-slate-900 dark:text-white">
+                          {item.subject}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-extrabold ${
+                            isHigh
+                              ? 'bg-emerald-600 text-white'
+                              : isLow
+                              ? 'bg-amber-500 text-white'
+                              : 'bg-sky-600 text-white'
+                          }`}
+                        >
+                          {item.score}/10
                         </span>
                       </div>
-                      <div className="text-[11px] font-medium text-zinc-600 dark:text-zinc-300 pl-4 mb-0.5">
-                        {item.badge}
+                      <div className="text-[11px] font-extrabold text-sky-700 dark:text-sky-400 mb-0.5">
+                        ★ {item.badge}
                       </div>
-                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pl-4 leading-snug">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
                         {item.evidence}
                       </p>
                     </div>
@@ -308,10 +310,13 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
               </div>
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800">
-              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
-                Sở thích nghề nghiệp (chọn để ưu tiên gói môn tự chọn)
-              </h2>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-sky-600" />
+                  Chọn Sở thích Nghề nghiệp (Click để lọc gói tự chọn)
+                </h3>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {INTEREST_OPTIONS.map((opt) => {
                   const Icon = opt.icon;
@@ -321,18 +326,13 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
                       key={opt.id}
                       type="button"
                       onClick={() => onToggleInterest(opt.id)}
-                      className={`h-10 px-3 rounded-lg border text-left text-xs font-medium flex items-center gap-2.5 transition-colors duration-150 ${
+                      className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-left text-xs font-bold transition-all ${
                         active
-                          ? 'bg-sky-600 text-white border-sky-600'
-                          : 'bg-zinc-50 dark:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-sky-400'
                       }`}
                     >
-                      <Icon
-                        className={`w-4 h-4 shrink-0 ${
-                          active ? 'text-white' : 'text-zinc-500 dark:text-zinc-400'
-                        }`}
-                        strokeWidth={1.5}
-                      />
+                      <Icon className="w-4 h-4 shrink-0" />
                       <span className="line-clamp-1">{opt.short}</span>
                     </button>
                   );
@@ -348,39 +348,40 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
           {careerTracks.map((track, idx) => (
             <div
               key={track.id}
-              className={`rounded-xl p-6 border bg-white dark:bg-zinc-900 ${
+              className={`rounded-2xl p-5 border-2 transition-all bg-white dark:bg-slate-900 shadow-sm ${
                 idx === 0
-                  ? 'border-sky-600/50 dark:border-sky-500/50'
-                  : 'border-zinc-200/80 dark:border-zinc-800'
+                  ? 'border-sky-500 dark:border-sky-400 ring-2 ring-sky-500/15'
+                  : 'border-slate-200 dark:border-slate-800'
               }`}
             >
-              <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
                   {idx === 0 && (
-                    <span className="inline-block text-[11px] font-medium text-sky-700 dark:text-sky-400 mb-1">
-                      Phù hợp nhất theo hồ sơ hiện tại
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-600 text-white mb-1.5">
+                      <Sparkles className="w-3 h-3" />
+                      ĐỀ XUẤT SỐ 1 CHO PHẠM NGỌC HUÂN
                     </span>
                   )}
-                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
+                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug">
                     {track.title}
-                  </h3>
+                  </h4>
                 </div>
-                <div className="text-right shrink-0 tabular-nums">
-                  <div className="text-2xl font-medium font-mono text-zinc-900 dark:text-zinc-100">
+                <div className="text-right shrink-0">
+                  <div className="text-2xl font-extrabold text-sky-600 dark:text-sky-400">
                     {track.matchScore}%
                   </div>
-                  <div className="text-[11px] text-zinc-500">Độ khớp</div>
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Độ khớp</div>
                 </div>
               </div>
 
-              <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/70 dark:border-zinc-800">
-                {track.whyFit}
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4 p-3 rounded-xl bg-sky-50/70 dark:bg-slate-800/70 border border-sky-100 dark:border-slate-700">
+                🎯 {track.whyFit}
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    Tự chọn Kỹ năng phần mềm V.2.1 (chọn 4/8 TC)
+                  <div className="text-xs font-extrabold text-slate-700 dark:text-slate-200 mb-1.5">
+                    1. Gói Tự chọn Kỹ năng Phần mềm V.2.1 (4/8 TC):
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {track.electiveV21.map((code) => {
@@ -389,21 +390,19 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
                       return (
                         <div
                           key={code}
-                          className="p-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between gap-2"
+                          className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/50 flex items-center justify-between gap-2"
                         >
-                          <div className="min-w-0">
-                            <div className="font-mono text-xs text-zinc-500 tabular-nums">
-                              {c.code} · {c.credits} TC
+                          <div>
+                            <div className="font-mono font-bold text-xs text-sky-700 dark:text-sky-400">
+                              {c.code} ({c.credits} TC)
                             </div>
-                            <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                            <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
                               {c.name_vi}
                             </div>
                           </div>
-                          {c.in_progress && (
-                            <span className="text-[11px] font-mono text-sky-600 dark:text-sky-400 shrink-0">
-                              K5
-                            </span>
-                          )}
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300">
+                            {c.in_progress ? 'Đang học K5' : 'Gợi ý'}
+                          </span>
                         </div>
                       );
                     })}
@@ -411,8 +410,8 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
                 </div>
 
                 <div>
-                  <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    Tự chọn chuyên sâu AI và PTPM V.2.2 (chọn 12/39 TC)
+                  <div className="text-xs font-extrabold text-slate-700 dark:text-slate-200 mb-1.5">
+                    2. Gói Tự chọn Chuyên sâu AI & PTPM V.2.2 (12/39 TC):
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {track.electiveV22.map((code) => {
@@ -421,13 +420,15 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
                       return (
                         <div
                           key={code}
-                          className="p-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/30"
+                          className="p-2.5 rounded-xl border border-sky-200/80 dark:border-slate-700 bg-sky-50/40 dark:bg-slate-800/50 flex items-center justify-between gap-2"
                         >
-                          <div className="font-mono text-xs text-zinc-500 tabular-nums">
-                            {c.code} · {c.credits} TC
-                          </div>
-                          <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                            {c.name_vi}
+                          <div>
+                            <div className="font-mono font-bold text-xs text-sky-700 dark:text-sky-400">
+                              {c.code} ({c.credits} TC)
+                            </div>
+                            <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
+                              {c.name_vi}
+                            </div>
                           </div>
                         </div>
                       );
@@ -441,20 +442,22 @@ export const CareerCompass: React.FC<CareerCompassProps> = ({
       )}
 
       {subTab === 'plo_reference' && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-            Chuẩn đầu ra chương trình đào tạo theo QĐ 3568
-          </h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm">
+          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white mb-3">
+            Bảng Tham chiếu Chuẩn Đầu Ra Chương trình Đào tạo (PK1-PK6 & PS1-PS6 theo QĐ 3568/QĐ-ĐHKHTN)
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
             {ploDefinitions.map((plo) => (
               <div
                 key={plo.code}
-                className="p-3 rounded-lg bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-800 flex items-start gap-2.5"
+                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800 flex items-start gap-2.5"
               >
-                <span className="px-2 py-0.5 rounded bg-zinc-200/80 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-mono font-medium text-[11px] shrink-0">
+                <span className="px-2 py-0.5 rounded bg-sky-600 text-white font-mono font-bold text-[11px] shrink-0">
                   {plo.code}
                 </span>
-                <span className="text-zinc-700 dark:text-zinc-300 leading-snug">{plo.title}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium leading-snug">
+                  {plo.title}
+                </span>
               </div>
             ))}
           </div>

@@ -9,13 +9,11 @@ import {
   Clock,
   ExternalLink,
   Link2,
-  MapPin,
   NotebookPen,
   Plus,
   Save,
   StickyNote,
   Trash2,
-  X,
 } from 'lucide-react';
 import {
   Course,
@@ -44,18 +42,18 @@ interface CurrentSemesterHubProps {
 }
 
 const PERIOD_TIMES: Record<number, string> = {
-  1: '07:00 - 07:50',
-  2: '07:55 - 08:45',
-  3: '08:50 - 09:40',
-  4: '09:50 - 10:40',
-  5: '10:45 - 11:35',
-  6: '11:40 - 12:30',
-  7: '13:00 - 13:50',
-  8: '13:55 - 14:45',
-  9: '14:50 - 15:40',
-  10: '15:50 - 16:40',
-  11: '16:45 - 17:35',
-  12: '17:40 - 18:30',
+  1: '7h00 - 7h50',
+  2: '7h55 - 8h45',
+  3: '8h50 - 9h40',
+  4: '9h50 - 10h40',
+  5: '10h45 - 11h35',
+  6: '11h40 - 12h30',
+  7: '13h00 - 13h50',
+  8: '13h55 - 14h45',
+  9: '14h50 - 15h40',
+  10: '15h50 - 16h40',
+  11: '16h45 - 17h35',
+  12: '17h40 - 18h30',
 };
 
 const DAYS_OF_WEEK = [
@@ -67,52 +65,45 @@ const DAYS_OF_WEEK = [
   { day: 7, label: 'Thứ Bảy' },
 ];
 
-// Restrained timetable block accents (clean surface tones, readable 4.5:1+ contrast)
 const COURSE_TIMETABLE_STYLES: Record<
   string,
-  { surface: string; border: string; accentBar: string; text: string; meta: string }
+  { bg: string; border: string; text: string; pill: string }
 > = {
   MAT1206E: {
-    surface: 'bg-sky-50/90 dark:bg-sky-950/40',
-    border: 'border-sky-200 dark:border-sky-800/60',
-    accentBar: 'bg-sky-600',
-    text: 'text-zinc-900 dark:text-zinc-100',
-    meta: 'text-sky-700 dark:text-sky-300',
+    bg: 'bg-gradient-to-br from-sky-500 to-sky-600',
+    border: 'border-sky-700',
+    text: 'text-white',
+    pill: 'bg-white/20 text-white',
   },
   MAT3519: {
-    surface: 'bg-zinc-100 dark:bg-zinc-800/70',
-    border: 'border-zinc-200 dark:border-zinc-700',
-    accentBar: 'bg-zinc-500',
-    text: 'text-zinc-900 dark:text-zinc-100',
-    meta: 'text-zinc-600 dark:text-zinc-400',
+    bg: 'bg-gradient-to-br from-cyan-100 to-sky-200 dark:from-cyan-950 dark:to-cyan-900',
+    border: 'border-cyan-400 dark:border-cyan-700',
+    text: 'text-cyan-950 dark:text-cyan-100',
+    pill: 'bg-cyan-600/15 text-cyan-900 dark:text-cyan-200',
   },
   MAT3533: {
-    surface: 'bg-indigo-50/80 dark:bg-indigo-950/40',
-    border: 'border-indigo-200 dark:border-indigo-800/60',
-    accentBar: 'bg-indigo-600',
-    text: 'text-zinc-900 dark:text-zinc-100',
-    meta: 'text-indigo-700 dark:text-indigo-300',
+    bg: 'bg-gradient-to-br from-pink-100 to-rose-200 dark:from-pink-950 dark:to-rose-900',
+    border: 'border-pink-400 dark:border-pink-700',
+    text: 'text-pink-950 dark:text-pink-100',
+    pill: 'bg-pink-600/15 text-pink-900 dark:text-pink-200',
   },
   THL1057: {
-    surface: 'bg-amber-50/80 dark:bg-amber-950/30',
-    border: 'border-amber-200 dark:border-amber-800/60',
-    accentBar: 'bg-amber-600',
-    text: 'text-zinc-900 dark:text-zinc-100',
-    meta: 'text-amber-800 dark:text-amber-300',
+    bg: 'bg-gradient-to-br from-orange-100 to-amber-200 dark:from-orange-950 dark:to-amber-900',
+    border: 'border-orange-400 dark:border-orange-700',
+    text: 'text-orange-950 dark:text-orange-100',
+    pill: 'bg-orange-600/15 text-orange-900 dark:text-orange-200',
   },
   MAT3506: {
-    surface: 'bg-emerald-50/80 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800/60',
-    accentBar: 'bg-emerald-600',
-    text: 'text-zinc-900 dark:text-zinc-100',
-    meta: 'text-emerald-700 dark:text-emerald-300',
+    bg: 'bg-gradient-to-br from-emerald-100 to-teal-200 dark:from-emerald-950 dark:to-teal-900',
+    border: 'border-emerald-400 dark:border-emerald-700',
+    text: 'text-emerald-950 dark:text-emerald-100',
+    pill: 'bg-emerald-600/15 text-emerald-900 dark:text-emerald-200',
   },
   MAT3505: {
-    surface: 'bg-teal-50/80 dark:bg-teal-950/30',
-    border: 'border-teal-200 dark:border-teal-800/60',
-    accentBar: 'bg-teal-600',
-    text: 'text-zinc-900 dark:text-zinc-100',
-    meta: 'text-teal-700 dark:text-teal-300',
+    bg: 'bg-gradient-to-br from-lime-500 to-emerald-600',
+    border: 'border-lime-700',
+    text: 'text-white',
+    pill: 'bg-white/25 text-white',
   },
 };
 
@@ -166,33 +157,40 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
   nlpResearch,
   onUpdateNlpResearch,
 }) => {
+  // Two clean top-level modes: Notebook (default) & Weekly Timetable
   const [viewMode, setViewMode] = useState<'notebook' | 'timetable'>('notebook');
 
   const inProgressCourses = courses.filter((c) => c.in_progress && !c.completed);
   const inProgressCredits = inProgressCourses.reduce((s, c) => s + c.credits, 0);
 
+  // Active selected page in the Notebook ('NCKH_NLP', course.code, or 'CHUNG')
   const [selectedKey, setSelectedKey] = useState<string>(
     inProgressCourses[0]?.code || 'NCKH_NLP'
   );
 
+  // Draft note states for smooth typing without lag
   const [noteDraft, setNoteDraft] = useState('');
   const [quickAttentionDraft, setQuickAttentionDraft] = useState('');
   const [scheduleDraft, setScheduleDraft] = useState('');
   const [editingSchedule, setEditingSchedule] = useState(false);
 
+  // NLP specific header drafts
   const [nlpTopicDraft, setNlpTopicDraft] = useState(nlpResearch.topic_title || '');
   const [nlpAdvisorDraft, setNlpAdvisorDraft] = useState(nlpResearch.advisor_name || '');
   const [nlpModelsDraft, setNlpModelsDraft] = useState(nlpResearch.datasets_and_models || '');
 
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'dirty'>('saved');
   const saveTimerRef = useRef<number | null>(null);
 
+  // Simple Add Link inputs
   const [linkTitleInput, setLinkTitleInput] = useState('');
   const [linkUrlInput, setLinkUrlInput] = useState('');
 
+  // Simple Add Todo inputs
   const [todoTitleInput, setTodoTitleInput] = useState('');
   const [todoDueInput, setTodoDueInput] = useState('');
 
+  // Simple Add Timetable session toggle
   const [showAddSession, setShowAddSession] = useState(false);
   const [newSessCourseCode, setNewSessCourseCode] = useState('MAT1206E');
   const [newSessClassCode, setNewSessClassCode] = useState('MAT1206E 3');
@@ -202,6 +200,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
   const [newSessEnd, setNewSessEnd] = useState(4);
   const [newSessRoom, setNewSessRoom] = useState('102T5');
 
+  // Sync drafts whenever selectedKey changes
   useEffect(() => {
     setEditingSchedule(false);
     setLinkTitleInput('');
@@ -305,6 +304,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
     }, 550);
   };
 
+  // --- LINKS HANDLERS ---
   const currentCourseState = selectedKey !== 'NCKH_NLP' ? coursesState[selectedKey] : undefined;
   const currentCourseMeta =
     selectedKey !== 'NCKH_NLP' && selectedKey !== 'CHUNG'
@@ -362,6 +362,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
     );
   };
 
+  // --- TODO CHECKLIST HANDLERS ---
   const pageTasks = tasks.filter((t) => t.course_code === selectedKey);
 
   const handleAddTodo = (e: React.FormEvent) => {
@@ -400,6 +401,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
     onUpdateNlpResearch({ ...nlpResearch, milestones: nextMilestones });
   };
 
+  // --- TIMETABLE HANDLERS ---
   const handleAddTimetableSession = (e: React.FormEvent) => {
     e.preventDefault();
     const newSession: TimetableSession = {
@@ -413,7 +415,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
       end_period: Math.max(newSessStart, newSessEnd),
       room: newSessRoom.trim() || 'T5',
       note: '',
-      color: '',
+      color: 'bg-sky-500 text-white border-sky-600',
     };
     onUpdateTimetable([...timetable, newSession]);
     setShowAddSession(false);
@@ -434,217 +436,241 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Page Header Bar */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl px-5 py-3.5 border border-zinc-200/80 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
+      {/* Compact Clean Top Bar */}
+      <div className="bg-white/95 dark:bg-slate-900/95 rounded-2xl px-4 py-3 border border-sky-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <NotebookPen className="w-5 h-5 text-sky-600 dark:text-sky-400 shrink-0" strokeWidth={1.5} />
+          <div className="p-2.5 rounded-xl bg-sky-600 text-white shadow-sm">
+            <NotebookPen className="w-5 h-5" />
+          </div>
           <div>
-            <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              Sổ tay Học kỳ 5 và NCKH NLP
-            </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 tabular-nums">
-              {inProgressCourses.length} học phần đang học · {inProgressCredits} tín chỉ · Tự động lưu theo môn
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-white">
+              Sổ Tay Học Kỳ 5 & NCKH NLP
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {inProgressCourses.length} môn đang học ({inProgressCredits} tín chỉ) • Tự động lưu mọi ghi chú & link tài liệu
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg border border-zinc-200/70 dark:border-zinc-700">
+        {/* Two Large, Clear Mode Switchers */}
+        <div className="flex items-center gap-1.5 bg-sky-50 dark:bg-slate-800 p-1 rounded-xl border border-sky-200 dark:border-slate-700">
           <button
             type="button"
             onClick={() => setViewMode('notebook')}
-            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+            className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
               viewMode === 'notebook'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
             }`}
           >
-            <BookOpen className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-            <span>Sổ ghi chú</span>
+            <BookOpen className="w-4 h-4" />
+            <span>Sổ Ghi Chú Từng Môn</span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewMode('timetable')}
-            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+            className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
               viewMode === 'timetable'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
             }`}
           >
-            <Calendar className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-            <span>Thời khóa biểu</span>
+            <Calendar className="w-4 h-4" />
+            <span>Thời Khóa Biểu Tuần</span>
           </button>
         </div>
       </div>
 
-      {/* Mode 1: Clean 2-Column Academic Notebook */}
+      {/* MODE 1: CLEAN 2-COLUMN NOTEBOOK */}
       {viewMode === 'notebook' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left Sidebar: Fixed-Rhythm Page List */}
-          <aside className="lg:col-span-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-3 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          {/* LEFT SIDEBAR: Easy-to-click Subject List */}
+          <aside className="lg:col-span-4 space-y-2.5">
             {/* Pinned: NCKH NLP */}
             {(() => {
               const { pendingTodos, linksCount } = getPageCounts('NCKH_NLP');
               const isSelected = selectedKey === 'NCKH_NLP';
               return (
-                <div>
-                  <div className="px-2 pb-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                    Nghiên cứu khoa học
+                <button
+                  type="button"
+                  onClick={() => handleSelectPage('NCKH_NLP')}
+                  className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start justify-between gap-2 ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-600 shadow-md'
+                      : 'bg-white dark:bg-slate-900 border-indigo-200 dark:border-indigo-900/60 hover:border-indigo-400 text-slate-900 dark:text-white'
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 font-extrabold text-sm">
+                      <BrainCircuit className="w-4 h-4 shrink-0" />
+                      <span className="truncate">NCKH NLP</span>
+                    </div>
+                    <p
+                      className={`text-xs mt-1 truncate ${
+                        isSelected ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'
+                      }`}
+                    >
+                      {nlpResearch.topic_title || 'Nghiên cứu Xử lý ngôn ngữ tự nhiên'}
+                    </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPage('NCKH_NLP')}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors duration-150 flex items-start justify-between gap-2 ${
-                      isSelected
-                        ? 'bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100'
-                        : 'bg-transparent border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300'
-                    }`}
-                  >
-                    <div className="flex items-start gap-2.5 min-w-0">
-                      <BrainCircuit
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${
-                          isSelected ? 'text-sky-600 dark:text-sky-400' : 'text-zinc-400'
+                  <div className="flex flex-col items-end gap-1 shrink-0 text-[10px] font-bold">
+                    {linksCount > 0 && (
+                      <span
+                        className={`px-2 py-0.5 rounded-full ${
+                          isSelected
+                            ? 'bg-white/20 text-white'
+                            : 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
                         }`}
-                        strokeWidth={1.5}
-                      />
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium leading-tight">NCKH NLP</div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">
-                          {nlpResearch.topic_title || 'SemEval-2027'}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 text-[11px] font-mono tabular-nums text-zinc-500 dark:text-zinc-400">
-                      {linksCount > 0 && <span>{linksCount} link</span>}
-                      {pendingTodos > 0 && (
-                        <span className="text-sky-700 dark:text-sky-400 font-medium">
-                          {pendingTodos} việc
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                </div>
+                      >
+                        🔗 {linksCount}
+                      </span>
+                    )}
+                    {pendingTodos > 0 && (
+                      <span
+                        className={`px-2 py-0.5 rounded-full ${
+                          isSelected
+                            ? 'bg-amber-300 text-slate-900'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        {pendingTodos} việc
+                      </span>
+                    )}
+                  </div>
+                </button>
               );
             })()}
 
-            {/* Semester 5 Courses List */}
-            <div>
-              <div className="px-2 pb-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
-                <span>Học phần Kỳ 5</span>
-                <span className="font-mono tabular-nums">{inProgressCourses.length} môn</span>
-              </div>
-              <div className="space-y-1">
-                {inProgressCourses.map((c) => {
-                  const st = coursesState[c.code];
-                  const { pendingTodos, linksCount } = getPageCounts(c.code);
-                  const isSelected = selectedKey === c.code;
-                  return (
-                    <button
-                      key={c.code}
-                      type="button"
-                      onClick={() => handleSelectPage(c.code)}
-                      className={`w-full text-left p-3 rounded-lg border transition-colors duration-150 flex items-start justify-between gap-2 ${
-                        isSelected
-                          ? 'bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100'
-                          : 'bg-transparent border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300'
-                      }`}
-                    >
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <span
-                          className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                            isSelected ? 'bg-sky-600' : 'bg-zinc-300 dark:bg-zinc-700'
-                          }`}
-                        />
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium leading-snug">{c.name_vi}</div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex flex-wrap items-center gap-1.5 tabular-nums">
-                            <span className="font-mono">{c.code}</span>
-                            <span>·</span>
-                            <span>{c.credits} TC</span>
-                            {st?.note && (
-                              <>
-                                <span>·</span>
-                                <span className="text-zinc-600 dark:text-zinc-300 truncate max-w-[140px]">
-                                  {st.note}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+            <div className="px-2 pt-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Các môn đang học Kỳ 5 ({inProgressCourses.length})
+            </div>
 
-                      <div className="flex flex-col items-end gap-0.5 shrink-0 text-[11px] font-mono tabular-nums text-zinc-500">
-                        {linksCount > 0 && <span>{linksCount} link</span>}
-                        {pendingTodos > 0 && (
-                          <span className="text-sky-700 dark:text-sky-400 font-medium">
-                            {pendingTodos} việc
+            {/* 6 Semester 5 Course Items */}
+            <div className="space-y-2">
+              {inProgressCourses.map((c) => {
+                const st = coursesState[c.code];
+                const { pendingTodos, linksCount } = getPageCounts(c.code);
+                const isSelected = selectedKey === c.code;
+                return (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onClick={() => handleSelectPage(c.code)}
+                    className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start justify-between gap-2 ${
+                      isSelected
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-md'
+                        : 'bg-white dark:bg-slate-900 border-sky-100 dark:border-slate-800 hover:border-sky-300 hover:bg-sky-50/40 dark:hover:bg-slate-800/70 text-slate-900 dark:text-white'
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-sm leading-snug">{c.name_vi}</div>
+                      <div
+                        className={`text-[11px] font-semibold mt-0.5 flex flex-wrap items-center gap-1.5 ${
+                          isSelected ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
+                        <span className="font-mono">{c.code}</span>
+                        <span>•</span>
+                        <span>{c.credits} TC</span>
+                        {st?.note && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                              isSelected
+                                ? 'bg-white/20 text-white'
+                                : 'bg-sky-100/80 dark:bg-slate-800 text-sky-700 dark:text-sky-300'
+                            }`}
+                          >
+                            {st.note}
                           </span>
                         )}
                       </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* General Semester Notes */}
-            <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
-              {(() => {
-                const { pendingTodos, linksCount } = getPageCounts('CHUNG');
-                const isSelected = selectedKey === 'CHUNG';
-                return (
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPage('CHUNG')}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors duration-150 flex items-start justify-between gap-2 ${
-                      isSelected
-                        ? 'bg-zinc-100 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100'
-                        : 'bg-transparent border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300'
-                    }`}
-                  >
-                    <div className="flex items-start gap-2.5 min-w-0">
-                      <StickyNote
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${
-                          isSelected ? 'text-sky-600 dark:text-sky-400' : 'text-zinc-400'
-                        }`}
-                        strokeWidth={1.5}
-                      />
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium leading-tight">Ghi chú chung Kỳ 5</div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-1">
-                          Link cổng đào tạo, nhóm lớp, lịch chung
-                        </div>
-                      </div>
                     </div>
-                    <div className="flex flex-col items-end gap-0.5 shrink-0 text-[11px] font-mono tabular-nums text-zinc-500">
-                      {linksCount > 0 && <span>{linksCount} link</span>}
+
+                    <div className="flex flex-col items-end gap-1 shrink-0 text-[10px] font-bold">
+                      {linksCount > 0 && (
+                        <span
+                          className={`px-2 py-0.5 rounded-full ${
+                            isSelected
+                              ? 'bg-white/20 text-white'
+                              : 'bg-sky-50 dark:bg-slate-800 text-sky-700 dark:text-sky-300'
+                          }`}
+                        >
+                          🔗 {linksCount}
+                        </span>
+                      )}
                       {pendingTodos > 0 && (
-                        <span className="text-sky-700 dark:text-sky-400 font-medium">
+                        <span
+                          className={`px-2 py-0.5 rounded-full ${
+                            isSelected
+                              ? 'bg-amber-300 text-slate-900'
+                              : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
+                          }`}
+                        >
                           {pendingTodos} việc
                         </span>
                       )}
                     </div>
                   </button>
                 );
-              })()}
+              })}
             </div>
+
+            {/* General Notes Item */}
+            {(() => {
+              const { pendingTodos, linksCount } = getPageCounts('CHUNG');
+              const isSelected = selectedKey === 'CHUNG';
+              return (
+                <button
+                  type="button"
+                  onClick={() => handleSelectPage('CHUNG')}
+                  className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-2 ${
+                    isSelected
+                      ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 shadow-md'
+                      : 'bg-slate-50/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-800 dark:text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <StickyNote className="w-4 h-4 shrink-0 text-amber-500" />
+                    <div className="min-w-0">
+                      <div className="font-extrabold text-sm">Ghi chú chung Kỳ 5</div>
+                      <div
+                        className={`text-[11px] truncate ${
+                          isSelected ? 'text-slate-300' : 'text-slate-500'
+                        }`}
+                      >
+                        Link nhóm lớp, cổng đào tạo, việc chung
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0 text-[10px] font-bold">
+                    {linksCount > 0 && <span className="px-2 py-0.5 rounded-full bg-white/15">🔗 {linksCount}</span>}
+                    {pendingTodos > 0 && (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-300 text-slate-900">
+                        {pendingTodos} việc
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })()}
           </aside>
 
-          {/* Right Main Notebook Sheet */}
-          <section className="lg:col-span-8 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-6 space-y-6">
-            {/* Sheet Header */}
+          {/* RIGHT MAIN PAGE: Focused, Clean Notebook Sheet */}
+          <section className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-sky-200 dark:border-slate-800 shadow-sm p-5 sm:p-6 space-y-6">
+            {/* A. NOTEBOOK PAGE HEADER */}
             {selectedKey === 'NCKH_NLP' ? (
-              <div className="space-y-4 pb-5 border-b border-zinc-200/80 dark:border-zinc-800">
-                <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">
-                  <span>NCKH</span>
-                  <span>·</span>
-                  <span>Ngôn ngữ tự nhiên</span>
+              <div className="space-y-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="px-2.5 py-1 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold flex items-center gap-1.5">
+                    <BrainCircuit className="w-3.5 h-3.5" />
+                    Sổ Tay Nghiên Cứu Khoa Học (NCKH NLP)
+                  </span>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400 block mb-1.5">
-                    Tên đề tài
+                  <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                    Tên đề tài đang làm:
                   </label>
                   <input
                     type="text"
@@ -672,15 +698,15 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                         nlpModelsDraft
                       )
                     }
-                    className="w-full text-lg font-semibold text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
-                    placeholder="Tên đề tài nghiên cứu"
+                    className="w-full text-lg font-extrabold text-slate-900 dark:text-white bg-slate-50/70 dark:bg-slate-800/70 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Nhập tên đề tài NCKH..."
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <label className="font-medium text-zinc-500 dark:text-zinc-400 block mb-1">
-                      Giảng viên hướng dẫn
+                    <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">
+                      Giảng viên hướng dẫn:
                     </label>
                     <input
                       type="text"
@@ -708,12 +734,12 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                           nlpModelsDraft
                         )
                       }
-                      className="w-full h-9 px-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 font-medium text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold"
                     />
                   </div>
                   <div>
-                    <label className="font-medium text-zinc-500 dark:text-zinc-400 block mb-1">
-                      Mô hình và tập dữ liệu
+                    <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">
+                      Mô hình / Dataset dùng:
                     </label>
                     <input
                       type="text"
@@ -741,53 +767,52 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                           nlpModelsDraft
                         )
                       }
-                      className="w-full h-9 px-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 font-medium text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold"
                     />
                   </div>
                 </div>
               </div>
             ) : selectedKey === 'CHUNG' ? (
-              <div className="pb-5 border-b border-zinc-200/80 dark:border-zinc-800">
-                <div className="text-xs font-mono text-zinc-500 dark:text-zinc-400 mb-1">
-                  K5 · Chung
-                </div>
-                <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-                  Ghi chú chung Học kỳ 5
-                </h2>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  Lưu liên kết cổng đào tạo, nhóm lớp học phần và nhắc nhở chung trong kỳ
+              <div className="pb-4 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>📌 Ghi chú chung Học kỳ 5</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Nơi lưu link Cổng đào tạo, link nhóm lớp, quy định điểm danh hoặc những nhắc nhở chung cho cả kỳ.
                 </p>
               </div>
             ) : (
-              <div className="space-y-4 pb-5 border-b border-zinc-200/80 dark:border-zinc-800">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400 tabular-nums">
-                    <span className="text-sky-700 dark:text-sky-400 font-medium">
-                      {currentCourseMeta?.code || selectedKey}
-                    </span>
-                    <span>·</span>
-                    <span>{currentCourseMeta?.credits || 3} tín chỉ</span>
-                    <span>·</span>
-                    <span>{currentCourseMeta?.type || 'Bắt buộc'}</span>
+              <div className="space-y-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-xs font-extrabold">
+                        {currentCourseMeta?.code || selectedKey}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold">
+                        {currentCourseMeta?.credits || 3} Tín chỉ • {currentCourseMeta?.type || 'Bắt buộc'}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+                      {currentCourseMeta?.name_vi || selectedKey}
+                    </h3>
                   </div>
-                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-1">
-                    {currentCourseMeta?.name_vi || selectedKey}
-                  </h2>
                 </div>
 
+                {/* Schedule & Quick Attention */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80">
-                    <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400 mb-1.5">
-                      <span className="flex items-center gap-1.5 font-medium">
-                        <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                        Lịch học và phòng
+                  <div className="p-2.5 rounded-xl bg-sky-50/70 dark:bg-slate-800/60 border border-sky-100 dark:border-slate-700">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-sky-700 dark:text-sky-300 mb-1">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        Lịch học & Phòng học:
                       </span>
                       <button
                         type="button"
                         onClick={() => setEditingSchedule((v) => !v)}
-                        className="text-sky-700 dark:text-sky-400 hover:underline font-medium"
+                        className="underline text-[10px] hover:text-sky-900"
                       >
-                        {editingSchedule ? 'Xong' : 'Chỉnh sửa'}
+                        {editingSchedule ? 'Xong' : 'Sửa'}
                       </button>
                     </div>
                     {editingSchedule ? (
@@ -800,19 +825,19 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                           scheduleAutoSave(noteDraft, quickAttentionDraft, val);
                         }}
                         onBlur={() => flushSave(selectedKey, noteDraft, quickAttentionDraft, scheduleDraft)}
-                        placeholder="Thứ 2 (Tiết 9-10, 101T5)"
-                        className="w-full h-8 px-2.5 rounded-md bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                        placeholder="VD: Thứ 2 (Tiết 9-10, 101T5)"
+                        className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-sky-300 text-xs font-semibold"
                       />
                     ) : (
-                      <div className="text-zinc-800 dark:text-zinc-200 font-medium tabular-nums">
-                        {scheduleDraft || 'Chưa cập nhật lịch học'}
+                      <div className="text-slate-700 dark:text-slate-200 font-semibold">
+                        {scheduleDraft || 'Chưa ghi lịch học (bấm Sửa để thêm)'}
                       </div>
                     )}
                   </div>
 
-                  <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80">
-                    <label className="text-zinc-500 dark:text-zinc-400 font-medium block mb-1.5">
-                      Chú ý ngắn
+                  <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/50">
+                    <label className="text-[11px] font-bold text-amber-800 dark:text-amber-300 block mb-1">
+                      ⚡ Chú ý ngắn (hiển thị ngoài danh sách):
                     </label>
                     <input
                       type="text"
@@ -823,31 +848,29 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                         scheduleAutoSave(noteDraft, val, scheduleDraft);
                       }}
                       onBlur={() => flushSave(selectedKey, noteDraft, quickAttentionDraft, scheduleDraft)}
-                      placeholder="Ghi chú ngắn gọn"
-                      className="w-full h-8 px-2.5 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                      placeholder="VD: Hơi khó, cố gắng học / Làm web thôi..."
+                      className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Section 1: Notebook Textarea */}
+            {/* B. SECTION 1: MAIN NOTEBOOK EDITOR */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Ghi chú và điều cần lưu ý
+                <label className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>📝 Ghi chú & Điều cần lưu ý</span>
                 </label>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                    {saveStatus === 'saving' ? (
-                      <span>Đang lưu</span>
-                    ) : (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" strokeWidth={1.75} />
-                        <span>Đã lưu</span>
-                      </>
-                    )}
-                  </span>
+                <div className="flex items-center gap-2">
+                  {saveStatus === 'saving' ? (
+                    <span className="text-[11px] font-bold text-amber-600">Đang lưu...</span>
+                  ) : (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      Đã tự động lưu
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() =>
@@ -861,9 +884,9 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                         nlpModelsDraft
                       )
                     }
-                    className="h-7 px-2.5 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-medium flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700 transition-colors duration-150"
+                    className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 text-xs font-bold flex items-center gap-1 border border-sky-200 dark:border-slate-700"
                   >
-                    <Save className="w-3.5 h-3.5 text-zinc-500" strokeWidth={1.5} />
+                    <Save className="w-3 h-3" />
                     <span>Lưu</span>
                   </button>
                 </div>
@@ -897,27 +920,28 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                 }
                 placeholder={
                   selectedKey === 'NCKH_NLP'
-                    ? 'Kết quả thực nghiệm, điểm số mô hình, trao đổi với giảng viên hướng dẫn và hướng phát triển'
-                    : 'Lưu ý từ giảng viên, nội dung trọng tâm thi giữa kỳ, cuối kỳ và tỷ lệ điểm thành phần'
+                    ? 'Ghi lại kết quả thực nghiệm, điểm số mô hình (VD: 0.87 task 1a), lời khuyên của cô Linh & anh An, hướng cải tiến tiếp theo...'
+                    : 'Ghi mọi điều quan trọng của môn này tại đây: thầy cô dặn gì, phần nào trọng tâm thi giữa kỳ/cuối kỳ, cách tính điểm thành phần...'
                 }
-                className="w-full p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/80 text-sm leading-relaxed text-zinc-800 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 resize-y"
+                className="w-full p-4 rounded-2xl bg-sky-50/40 dark:bg-slate-800/70 border border-sky-200 dark:border-slate-700 text-sm leading-relaxed text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-y"
               />
             </div>
 
-            {/* Section 2: Related Links */}
-            <div className="space-y-3 pt-4 border-t border-zinc-200/80 dark:border-zinc-800">
-              <div className="flex items-center gap-2">
-                <Link2 className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Liên kết tài liệu
-                </h3>
+            {/* C. SECTION 2: RELATED LINKS */}
+            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Link2 className="w-4 h-4 text-sky-600" />
+                  <span>Link tài liệu & Liên kết quan trọng</span>
+                </h4>
               </div>
 
-              <div className="space-y-1.5">
+              {/* Saved Links List */}
+              <div className="space-y-2">
                 {selectedKey === 'NCKH_NLP' ? (
                   (nlpResearch.paper_links || []).length === 0 ? (
-                    <p className="text-xs text-zinc-400 py-1">
-                      Chưa có liên kết tài liệu nào
+                    <p className="text-xs text-slate-400 italic py-1">
+                      Chưa có link nào. Hãy dán link Paper, GitHub, Overleaf, Drive ở ô bên dưới để lưu nhanh.
                     </p>
                   ) : (
                     (nlpResearch.paper_links || []).map((rawItem, idx) => {
@@ -925,26 +949,26 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                       return (
                         <div
                           key={idx}
-                          className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors duration-150"
+                          className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors"
                         >
                           {parsed.url ? (
                             <a
                               href={parsed.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2.5 min-w-0 flex-1 text-sky-700 dark:text-sky-400 hover:underline font-medium text-xs sm:text-sm"
+                              className="flex items-center gap-2.5 min-w-0 flex-1 text-sky-700 dark:text-sky-300 hover:underline font-bold text-xs sm:text-sm"
                             >
-                              <ExternalLink className="w-4 h-4 shrink-0 text-zinc-400" strokeWidth={1.5} />
+                              <ExternalLink className="w-4 h-4 shrink-0 text-sky-500" />
                               <span className="truncate">{parsed.title}</span>
                               {parsed.title !== parsed.url && (
-                                <span className="text-xs font-mono text-zinc-400 truncate hidden sm:inline">
-                                  {parsed.url}
+                                <span className="text-[11px] font-normal text-slate-400 truncate hidden sm:inline">
+                                  ({parsed.url})
                                 </span>
                               )}
                             </a>
                           ) : (
-                            <div className="flex items-center gap-2.5 min-w-0 flex-1 text-zinc-700 dark:text-zinc-200 font-medium text-xs sm:text-sm">
-                              <Link2 className="w-4 h-4 shrink-0 text-zinc-400" strokeWidth={1.5} />
+                            <div className="flex items-center gap-2.5 min-w-0 flex-1 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm">
+                              <Link2 className="w-4 h-4 shrink-0 text-slate-400" />
                               <span className="truncate">{parsed.title}</span>
                             </div>
                           )}
@@ -952,18 +976,18 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                           <button
                             type="button"
                             onClick={() => handleDeleteNlpLink(idx)}
-                            className="p-1.5 rounded-md text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors duration-150 shrink-0"
-                            title="Xóa liên kết"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors shrink-0"
+                            title="Xóa link này"
                           >
-                            <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       );
                     })
                   )
                 ) : (currentCourseState?.links || []).length === 0 ? (
-                  <p className="text-xs text-zinc-400 py-1">
-                    Chưa có liên kết tài liệu nào cho học phần này
+                  <p className="text-xs text-slate-400 italic py-1">
+                    Chưa có link nào cho môn này (Slide bài giảng, Google Drive, Classroom, GitHub...). Thêm ngay bên dưới!
                   </p>
                 ) : (
                   (currentCourseState?.links || []).map((lk) => {
@@ -971,26 +995,26 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                     return (
                       <div
                         key={lk.id}
-                        className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors duration-150"
+                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors"
                       >
                         {hasHref ? (
                           <a
                             href={lk.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2.5 min-w-0 flex-1 text-sky-700 dark:text-sky-400 hover:underline font-medium text-xs sm:text-sm"
+                            className="flex items-center gap-2.5 min-w-0 flex-1 text-sky-700 dark:text-sky-300 hover:underline font-bold text-xs sm:text-sm"
                           >
-                            <ExternalLink className="w-4 h-4 shrink-0 text-zinc-400" strokeWidth={1.5} />
+                            <ExternalLink className="w-4 h-4 shrink-0 text-sky-500" />
                             <span className="truncate">{lk.title}</span>
                             {lk.title !== lk.url && (
-                              <span className="text-xs font-mono text-zinc-400 truncate hidden sm:inline">
-                                {lk.url}
+                              <span className="text-[11px] font-normal text-slate-400 truncate hidden sm:inline">
+                                ({lk.url})
                               </span>
                             )}
                           </a>
                         ) : (
-                          <div className="flex items-center gap-2.5 min-w-0 flex-1 text-zinc-700 dark:text-zinc-200 font-medium text-xs sm:text-sm">
-                            <Link2 className="w-4 h-4 shrink-0 text-zinc-400" strokeWidth={1.5} />
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm">
+                            <Link2 className="w-4 h-4 shrink-0 text-slate-400" />
                             <span className="truncate">{lk.title}</span>
                           </div>
                         )}
@@ -998,10 +1022,10 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                         <button
                           type="button"
                           onClick={() => handleDeleteCourseLink(lk.id)}
-                          className="p-1.5 rounded-md text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors duration-150 shrink-0"
-                          title="Xóa liên kết"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors shrink-0"
+                          title="Xóa link này"
                         >
-                          <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     );
@@ -1009,90 +1033,81 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                 )}
               </div>
 
+              {/* Super Simple 1-Row Add Link Bar */}
               <form onSubmit={handleAddLink} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
                 <input
                   type="text"
                   value={linkTitleInput}
                   onChange={(e) => setLinkTitleInput(e.target.value)}
-                  placeholder="Tên tài liệu (Slide, Drive, Paper)"
-                  className="sm:col-span-5 h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                  placeholder="Tên link (VD: Slide, Drive, GitHub...)"
+                  className="sm:col-span-5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
                 <input
                   type="text"
                   value={linkUrlInput}
                   onChange={(e) => setLinkUrlInput(e.target.value)}
-                  placeholder="Đường dẫn URL (https://...)"
-                  className="sm:col-span-5 h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs font-mono text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                  placeholder="Dán đường dẫn URL (https://...)"
+                  className="sm:col-span-5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
                 <button
                   type="submit"
-                  className="sm:col-span-2 h-9 px-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors duration-150"
+                  className="sm:col-span-2 py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold flex items-center justify-center gap-1 shadow-sm"
                 >
-                  <Plus className="w-4 h-4" strokeWidth={1.5} />
-                  <span>Lưu link</span>
+                  <Plus className="w-4 h-4" />
+                  <span>Lưu Link</span>
                 </button>
               </form>
             </div>
 
-            {/* Section 3: Todo / Exam Checklist */}
-            <div className="space-y-3 pt-4 border-t border-zinc-200/80 dark:border-zinc-800">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    Việc cần làm và lịch kiểm tra
-                  </h3>
-                </div>
+            {/* D. SECTION 3: SIMPLE TODO / DEADLINE CHECKLIST FOR THIS SUBJECT */}
+            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Việc cần làm / Lịch kiểm tra</span>
                 {pageTasks.length > 0 && (
-                  <span className="text-xs font-mono tabular-nums text-zinc-500">
-                    {pageTasks.filter((t) => !t.completed).length} chưa xong
+                  <span className="text-xs font-bold text-slate-400">
+                    ({pageTasks.filter((t) => !t.completed).length} chưa xong)
                   </span>
                 )}
-              </div>
+              </h4>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {pageTasks.length === 0 ? (
-                  <p className="text-xs text-zinc-400 py-1">
-                    Chưa có công việc nào
+                  <p className="text-xs text-slate-400 italic py-1">
+                    Chưa có việc cần làm nào cho mục này.
                   </p>
                 ) : (
                   pageTasks.map((t) => (
                     <div
                       key={t.id}
-                      className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border transition-colors duration-150 ${
+                      className={`flex items-center justify-between gap-3 p-3 rounded-xl border transition-all ${
                         t.completed
-                          ? 'bg-zinc-50/50 dark:bg-zinc-800/30 border-zinc-200/60 dark:border-zinc-800/60 opacity-60'
-                          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
+                          ? 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-800 opacity-65'
+                          : 'bg-white dark:bg-slate-800 border-sky-100 dark:border-slate-700 hover:border-sky-300'
                       }`}
                     >
                       <button
                         type="button"
                         onClick={() => handleToggleTodo(t.id)}
-                        className="flex items-start gap-2.5 flex-1 text-left min-w-0"
+                        className="flex items-start gap-3 flex-1 text-left min-w-0"
                       >
                         {t.completed ? (
-                          <CheckCircle2
-                            className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5"
-                            strokeWidth={1.5}
-                          />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                         ) : (
-                          <Circle
-                            className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5"
-                            strokeWidth={1.5}
-                          />
+                          <Circle className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" />
                         )}
                         <div className="min-w-0 flex-1">
                           <div
-                            className={`text-xs sm:text-sm font-medium ${
+                            className={`text-xs sm:text-sm font-bold ${
                               t.completed
-                                ? 'line-through text-zinc-400'
-                                : 'text-zinc-800 dark:text-zinc-100'
+                                ? 'line-through text-slate-400'
+                                : 'text-slate-800 dark:text-slate-100'
                             }`}
                           >
                             {t.title}
                           </div>
                           {t.details && (
-                            <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                               {t.details}
                             </div>
                           )}
@@ -1101,17 +1116,17 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
 
                       <div className="flex items-center gap-2 shrink-0">
                         {t.due_date && (
-                          <span className="text-xs font-mono tabular-nums text-zinc-500 dark:text-zinc-400">
+                          <span className="px-2 py-0.5 rounded-md bg-sky-50 dark:bg-slate-700 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
                             {t.due_date}
                           </span>
                         )}
                         <button
                           type="button"
                           onClick={() => handleDeleteTodo(t.id)}
-                          className="p-1.5 rounded-md text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors duration-150"
-                          title="Xóa công việc"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                          title="Xóa việc này"
                         >
-                          <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -1119,38 +1134,41 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                 )}
               </div>
 
+              {/* Super Simple 1-Row Add Todo Bar */}
               <form onSubmit={handleAddTodo} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
                 <input
                   type="text"
                   value={todoTitleInput}
                   onChange={(e) => setTodoTitleInput(e.target.value)}
-                  placeholder="Thêm việc cần làm hoặc lịch thi"
-                  className="sm:col-span-7 h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                  placeholder="Gõ việc cần làm / hạn nộp bài / lịch thi..."
+                  className="sm:col-span-7 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
                 <input
                   type="text"
                   value={todoDueInput}
                   onChange={(e) => setTodoDueInput(e.target.value)}
-                  placeholder="Hạn (25/11)"
-                  className="sm:col-span-3 h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs font-mono tabular-nums text-zinc-900 dark:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30"
+                  placeholder="Ngày / Hạn (VD: 25/11)"
+                  className="sm:col-span-3 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
                 <button
                   type="submit"
-                  className="sm:col-span-2 h-9 px-3 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors duration-150"
+                  className="sm:col-span-2 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center justify-center gap-1 shadow-sm"
                 >
-                  <Plus className="w-4 h-4" strokeWidth={1.5} />
+                  <Plus className="w-4 h-4" />
                   <span>Thêm</span>
                 </button>
               </form>
             </div>
 
-            {/* Section 4: NCKH Milestones (only on NCKH_NLP) */}
+            {/* E. CLEAN COMPACT MILESTONES STRIP (Only on NCKH NLP page) */}
             {selectedKey === 'NCKH_NLP' && (nlpResearch.milestones || []).length > 0 && (
-              <div className="space-y-3 pt-4 border-t border-zinc-200/80 dark:border-zinc-800">
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                  Tiến độ 4 giai đoạn NCKH
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                    🗺️ Tiến độ 4 Giai đoạn NCKH (Bấm để đổi trạng thái)
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(nlpResearch.milestones || []).map((m) => {
                     const isDone = m.status === 'completed';
                     const isProg = m.status === 'in_progress';
@@ -1159,26 +1177,32 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                         key={m.id}
                         type="button"
                         onClick={() => handleCycleMilestone(m.id)}
-                        className="text-left p-3 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors duration-150 flex items-start justify-between gap-2"
+                        className={`text-left p-3 rounded-xl border transition-all flex items-start justify-between gap-2 ${
+                          isDone
+                            ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900'
+                            : isProg
+                            ? 'bg-amber-50/70 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900'
+                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
+                        }`}
                       >
                         <div className="min-w-0">
-                          <div className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                          <div className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400">
                             {m.phase}
                           </div>
-                          <div className="text-xs font-medium text-zinc-800 dark:text-zinc-200 mt-1 line-clamp-2">
+                          <div className="text-xs font-bold text-slate-800 dark:text-slate-100 mt-0.5 line-clamp-2">
                             {m.title}
                           </div>
                         </div>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[11px] font-medium shrink-0 ${
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
                             isDone
-                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+                              ? 'bg-emerald-600 text-white'
                               : isProg
-                              ? 'bg-sky-500/15 text-sky-700 dark:text-sky-400'
-                              : 'bg-zinc-200/70 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
+                              ? 'bg-amber-500 text-white'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                           }`}
                         >
-                          {isDone ? 'Xong' : isProg ? 'Đang làm' : 'Sắp tới'}
+                          {isDone ? 'Xong' : isProg ? 'Đang làm' : 'Chưa tới'}
                         </span>
                       </button>
                     );
@@ -1190,24 +1214,25 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
         </div>
       )}
 
-      {/* Mode 2: Clean Timetable Matrix */}
+      {/* MODE 2: CLEAN WEEKLY TIMETABLE */}
       {viewMode === 'timetable' && (
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                Thời khóa biểu Học kỳ 5
-              </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Nhấp vào ô môn học để mở trang sổ ghi chú tương ứng
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-sky-600" />
+                Thời Khóa Biểu Kỳ 5 (Bấm vào môn học để mở nhanh Sổ Note)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Hiển thị trực quan lịch học từ Tiết 1 đến Tiết 12 kèm phòng học
               </p>
             </div>
             <button
               type="button"
               onClick={() => setShowAddSession((v) => !v)}
-              className="h-9 px-3 rounded-lg text-xs font-medium bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 transition-colors duration-150"
+              className="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-sm"
             >
-              <Plus className="w-4 h-4" strokeWidth={1.5} />
+              <Plus className="w-4 h-4" />
               <span>Thêm ca học</span>
             </button>
           </div>
@@ -1215,33 +1240,33 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
           {showAddSession && (
             <form
               onSubmit={handleAddTimetableSession}
-              className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 grid grid-cols-2 sm:grid-cols-7 gap-2.5 text-xs"
+              className="p-4 rounded-xl bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-700 grid grid-cols-2 sm:grid-cols-7 gap-2.5 text-xs"
             >
               <input
                 type="text"
                 value={newSessCourseCode}
                 onChange={(e) => setNewSessCourseCode(e.target.value)}
                 placeholder="Mã môn (MAT3533)"
-                className="h-9 px-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 font-mono"
+                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700 font-bold"
               />
               <input
                 type="text"
                 value={newSessClassCode}
                 onChange={(e) => setNewSessClassCode(e.target.value)}
                 placeholder="Mã lớp"
-                className="h-9 px-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 font-mono"
+                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700"
               />
               <input
                 type="text"
                 value={newSessName}
                 onChange={(e) => setNewSessName(e.target.value)}
                 placeholder="Tên môn"
-                className="h-9 px-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700 font-bold"
               />
               <select
                 value={newSessDay}
                 onChange={(e) => setNewSessDay(Number(e.target.value))}
-                className="h-9 px-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700 font-bold"
               >
                 {DAYS_OF_WEEK.map((d) => (
                   <option key={d.day} value={d.day}>
@@ -1256,7 +1281,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                   max={12}
                   value={newSessStart}
                   onChange={(e) => setNewSessStart(Number(e.target.value))}
-                  className="w-full h-9 px-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-center font-mono tabular-nums"
+                  className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 text-center font-bold"
                 />
                 <span>-</span>
                 <input
@@ -1265,7 +1290,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                   max={12}
                   value={newSessEnd}
                   onChange={(e) => setNewSessEnd(Number(e.target.value))}
-                  className="w-full h-9 px-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-center font-mono tabular-nums"
+                  className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 text-center font-bold"
                 />
               </div>
               <input
@@ -1273,31 +1298,31 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                 value={newSessRoom}
                 onChange={(e) => setNewSessRoom(e.target.value)}
                 placeholder="Phòng (102T5)"
-                className="h-9 px-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 font-mono"
+                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700"
               />
               <button
                 type="submit"
-                className="h-9 px-3 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium"
+                className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold"
               >
                 Lưu ca
               </button>
             </form>
           )}
 
-          <div className="overflow-x-auto rounded-xl border border-zinc-200/80 dark:border-zinc-800">
-            <table className="w-full min-w-[920px] table-fixed border-collapse text-xs tabular-nums">
+          <div className="overflow-x-auto rounded-xl border border-sky-200 dark:border-slate-700">
+            <table className="w-full min-w-[920px] table-fixed border-collapse text-xs">
               <thead>
-                <tr className="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800">
-                  <th className="w-[56px] py-2.5 px-2 border-r border-zinc-200/70 dark:border-zinc-800 text-center font-medium">
+                <tr className="bg-gradient-to-r from-sky-600 to-sky-500 text-white">
+                  <th className="w-[56px] py-2.5 px-2 border border-sky-500/40 text-center font-extrabold">
                     Tiết
                   </th>
-                  <th className="w-[116px] py-2.5 px-2 border-r border-zinc-200/70 dark:border-zinc-800 text-center font-medium">
+                  <th className="w-[112px] py-2.5 px-2 border border-sky-500/40 text-center font-extrabold">
                     Thời gian
                   </th>
                   {DAYS_OF_WEEK.map((d) => (
                     <th
                       key={d.day}
-                      className="py-2.5 px-2 border-r last:border-r-0 border-zinc-200/70 dark:border-zinc-800 text-center font-medium"
+                      className="py-2.5 px-2 border border-sky-500/40 text-center font-extrabold"
                     >
                       {d.label}
                     </th>
@@ -1320,27 +1345,27 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                   return (
                     <React.Fragment key={period}>
                       {period === 7 && (
-                        <tr className="bg-zinc-100/80 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400">
-                          <td className="py-2 px-2 border-y border-r border-zinc-200/70 dark:border-zinc-800 text-center font-medium">
+                        <tr className="bg-sky-100/80 dark:bg-slate-800 text-sky-900 dark:text-sky-200 font-extrabold">
+                          <td className="py-1.5 px-2 border border-sky-200 dark:border-slate-700 text-center">
                             Trưa
                           </td>
-                          <td className="py-2 px-2 border-y border-r border-zinc-200/70 dark:border-zinc-800 text-center font-mono">
-                            12:30 - 13:00
+                          <td className="py-1.5 px-2 border border-sky-200 dark:border-slate-700 text-center">
+                            12h30 - 13h00
                           </td>
                           <td
                             colSpan={6}
-                            className="py-2 px-3 border-y border-zinc-200/70 dark:border-zinc-800 text-center text-xs"
+                            className="py-1.5 px-3 border border-sky-200 dark:border-slate-700 text-center tracking-wider uppercase text-[11px]"
                           >
                             Nghỉ trưa
                           </td>
                         </tr>
                       )}
 
-                      <tr className="h-[52px]">
-                        <td className="border-b border-r border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 text-center font-mono font-medium text-zinc-600 dark:text-zinc-400">
+                      <tr className="h-[54px]">
+                        <td className="border border-slate-200 dark:border-slate-800 bg-sky-50/70 dark:bg-slate-800/80 text-center font-extrabold text-slate-700 dark:text-slate-200">
                           {period}
                         </td>
-                        <td className="border-b border-r border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/60 text-center font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <td className="border border-slate-200 dark:border-slate-800 bg-sky-50/40 dark:bg-slate-800/50 text-center font-semibold text-[11px] text-slate-600 dark:text-slate-300">
                           {PERIOD_TIMES[period]}
                         </td>
 
@@ -1351,65 +1376,60 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                             return (
                               <td
                                 key={d.day}
-                                className="border-b border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-950/30"
+                                className="border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900"
                               />
                             );
                           }
 
                           const span = Math.max(1, sess.end_period - sess.start_period + 1);
                           const palette = COURSE_TIMETABLE_STYLES[sess.course_code] || {
-                            surface: 'bg-sky-50 dark:bg-sky-950/40',
-                            border: 'border-sky-200 dark:border-sky-800/60',
-                            accentBar: 'bg-sky-600',
-                            text: 'text-zinc-900 dark:text-zinc-100',
-                            meta: 'text-sky-700 dark:text-sky-300',
+                            bg: 'bg-sky-500',
+                            border: 'border-sky-600',
+                            text: 'text-white',
+                            pill: 'bg-white/20 text-white',
                           };
 
                           return (
                             <td
                               key={d.day}
                               rowSpan={span}
-                              className="p-1 border-b border-r last:border-r-0 border-zinc-200/70 dark:border-zinc-800 align-stretch"
+                              className="p-1 border border-slate-200 dark:border-slate-800 align-stretch"
                             >
                               <div
                                 onClick={() => {
                                   setSelectedKey(sess.course_code);
                                   setViewMode('notebook');
                                 }}
-                                title="Mở sổ ghi chú môn học này"
-                                className={`h-full w-full rounded-lg p-2.5 border ${palette.surface} ${palette.border} ${palette.text} flex flex-col justify-between relative group cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors duration-150 overflow-hidden`}
+                                title="Bấm để mở Sổ ghi chú môn này"
+                                className={`h-full w-full rounded-xl p-2 border ${palette.bg} ${palette.border} ${palette.text} shadow-sm flex flex-col justify-between relative group cursor-pointer hover:brightness-95 transition-all`}
                               >
-                                <div
-                                  className={`absolute left-0 top-0 bottom-0 w-1 ${palette.accentBar}`}
-                                />
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRemoveTimetableSession(sess.id);
                                   }}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 absolute top-1.5 right-1.5 w-5 h-5 rounded-md bg-zinc-900/10 hover:bg-rose-600 hover:text-white text-zinc-600 dark:text-zinc-300 flex items-center justify-center"
-                                  title="Xóa ca học"
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-1 right-1 w-5 h-5 rounded-full bg-black/25 hover:bg-rose-600 text-white flex items-center justify-center text-[10px]"
+                                  title="Xóa ca học này"
                                 >
-                                  <X className="w-3 h-3" strokeWidth={1.75} />
+                                  ×
                                 </button>
 
-                                <div className="pl-1.5">
-                                  <div className="font-medium text-xs leading-snug break-words pr-4">
+                                <div>
+                                  <div className="font-extrabold text-xs leading-snug break-words pr-4">
                                     {sess.course_name}
                                   </div>
-                                  <div className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                  <div className="text-[10px] font-mono font-bold opacity-90 mt-0.5">
                                     {sess.class_code}
                                   </div>
                                 </div>
 
-                                <div className="pl-1.5 flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-zinc-900/10 dark:border-white/10 text-[11px] font-mono">
-                                  <span className={`inline-flex items-center gap-1 font-medium ${palette.meta}`}>
-                                    <MapPin className="w-3 h-3 shrink-0" strokeWidth={1.5} />
-                                    <span>{sess.room}</span>
+                                <div className="flex flex-wrap items-center justify-between gap-1 mt-1.5 pt-1 border-t border-current/15 text-[10px] font-bold">
+                                  <span className={`px-1.5 py-0.5 rounded ${palette.pill}`}>
+                                    📍 {sess.room}
                                   </span>
-                                  <span className="text-zinc-500 dark:text-zinc-400">
-                                    T{sess.start_period}-{sess.end_period}
+                                  <span>
+                                    Tiết {sess.start_period}-{sess.end_period}
                                   </span>
                                 </div>
                               </div>

@@ -5,14 +5,17 @@ import {
   AlertTriangle,
   CheckCircle2,
   Calendar,
+  Sparkles,
   Clock,
   BookOpen,
   Plus,
   CheckSquare,
   Star,
+  Layers,
+  Filter,
+  Info,
   MapPin,
-  Lock,
-  X,
+  GraduationCap,
 } from 'lucide-react';
 import { Course, CourseUserState, TimetableSession } from '../types/academic';
 import { letterToGrade, score10ToGrade } from '../utils/academicMath';
@@ -55,69 +58,84 @@ const DAYS_OF_WEEK = [
   { day: 7, label: 'Thứ Bảy', short: 'T7' },
 ];
 
+// Clean, high-contrast color themes per course for the timetable
 const COURSE_TIMETABLE_STYLES: Record<
   string,
-  { surface: string; border: string; accentBar: string; titleText: string; metaText: string }
+  { bg: string; border: string; titleText: string; subText: string; badgeBg: string }
 > = {
   MAT1206E: {
-    surface: 'bg-sky-50/90 dark:bg-sky-950/40',
-    border: 'border-sky-200 dark:border-sky-800/60',
-    accentBar: 'bg-sky-600',
-    titleText: 'text-zinc-900 dark:text-zinc-100',
-    metaText: 'text-sky-700 dark:text-sky-300',
+    bg: 'bg-sky-500 dark:bg-sky-600',
+    border: 'border-sky-600 dark:border-sky-400',
+    titleText: 'text-white',
+    subText: 'text-sky-100',
+    badgeBg: 'bg-white/20 text-white',
   },
   MAT3519: {
-    surface: 'bg-zinc-100 dark:bg-zinc-800/70',
-    border: 'border-zinc-200 dark:border-zinc-700',
-    accentBar: 'bg-zinc-500',
-    titleText: 'text-zinc-900 dark:text-zinc-100',
-    metaText: 'text-zinc-600 dark:text-zinc-400',
+    bg: 'bg-cyan-100 dark:bg-cyan-950/90',
+    border: 'border-cyan-400 dark:border-cyan-600',
+    titleText: 'text-cyan-950 dark:text-cyan-100',
+    subText: 'text-cyan-700 dark:text-cyan-300',
+    badgeBg: 'bg-cyan-600 text-white',
   },
   MAT3533: {
-    surface: 'bg-indigo-50/80 dark:bg-indigo-950/40',
-    border: 'border-indigo-200 dark:border-indigo-800/60',
-    accentBar: 'bg-indigo-600',
-    titleText: 'text-zinc-900 dark:text-zinc-100',
-    metaText: 'text-indigo-700 dark:text-indigo-300',
+    bg: 'bg-rose-100 dark:bg-rose-950/90',
+    border: 'border-rose-400 dark:border-rose-600',
+    titleText: 'text-rose-950 dark:text-rose-100',
+    subText: 'text-rose-700 dark:text-rose-300',
+    badgeBg: 'bg-rose-600 text-white',
   },
   THL1057: {
-    surface: 'bg-amber-50/80 dark:bg-amber-950/30',
-    border: 'border-amber-200 dark:border-amber-800/60',
-    accentBar: 'bg-amber-600',
-    titleText: 'text-zinc-900 dark:text-zinc-100',
-    metaText: 'text-amber-800 dark:text-amber-300',
+    bg: 'bg-amber-100 dark:bg-amber-950/90',
+    border: 'border-amber-400 dark:border-amber-600',
+    titleText: 'text-amber-950 dark:text-amber-100',
+    subText: 'text-amber-800 dark:text-amber-300',
+    badgeBg: 'bg-amber-600 text-white',
   },
   MAT3506: {
-    surface: 'bg-emerald-50/80 dark:bg-emerald-950/30',
-    border: 'border-emerald-200 dark:border-emerald-800/60',
-    accentBar: 'bg-emerald-600',
-    titleText: 'text-zinc-900 dark:text-zinc-100',
-    metaText: 'text-emerald-700 dark:text-emerald-300',
+    bg: 'bg-emerald-100 dark:bg-emerald-950/90',
+    border: 'border-emerald-400 dark:border-emerald-600',
+    titleText: 'text-emerald-950 dark:text-emerald-100',
+    subText: 'text-emerald-800 dark:text-emerald-300',
+    badgeBg: 'bg-emerald-600 text-white',
   },
   MAT3505: {
-    surface: 'bg-teal-50/80 dark:bg-teal-950/30',
-    border: 'border-teal-200 dark:border-teal-800/60',
-    accentBar: 'bg-teal-600',
-    titleText: 'text-zinc-900 dark:text-zinc-100',
-    metaText: 'text-teal-700 dark:text-teal-300',
+    bg: 'bg-lime-500 dark:bg-lime-600',
+    border: 'border-lime-600 dark:border-lime-400',
+    titleText: 'text-white',
+    subText: 'text-lime-50',
+    badgeBg: 'bg-black/20 text-white',
   },
 };
 
-export const StarRatingBadge: React.FC<{ stars: number }> = ({ stars }) => {
+export const StarRatingBadge: React.FC<{ stars: number; showNumber?: boolean }> = ({
+  stars,
+  showNumber = true,
+}) => {
+  const fullStars = Math.floor(stars);
+  const hasHalf = stars - fullStars >= 0.5;
   const colorClass =
     stars >= 4.0
-      ? 'text-rose-600 dark:text-rose-400'
+      ? 'text-rose-500'
       : stars >= 3.0
-      ? 'text-amber-600 dark:text-amber-400'
-      : 'text-emerald-600 dark:text-emerald-400';
+      ? 'text-amber-500'
+      : 'text-emerald-500';
 
   return (
-    <span
-      className="inline-flex items-center gap-1 font-mono tabular-nums text-[11px] font-medium"
-      title={`Độ khó: ${stars}/5 (Tham khảo Góc nhìn HUS)`}
-    >
-      <Star className={`w-3.5 h-3.5 ${colorClass} fill-current`} strokeWidth={1.5} />
-      <span className="text-zinc-700 dark:text-zinc-300">{stars.toFixed(1)}/5</span>
+    <span className="inline-flex items-center gap-0.5" title={`Độ khó: ${stars}/5 sao (Theo Góc nhìn HUS)`}>
+      {[1, 2, 3, 4, 5].map((idx) => {
+        const filled = idx <= fullStars || (idx === fullStars + 1 && hasHalf);
+        return (
+          <Star
+            key={idx}
+            className={`w-3 h-3 ${
+              filled ? `${colorClass} fill-current` : 'text-slate-300 dark:text-slate-700'
+            }`}
+          />
+        );
+      })}
+      {showNumber && (
+        <span className={`ml-1 text-[10px] font-extrabold ${colorClass}`}>{stars.toFixed(1)}★</span>
+      )}
     </span>
   );
 };
@@ -133,9 +151,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
   onUpdateTimetable,
 }) => {
   const [subTab, setSubTab] = useState<'timetable_sem5' | 'roadmap_5_8' | 'cpa_retake'>(
-    'roadmap_5_8'
+    'timetable_sem5'
   );
 
+  // Filter for Elective Pool in Roadmap
   const [poolCategoryFilter, setPoolCategoryFilter] = useState<
     'all' | 'mandatory' | 'v21' | 'v22' | 'v3'
   >('all');
@@ -153,8 +172,8 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
     start_period: 7,
     end_period: 8,
     room: '101T5',
-    note: 'Cố gắng học',
-    color: '',
+    note: 'Chăm là được',
+    color: 'bg-sky-500 text-white border-sky-600',
   });
 
   const sem5InProgressCourses = useMemo(() => {
@@ -295,7 +314,7 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
       end_period: Number(newSession.end_period) || 2,
       room: newSession.room || '',
       note: newSession.note || '',
-      color: '',
+      color: newSession.color || 'bg-sky-500 text-white border-sky-600',
     };
     onUpdateTimetable([...timetable, created]);
     setShowAddSession(false);
@@ -310,6 +329,7 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
     [courses]
   );
 
+  // Detailed Audit of Planned Semesters 5, 6, 7, 8 by Category Quota
   const roadmapQuotaAudit = useMemo(() => {
     const completedCodes = new Set(courses.filter((c) => c.completed).map((c) => c.code));
     const warnings: Array<{ code: string; name: string; semester: number; missingPrereqs: string[] }> = [];
@@ -327,7 +347,7 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
         const preCourse = courses.find((x) => x.code === preCode);
         const preSem = preCourse?.in_progress ? 5 : preCourse?.planned_semester || 0;
         if (!preSem || preSem >= assignedSem) {
-          missing.push(`${preCode} (${preSem ? `đang xếp K${preSem}` : 'chưa xếp'})`);
+          missing.push(`${preCode} (${preSem ? `đang xếp Kỳ ${preSem}` : 'chưa xếp kỳ'})`);
         }
       });
 
@@ -355,66 +375,67 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
     return {
       warnings,
       totalPlannedCredits,
-      mandatoryI_IV_V1_Tc,
-      electiveV21_Tc,
-      electiveV22_Tc,
-      gradV3_Tc,
+      mandatoryI_IV_V1_Tc, // Need 35 TC (2 TC Block I + 6 TC Block IV + 27 TC Block V.1)
+      electiveV21_Tc, // Need 4 TC out of 8 TC
+      electiveV22_Tc, // Need 12 TC out of 39 TC
+      gradV3_Tc, // Need 7 TC
     };
   }, [courses, uncompletedCourses]);
 
   const getCourseBadgeType = (c: Course) => {
     if (c.block === 'I') {
       return {
-        text: 'Bắt buộc Khối I (Thiếu 2 TC)',
+        text: 'Bắt buộc Khối I (Còn thiếu đúng 2 TC)',
         short: 'Bắt buộc Khối I',
-        dot: 'bg-zinc-600',
+        style: 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 border-purple-300',
       };
     }
     if (c.block === 'IV') {
       return {
-        text: 'Bắt buộc Khối IV',
+        text: 'Bắt buộc Khối IV (Nhóm ngành)',
         short: 'Bắt buộc Khối IV',
-        dot: 'bg-zinc-600',
+        style: 'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-200 border-indigo-300',
       };
     }
     if (c.sub_block === 'V.1') {
       return {
         text: 'Bắt buộc Ngành V.1',
         short: 'Bắt buộc V.1',
-        dot: 'bg-zinc-600',
+        style: 'bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-200 border-sky-300',
       };
     }
     if (c.sub_block === 'V.2.1') {
       return {
-        text: 'Tự chọn V.2.1 · Kỹ năng PM (4/8 TC)',
-        short: 'Tự chọn V.2.1',
-        dot: 'bg-sky-600',
+        text: 'Tự chọn V.2.1 - Kỹ năng PM (Chọn 4/8 TC)',
+        short: 'Tự chọn V.2.1 (Kỹ năng PM)',
+        style: 'bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-200 border-teal-300',
       };
     }
     if (c.sub_block === 'V.2.2') {
       return {
-        text: 'Tự chọn V.2.2 · AI và PTPM (12/39 TC)',
-        short: 'Tự chọn V.2.2',
-        dot: 'bg-sky-600',
+        text: 'Tự chọn V.2.2 - AI & PTPM (Chọn 12/39 TC)',
+        short: 'Tự chọn V.2.2 (AI & PTPM)',
+        style: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border-emerald-300',
       };
     }
     if (c.sub_block === 'V.3') {
       return {
-        text: 'Tốt nghiệp V.3 (7 TC)',
-        short: 'Tốt nghiệp V.3',
-        dot: 'bg-emerald-600',
+        text: 'Tốt nghiệp V.3 (Chọn 7 TC: KLTN hoặc 2 môn thay thế)',
+        short: 'Tốt nghiệp V.3 (7 TC)',
+        style: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 border-amber-300',
       };
     }
     return {
       text: c.sub_block,
       short: c.sub_block,
-      dot: 'bg-zinc-400',
+      style: 'bg-slate-100 text-slate-700',
     };
   };
 
+  // Filtered & Sorted Unassigned / Elective Explorer Pool
   const explorerCourses = useMemo(() => {
     return uncompletedCourses
-      .filter((c) => c.block !== 'II')
+      .filter((c) => c.block !== 'II') // Khối II đã học xong 5/5 TC
       .filter((c) => {
         if (poolCategoryFilter === 'all') return true;
         if (poolCategoryFilter === 'mandatory')
@@ -439,102 +460,113 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
   );
 
   return (
-    <div className="space-y-5">
-      {/* Segmented Sub-Tab Control */}
-      <div className="inline-flex flex-wrap items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-lg border border-zinc-200/70 dark:border-zinc-800">
+    <div className="space-y-4">
+      {/* Sub-Navigation Pills (Clean, No Unnecessary Storage Text) */}
+      <div className="bg-white/95 dark:bg-slate-900/95 rounded-2xl p-2 border border-sky-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setSubTab('timetable_sem5')}
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
+            subTab === 'timetable_sem5'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Clock className="w-4 h-4" />
+          <span>
+            1. Thời Khóa Biểu Kỳ 5 Đang Học ({sem5InProgressCourses.reduce((s, c) => s + c.credits, 0)}{' '}
+            TC)
+          </span>
+        </button>
+
         <button
           type="button"
           onClick={() => setSubTab('roadmap_5_8')}
-          className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
             subTab === 'roadmap_5_8'
-              ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Calendar className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-          <span>Lộ trình Kỳ 5–8 và độ khó</span>
+          <Calendar className="w-4 h-4" />
+          <span>
+            2. Sắp Xếp Lộ Trình Kỳ 5, 6, 7, 8 & Đánh Giá Độ Khó ({roadmapQuotaAudit.totalPlannedCredits}/58 TC)
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => setSubTab('cpa_retake')}
-          className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
             subTab === 'cpa_retake'
-              ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-800'
           }`}
         >
-          <Calculator className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-          <span>Mô phỏng CPA và học cải thiện</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setSubTab('timetable_sem5')}
-          className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-colors duration-150 ${
-            subTab === 'timetable_sem5'
-              ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-              : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
-          }`}
-        >
-          <Clock className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-          <span>Chốt điểm Kỳ 5 ({sem5InProgressCourses.length} môn)</span>
+          <Calculator className="w-4 h-4" />
+          <span>3. Giả Lập CPA Mục Tiêu & Cải Thiện Môn D+ (OOP)</span>
         </button>
       </div>
 
-      {/* Sub-tab 1: Timetable & Sem 5 Grade Finalization */}
+      {/* SUB-TAB 1: REDESIGNED BEAUTIFUL TIMETABLE & SEMESTER 5 IN-PROGRESS COURSES */}
       {subTab === 'timetable_sem5' && (
         <div className="space-y-5">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 space-y-4">
+          {/* Full-Width High-Clarity Weekly Timetable Card */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                  Thời khóa biểu Học kỳ 5
-                </h2>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 tabular-nums">
-                  {sem5InProgressCourses.length} học phần · {sem5InProgressCourses.reduce((s, c) => s + c.credits, 0)} tín chỉ
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                    Thời Khóa Biểu Học Kỳ 5 — Phạm Ngọc Huân
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-600 text-white">
+                    6 Học phần • 16 Tín chỉ
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Lịch học chuẩn theo từng Tiết (Tiết 1: 07h00 ➔ Tiết 12: 18h30) kèm Mã lớp, Phòng học và Độ khó thực tế
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowAddSession((s) => !s)}
-                className="h-9 px-3 rounded-lg text-xs font-medium bg-sky-600 text-white hover:bg-sky-700 flex items-center gap-1.5 transition-colors duration-150"
+                className="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-sky-600 text-white hover:bg-sky-700 flex items-center gap-1.5 shadow-sm transition-all"
               >
-                <Plus className="w-4 h-4" strokeWidth={1.5} />
-                <span>{showAddSession ? 'Đóng' : 'Thêm ca học'}</span>
+                <Plus className="w-4 h-4" />
+                <span>{showAddSession ? 'Đóng khung thêm' : 'Thêm ca học mới'}</span>
               </button>
             </div>
 
             {showAddSession && (
-              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
+              <div className="p-3.5 rounded-xl bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-700 grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
                 <input
                   type="text"
-                  placeholder="Mã HP (MAT3533)"
+                  placeholder="Mã HP (VD: MAT3533)"
                   value={newSession.course_code || ''}
                   onChange={(e) => setNewSession({ ...newSession, course_code: e.target.value })}
-                  className="h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 font-mono"
+                  className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold"
                 />
                 <input
                   type="text"
-                  placeholder="Tên môn (Học máy)"
+                  placeholder="Tên môn (VD: Học máy)"
                   value={newSession.course_name || ''}
                   onChange={(e) => setNewSession({ ...newSession, course_name: e.target.value })}
-                  className="h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 font-medium"
+                  className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold"
                 />
                 <input
                   type="text"
-                  placeholder="Phòng (101T5)"
+                  placeholder="Phòng học (VD: 101T5)"
                   value={newSession.room || ''}
                   onChange={(e) => setNewSession({ ...newSession, room: e.target.value })}
-                  className="h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 font-mono"
+                  className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold"
                 />
                 <select
                   value={newSession.day_of_week || 2}
                   onChange={(e) =>
                     setNewSession({ ...newSession, day_of_week: Number(e.target.value) })
                   }
-                  className="h-9 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                  className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold"
                 >
                   {DAYS_OF_WEEK.map((d) => (
                     <option key={d.day} value={d.day}>
@@ -551,9 +583,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                     onChange={(e) =>
                       setNewSession({ ...newSession, start_period: Number(e.target.value) })
                     }
-                    className="w-14 h-9 px-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-center font-mono tabular-nums"
+                    className="w-14 px-2 py-2 rounded-xl bg-white dark:bg-slate-900 border text-center font-bold"
+                    title="Tiết bắt đầu"
                   />
-                  <span>-</span>
+                  <span>➔</span>
                   <input
                     type="number"
                     min="1"
@@ -562,12 +595,13 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                     onChange={(e) =>
                       setNewSession({ ...newSession, end_period: Number(e.target.value) })
                     }
-                    className="w-14 h-9 px-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-center font-mono tabular-nums"
+                    className="w-14 px-2 py-2 rounded-xl bg-white dark:bg-slate-900 border text-center font-bold"
+                    title="Tiết kết thúc"
                   />
                   <button
                     type="button"
                     onClick={handleAddSession}
-                    className="h-9 px-3 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium shrink-0"
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-extrabold shrink-0"
                   >
                     Lưu
                   </button>
@@ -575,20 +609,21 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
               </div>
             )}
 
-            <div className="overflow-x-auto rounded-xl border border-zinc-200/80 dark:border-zinc-800">
-              <table className="w-full table-fixed min-w-[920px] border-collapse tabular-nums">
+            {/* Fixed-Layout Beautiful Timetable Table */}
+            <div className="overflow-x-auto rounded-2xl border-2 border-emerald-500/40 dark:border-slate-700 shadow-sm">
+              <table className="w-full table-fixed min-w-[920px] border-collapse">
                 <thead>
-                  <tr className="bg-zinc-50 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-300 text-xs border-b border-zinc-200 dark:border-zinc-800">
-                    <th className="w-[54px] py-2.5 px-2 border-r border-zinc-200/70 dark:border-zinc-800 text-center font-medium">
+                  <tr className="bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 text-white text-xs font-extrabold">
+                    <th className="w-[54px] py-3 px-2 border-r border-white/20 text-center">
                       Tiết
                     </th>
-                    <th className="w-[112px] py-2.5 px-2 border-r border-zinc-200/70 dark:border-zinc-800 text-center font-medium">
+                    <th className="w-[106px] py-3 px-2 border-r border-white/20 text-center">
                       Thời gian
                     </th>
                     {DAYS_OF_WEEK.map((d) => (
                       <th
                         key={d.day}
-                        className="py-2.5 px-2 border-r last:border-r-0 border-zinc-200/70 dark:border-zinc-800 text-center font-medium"
+                        className="py-3 px-2 border-r last:border-r-0 border-white/20 text-center"
                       >
                         {d.label}
                       </th>
@@ -599,26 +634,26 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((period) => (
                     <React.Fragment key={period}>
                       {period === 7 && (
-                        <tr className="bg-zinc-100/80 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 text-center">
-                          <td className="py-2 border-y border-r border-zinc-200/70 dark:border-zinc-800 text-xs font-medium">
+                        <tr className="bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 font-extrabold text-center">
+                          <td className="py-2 border-y border-r border-emerald-300 dark:border-slate-700 text-[11px]">
                             Trưa
                           </td>
-                          <td className="py-2 border-y border-r border-zinc-200/70 dark:border-zinc-800 font-mono text-[11px]">
+                          <td className="py-2 border-y border-r border-emerald-300 dark:border-slate-700 text-[11px]">
                             12:30 - 13:00
                           </td>
                           <td
                             colSpan={6}
-                            className="py-2 border-y border-zinc-200/70 dark:border-zinc-800 text-xs"
+                            className="py-2 border-y border-emerald-300 dark:border-slate-700 tracking-widest uppercase text-[11px]"
                           >
-                            Nghỉ trưa
+                            ☀️ Nghỉ ăn trưa & Chuyển sang ca học buổi chiều
                           </td>
                         </tr>
                       )}
-                      <tr className="h-[50px]">
-                        <td className="border-b border-r border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 text-center font-mono text-zinc-600 dark:text-zinc-400">
+                      <tr className="h-[46px] hover:bg-sky-50/30 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="border-b border-r border-slate-200 dark:border-slate-800 bg-emerald-50/60 dark:bg-slate-800/90 text-center font-extrabold text-slate-700 dark:text-slate-200">
                           {period}
                         </td>
-                        <td className="border-b border-r border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/60 text-center font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <td className="border-b border-r border-slate-200 dark:border-slate-800 bg-emerald-50/30 dark:bg-slate-800/50 text-center font-mono text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                           {PERIOD_TIMES[period]}
                         </td>
                         {DAYS_OF_WEEK.map((d) => {
@@ -642,56 +677,55 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                             const palette = COURSE_TIMETABLE_STYLES[
                               startingSession.course_code
                             ] || {
-                              surface: 'bg-sky-50 dark:bg-sky-950/40',
-                              border: 'border-sky-200 dark:border-sky-800/60',
-                              accentBar: 'bg-sky-600',
-                              titleText: 'text-zinc-900 dark:text-zinc-100',
-                              metaText: 'text-sky-700 dark:text-sky-300',
+                              bg: 'bg-sky-500',
+                              border: 'border-sky-600',
+                              titleText: 'text-white',
+                              subText: 'text-sky-100',
+                              badgeBg: 'bg-white/20 text-white',
                             };
 
                             return (
                               <td
                                 key={d.day}
                                 rowSpan={span}
-                                className="border-b border-r last:border-r-0 border-zinc-200/70 dark:border-zinc-800 p-1 align-stretch"
+                                className="border-b border-r border-slate-200 dark:border-slate-800 p-1 align-stretch"
                               >
                                 <div
-                                  className={`w-full h-full min-h-[78px] rounded-lg border p-2.5 flex flex-col justify-between relative group overflow-hidden ${palette.surface} ${palette.border}`}
+                                  className={`w-full h-full min-h-[78px] rounded-xl border-2 p-2.5 flex flex-col justify-between relative group shadow-sm transition-transform hover:scale-[1.01] ${palette.bg} ${palette.border}`}
                                 >
-                                  <div
-                                    className={`absolute left-0 top-0 bottom-0 w-1 ${palette.accentBar}`}
-                                  />
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteSession(startingSession.id)}
-                                    title="Xóa ca học"
-                                    className="opacity-0 group-hover:opacity-100 absolute top-1.5 right-1.5 w-5 h-5 rounded bg-zinc-900/10 hover:bg-rose-600 hover:text-white text-zinc-600 flex items-center justify-center transition-opacity duration-150"
+                                    title="Xóa ca học này"
+                                    className="opacity-0 group-hover:opacity-100 absolute top-1.5 right-1.5 w-5 h-5 rounded-md bg-black/25 hover:bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center transition-all"
                                   >
-                                    <X className="w-3 h-3" strokeWidth={1.75} />
+                                    ✕
                                   </button>
 
-                                  <div className="pl-1.5">
+                                  <div>
                                     <div
-                                      className={`font-medium text-xs leading-snug pr-4 break-words ${palette.titleText}`}
+                                      className={`font-extrabold text-xs leading-snug pr-4 break-words ${palette.titleText}`}
                                     >
                                       {startingSession.course_name}
                                     </div>
                                     {startingSession.room && (
                                       <div
-                                        className={`text-[11px] font-mono mt-0.5 flex items-center gap-1 ${palette.metaText}`}
+                                        className={`text-[10px] font-semibold mt-0.5 flex items-center gap-1 ${palette.subText}`}
                                       >
-                                        <MapPin className="w-3 h-3 shrink-0" strokeWidth={1.5} />
+                                        <MapPin className="w-3 h-3 shrink-0" />
                                         <span className="truncate">{startingSession.room}</span>
                                       </div>
                                     )}
                                   </div>
 
-                                  <div className="pl-1.5 flex items-center justify-between gap-1 mt-1.5 pt-1 border-t border-zinc-900/10 dark:border-white/10 text-[11px] font-mono">
-                                    <span className="text-zinc-600 dark:text-zinc-300">
+                                  <div className="flex items-center justify-between gap-1 mt-1.5 pt-1 border-t border-current/10">
+                                    <span
+                                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-extrabold ${palette.badgeBg}`}
+                                    >
                                       {startingSession.class_code || startingSession.course_code}
                                     </span>
-                                    <span className="text-zinc-500">
-                                      T{startingSession.start_period}-{startingSession.end_period}
+                                    <span className={`text-[10px] font-bold ${palette.subText}`}>
+                                      Tiết {startingSession.start_period}-{startingSession.end_period}
                                     </span>
                                   </div>
                                 </div>
@@ -702,7 +736,7 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                           return (
                             <td
                               key={d.day}
-                              className="border-b border-r last:border-r-0 border-zinc-100 dark:border-zinc-800/60"
+                              className="border-b border-r border-slate-100 dark:border-slate-800/70"
                             />
                           );
                         })}
@@ -714,76 +748,90 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 space-y-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                Chốt điểm nhanh các học phần Kỳ 5
-              </h3>
+          {/* 6 Semester 5 Course Cards Grid Below with Star Difficulty, Category Badge & Quick Grade Completion */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-sky-600" />
+                  Chi Tiết 6 Học Phần Đang Học Kỳ 5 (Đánh giá độ khó & Chốt điểm nhanh)
+                </h4>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {sem5InProgressCourses.map((c) => {
                 const diff = getCourseDifficulty(c.code);
                 const badge = getCourseBadgeType(c);
                 return (
                   <div
                     key={c.code}
-                    className="p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between gap-3"
+                    className="p-4 rounded-2xl bg-sky-50/40 dark:bg-slate-800/60 border border-sky-200/80 dark:border-slate-700 flex flex-col justify-between gap-3"
                   >
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2 text-xs">
-                        <span className="inline-flex items-center gap-1.5 text-zinc-600 dark:text-zinc-300">
-                          <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
-                          <span>{badge.short}</span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${badge.style}`}>
+                          {badge.short}
                         </span>
                         <StarRatingBadge stars={diff.stars} />
                       </div>
 
                       <div>
-                        <div className="font-mono text-xs text-zinc-500 tabular-nums">
-                          {c.code} · {c.credits} TC
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-extrabold text-xs text-sky-700 dark:text-sky-400">
+                            {c.code} • {c.credits} Tín chỉ
+                          </span>
+                          <span className="text-[11px] font-bold text-slate-500">
+                            {diff.levelLabel}
+                          </span>
                         </div>
-                        <div className="font-medium text-sm text-zinc-900 dark:text-zinc-100 mt-0.5">
+                        <h5 className="font-extrabold text-sm text-slate-900 dark:text-white mt-0.5">
                           {c.name_vi}
-                        </div>
+                        </h5>
                       </div>
 
                       {c.schedule_info && (
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400 tabular-nums">
-                          {c.schedule_info}
+                        <div className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 px-2.5 py-1.5 rounded-lg border border-sky-100 dark:border-slate-700">
+                          🕒 {c.schedule_info}
                         </div>
                       )}
 
-                      <input
-                        type="text"
-                        value={c.note || ''}
-                        onChange={(e) => onUpdateCourseFullState(c.code, { note: e.target.value })}
-                        placeholder="Ghi chú"
-                        className="w-full h-8 px-2.5 rounded-md text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
-                      />
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-slate-500 shrink-0">
+                          Ghi chú:
+                        </span>
+                        <input
+                          type="text"
+                          value={c.note || ''}
+                          onChange={(e) =>
+                            onUpdateCourseFullState(c.code, { note: e.target.value })
+                          }
+                          placeholder="Ghi chú môn học..."
+                          className="flex-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700"
+                        />
+                      </div>
                     </div>
 
-                    <div className="pt-2.5 border-t border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between gap-2">
+                    <div className="pt-2.5 border-t border-sky-200/60 dark:border-slate-700 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5">
                         <input
                           type="number"
                           step="0.1"
                           min="4.0"
                           max="10.0"
-                          placeholder="8.5"
+                          placeholder="Điểm 10"
                           value={quickScoreMap[c.code] ?? ''}
                           onChange={(e) =>
                             setQuickScoreMap((prev) => ({ ...prev, [c.code]: e.target.value }))
                           }
-                          className="w-16 h-8 px-2 rounded-md text-xs font-mono tabular-nums bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-center"
+                          className="w-20 px-2 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 border border-emerald-300 dark:border-slate-600"
                         />
                         <button
                           type="button"
                           onClick={() => handleCompleteSem5Course(c)}
-                          className="h-8 px-2.5 rounded-md text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1 shadow-sm"
                         >
-                          <CheckSquare className="w-3.5 h-3.5" strokeWidth={1.5} />
+                          <CheckSquare className="w-3.5 h-3.5" />
                           <span>Chốt điểm</span>
                         </button>
                       </div>
@@ -791,9 +839,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                       <button
                         type="button"
                         onClick={() => handleDropSem5Course(c, 6)}
-                        className="h-8 px-2.5 rounded-md text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                        className="px-2 py-1 rounded-lg text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-200"
+                        title="Rút môn này khỏi Kỳ 5 và chuyển sang Kỳ 6"
                       >
-                        Chuyển K6
+                        Rút sang K6
                       </button>
                     </div>
                   </div>
@@ -804,87 +853,111 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
         </div>
       )}
 
-      {/* Sub-tab 2: Roadmap 5-8 & Difficulty Explorer */}
+      {/* SUB-TAB 2: DETAILED ROADMAP PLANNER (SEMESTERS 5, 6, 7, 8) + STAR DIFFICULTY & HUS COMMUNITY REVIEWS */}
       {subTab === 'roadmap_5_8' && (
         <div className="space-y-5">
-          {/* Quota Stat Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                <span>Bắt buộc còn lại</span>
-                <span className="font-mono tabular-nums text-zinc-900 dark:text-zinc-100 font-medium">
+          {/* Top Quota Progress Tracker for the 58 Remaining Credits */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center justify-between text-xs font-extrabold text-sky-700 dark:text-sky-400">
+                <span>1. Môn Bắt Buộc Còn Lại (Khối I, IV, V.1)</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[11px] ${
+                    roadmapQuotaAudit.mandatoryI_IV_V1_Tc === 35
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-amber-500 text-white'
+                  }`}
+                >
                   {roadmapQuotaAudit.mandatoryI_IV_V1_Tc} / 35 TC
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 mt-1.5">
-                THL1057 (I), Tối ưu hóa & PPNCKH (IV), 9 môn ngành (V.1)
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Gồm: THL1057 (2 TC Khối I) + Tối ưu hóa & PPNCKH (6 TC Khối IV) + 9 môn Bắt buộc ngành V.1 (27 TC).
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                <span>Tự chọn V.2.1 (Kỹ năng PM)</span>
-                <span className="font-mono tabular-nums text-zinc-900 dark:text-zinc-100 font-medium">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-teal-200 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center justify-between text-xs font-extrabold text-teal-700 dark:text-teal-400">
+                <span>2. Tự Chọn V.2.1 (Kỹ Năng PM)</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[11px] ${
+                    roadmapQuotaAudit.electiveV21_Tc >= 4
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-amber-500 text-white'
+                  }`}
+                >
                   {roadmapQuotaAudit.electiveV21_Tc} / 4 TC
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 mt-1.5">
-                Chọn 2 môn trong NNLT thứ 2, Mobile, Game, Mạng không dây
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Chọn đúng 2 môn (4/8 TC) trong 4 môn: NNLT thứ 2 (2 TC), Mobile (2 TC), Game (2 TC), Nhúng (2 TC).
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                <span>Tự chọn V.2.2 (AI và PTPM)</span>
-                <span className="font-mono tabular-nums text-zinc-900 dark:text-zinc-100 font-medium">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center justify-between text-xs font-extrabold text-emerald-700 dark:text-emerald-400">
+                <span>3. Tự Chọn V.2.2 (AI & PTPM)</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[11px] ${
+                    roadmapQuotaAudit.electiveV22_Tc >= 12
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-amber-500 text-white'
+                  }`}
+                >
                   {roadmapQuotaAudit.electiveV22_Tc} / 12 TC
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 mt-1.5">
-                Chọn 4 môn trong 13 học phần chuyên sâu tự chọn
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Chọn đúng 4 môn (12/39 TC) trong 13 môn chuyên sâu (Khuyên chọn: Khai phá DL, Thống kê nhiều chiều, Giải tích số, NLP).
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
-              <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                <span>Tốt nghiệp V.3</span>
-                <span className="font-mono tabular-nums text-zinc-900 dark:text-zinc-100 font-medium">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-amber-200 dark:border-slate-800 shadow-sm">
+              <div className="flex items-center justify-between text-xs font-extrabold text-amber-700 dark:text-amber-400">
+                <span>4. Khối V.3 Tốt Nghiệp</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[11px] ${
+                    roadmapQuotaAudit.gradV3_Tc >= 7
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-amber-500 text-white'
+                  }`}
+                >
                   {roadmapQuotaAudit.gradV3_Tc} / 7 TC
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 mt-1.5">
-                Khóa luận tốt nghiệp MAT4080 hoặc 2 học phần thay thế
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Phương án 1: Khóa luận tốt nghiệp MAT4080 (7 TC) • Phương án 2: MAT1203 (4 TC) + MAT3377 (3 TC).
               </p>
             </div>
           </div>
 
-          {/* Validation Notice */}
+          {/* Prerequisite Validation Banner */}
           {roadmapQuotaAudit.warnings.length > 0 ? (
-            <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 text-xs text-rose-700 dark:text-rose-400 space-y-1">
-              <div className="font-medium flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-                <span>Cảnh báo điều kiện tiên quyết trong lịch dự kiến</span>
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-xs text-rose-800 dark:text-rose-200 space-y-1">
+              <div className="font-extrabold flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-rose-600" />
+                Cảnh báo Điều kiện Tiên quyết trong lịch dự kiến:
               </div>
               {roadmapQuotaAudit.warnings.map((w) => (
-                <div key={w.code} className="pl-5">
-                  {w.code} · {w.name} (Kỳ {w.semester}) cần hoàn thành trước:{' '}
-                  <span className="font-mono">{w.missingPrereqs.join(', ')}</span>
+                <div key={w.code}>
+                  • Học phần <strong>{w.code} - {w.name}</strong> (đang xếp ở Kỳ {w.semester}) cần hoàn thành trước:{' '}
+                  <strong>{w.missingPrereqs.join(', ')}</strong>.
                 </div>
               ))}
             </div>
           ) : (
-            <div className="px-4 py-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 flex flex-wrap items-center justify-between gap-2">
+            <div className="p-3 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/70 text-xs text-emerald-800 dark:text-emerald-200 font-semibold flex items-center justify-between gap-2">
               <span className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={1.5} />
-                <span>Thỏa mãn điều kiện tiên quyết theo QĐ 3568 từ Kỳ 5 đến Kỳ 8</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                Hợp lệ 100% Tiên quyết QĐ 3568! Toàn bộ chuỗi môn Kỳ 5 (16 TC) ➔ Kỳ 6 (18 TC) ➔ Kỳ 7 (17 TC) ➔ Kỳ 8 (7 TC) đều thỏa mãn điều kiện mở khóa.
               </span>
-              <span className="font-mono tabular-nums text-zinc-900 dark:text-zinc-100 font-medium">
-                {roadmapQuotaAudit.totalPlannedCredits} / 58 TC còn lại
+              <span className="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-extrabold shrink-0">
+                Tổng đã xếp: {roadmapQuotaAudit.totalPlannedCredits}/58 TC
               </span>
             </div>
           )}
 
-          {/* 4 Columns for Semesters 5, 6, 7, 8 */}
+          {/* 4 Columns for Semesters 5, 6, 7, 8 with Explicit Category Badges & Star Difficulty */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[5, 6, 7, 8].map((sem) => {
               const semCourses = uncompletedCourses.filter((c) => {
@@ -903,23 +976,25 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
               return (
                 <div
                   key={sem}
-                  className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 flex flex-col justify-between"
+                  className={`rounded-2xl border p-3.5 flex flex-col justify-between ${
+                    sem === 5
+                      ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700'
+                      : 'bg-sky-50/50 dark:bg-slate-800/50 border-sky-200/80 dark:border-slate-700'
+                  }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 dark:border-zinc-800">
+                    <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-sky-200/70 dark:border-slate-700">
                       <div>
-                        <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-                          {sem === 5 ? 'Học kỳ 5 · Đang học' : `Học kỳ ${sem}`}
-                        </h3>
-                        <span className="text-xs text-zinc-500 font-mono tabular-nums">
-                          {semCourses.length} môn · TB {avgDiff}/5
+                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                          {sem === 5 ? '🔥 Học kỳ 5 (Đang học)' : `Học kỳ ${sem} (Dự kiến)`}
+                        </h4>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {semCourses.length} môn • Độ khó TB: <strong>{avgDiff}★</strong>
                         </span>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded text-xs font-mono tabular-nums font-medium ${
-                          sem === 5
-                            ? 'bg-sky-600 text-white'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                        className={`px-2.5 py-1 rounded-xl text-xs font-extrabold text-white ${
+                          sem === 5 ? 'bg-amber-500' : 'bg-sky-600'
                         }`}
                       >
                         {semCredits} TC
@@ -934,33 +1009,41 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                           <div
                             key={c.code}
                             onClick={() => setSelectedReviewCourseCode(c.code)}
-                            className={`p-3 rounded-lg bg-zinc-50/70 dark:bg-zinc-800/40 border space-y-1.5 cursor-pointer transition-colors duration-150 ${
+                            className={`p-3 rounded-xl bg-white dark:bg-slate-900 border shadow-sm space-y-1.5 cursor-pointer transition-all hover:border-sky-400 ${
                               selectedReviewCourseCode === c.code
-                                ? 'border-sky-600 ring-1 ring-sky-600/20'
-                                : 'border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300'
+                                ? 'ring-2 ring-sky-500 border-sky-500'
+                                : 'border-sky-100 dark:border-slate-700'
                             }`}
                           >
+                            {/* Top Badge: Mandatory vs Elective V.2.1 / V.2.2 + Star Rating */}
                             <div className="flex items-center justify-between gap-1">
-                              <span className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-                                <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                                <span>{badge.short}</span>
+                              <span
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold border ${badge.style}`}
+                              >
+                                {badge.short}
                               </span>
                               <StarRatingBadge stars={diff.stars} />
                             </div>
 
-                            <div className="flex items-center justify-between gap-1 font-mono text-xs tabular-nums text-zinc-500">
-                              <span className="text-sky-700 dark:text-sky-400 font-medium">
+                            <div className="flex items-center justify-between gap-1 pt-0.5">
+                              <span className="font-mono font-extrabold text-xs text-sky-700 dark:text-sky-400">
                                 {c.code}
                               </span>
-                              <span>{c.credits} TC</span>
+                              <span className="text-[11px] font-bold text-slate-500">
+                                {c.credits} TC
+                              </span>
                             </div>
 
-                            <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100 leading-snug">
+                            <div className="text-xs font-extrabold text-slate-800 dark:text-slate-100 leading-snug">
                               {c.name_vi}
                             </div>
 
-                            <div className="pt-2 flex items-center justify-between border-t border-zinc-200/60 dark:border-zinc-800">
-                              <span className="text-[11px] text-zinc-400">Chuyển kỳ</span>
+                            <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                              💡 {diff.levelLabel}
+                            </div>
+
+                            <div className="pt-1.5 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                              <span className="text-[10px] text-slate-400">Đổi kỳ:</span>
                               <div className="flex items-center gap-1">
                                 {[5, 6, 7, 8].map((targetSem) => (
                                   <button
@@ -973,10 +1056,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                                         planned_semester: targetSem,
                                       });
                                     }}
-                                    className={`w-6 h-6 rounded text-[11px] font-mono tabular-nums ${
+                                    className={`w-5 h-5 rounded text-[10px] font-bold ${
                                       sem === targetSem
                                         ? 'bg-sky-600 text-white'
-                                        : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-100'
                                     }`}
                                   >
                                     {targetSem}
@@ -991,10 +1074,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                                       planned_semester: 0,
                                     });
                                   }}
-                                  title="Bỏ khỏi lộ trình"
-                                  className="w-6 h-6 rounded text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center justify-center"
+                                  title="Bỏ khỏi lịch dự kiến"
+                                  className="px-1.5 h-5 rounded text-[10px] font-bold bg-rose-50 dark:bg-rose-950 text-rose-600 hover:bg-rose-100"
                                 >
-                                  <X className="w-3 h-3" strokeWidth={1.75} />
+                                  ✕
                                 </button>
                               </div>
                             </div>
@@ -1008,37 +1091,38 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
             })}
           </div>
 
-          {/* Course Review & Elective Selector Catalog */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 space-y-4">
+          {/* Course Review & Elective Selector Catalog (Ranked 0-5 Stars from Góc nhìn HUS) */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                  Phân loại môn học và xếp hạng độ khó (0–5 sao)
-                </h2>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                  Tổng hợp từ chương trình QĐ 3568 và đánh giá sinh viên HUS
+                <h4 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                  Bảng Xếp Hạng Độ Khó (0 - 5 Sao) & Review Chọn Môn Tự Chọn (Tham khảo Góc nhìn HUS)
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Phân loại rõ môn Bắt buộc, Tự chọn Kỹ năng PM (V.2.1 - chọn 4/8 TC), Tự chọn AI & PTPM (V.2.2 - chọn 12/39 TC) kèm đánh giá độ khó để bạn chọn môn dễ kéo CPA nhất
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <div className="flex flex-wrap items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg border border-zinc-200/70 dark:border-zinc-700">
+                <div className="flex items-center gap-1 bg-sky-50 dark:bg-slate-800 p-1 rounded-xl border border-sky-200 dark:border-slate-700">
                   {(
                     [
-                      { id: 'all', label: 'Tất cả' },
-                      { id: 'mandatory', label: 'Bắt buộc' },
-                      { id: 'v21', label: 'Tự chọn V.2.1' },
-                      { id: 'v22', label: 'Tự chọn V.2.2' },
-                      { id: 'v3', label: 'Tốt nghiệp V.3' },
+                      { id: 'all', label: 'Tất cả môn chưa học' },
+                      { id: 'mandatory', label: 'Bắt buộc (Khối I, IV, V.1)' },
+                      { id: 'v21', label: 'Tự chọn V.2.1 (Chọn 4/8 TC)' },
+                      { id: 'v22', label: 'Tự chọn V.2.2 (Chọn 12/39 TC)' },
+                      { id: 'v3', label: 'Tốt nghiệp V.3 (7 TC)' },
                     ] as const
                   ).map((tab) => (
                     <button
                       key={tab.id}
                       type="button"
                       onClick={() => setPoolCategoryFilter(tab.id)}
-                      className={`h-7 px-2.5 rounded-md font-medium transition-colors duration-150 ${
+                      className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                         poolCategoryFilter === tab.id
-                          ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900'
+                          ? 'bg-sky-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-white/60'
                       }`}
                     >
                       {tab.label}
@@ -1048,42 +1132,53 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
 
                 <select
                   value={poolSortBy}
-                  onChange={(e) => setPoolSortBy(e.target.value as 'easiest' | 'hardest' | 'code')}
-                  className="h-9 px-3 rounded-lg font-medium bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200"
+                  onChange={(e) => setPoolSortBy(e.target.value as any)}
+                  className="px-3 py-1.5 rounded-xl font-bold bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-700"
                 >
-                  <option value="easiest">Từ dễ đến khó</option>
-                  <option value="hardest">Từ khó đến dễ</option>
-                  <option value="code">Theo mã học phần</option>
+                  <option value="easiest">⭐ Xếp từ Dễ thở nhất ➔ Khó nhất</option>
+                  <option value="hardest">🔥 Xếp từ Khó nhất ➔ Dễ nhất</option>
+                  <option value="code">🔤 Xếp theo Mã học phần</option>
                 </select>
               </div>
             </div>
 
+            {/* Selected Course Detailed HUS Community Review Box */}
             {selectedReviewCourse && (
-              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-indigo-50/40 to-amber-50/40 dark:from-slate-800 dark:to-slate-800/70 border-2 border-sky-300 dark:border-sky-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1.5 flex-1">
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <span className="font-mono text-xs font-medium text-sky-700 dark:text-sky-400 tabular-nums">
-                      {selectedReviewCourse.code} · {selectedReviewCourse.credits} TC
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-sky-600 text-white font-mono font-extrabold text-xs">
+                      {selectedReviewCourse.code} ({selectedReviewCourse.credits} TC)
                     </span>
-                    <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                    <span className="font-extrabold text-sm text-slate-900 dark:text-white">
                       {selectedReviewCourse.name_vi}
                     </span>
-                    <span className="text-xs text-zinc-500">
+                    <span
+                      className={`px-2 py-0.5 rounded text-[11px] font-extrabold border ${
+                        getCourseBadgeType(selectedReviewCourse).style
+                      }`}
+                    >
                       {getCourseBadgeType(selectedReviewCourse).text}
                     </span>
-                    <StarRatingBadge stars={getCourseDifficulty(selectedReviewCourse.code).stars} />
+                    <StarRatingBadge
+                      stars={getCourseDifficulty(selectedReviewCourse.code).stars}
+                    />
                   </div>
 
-                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
+                    💬 <strong>Review Góc nhìn HUS & Kinh nghiệm thực tế:</strong>{' '}
                     {getCourseDifficulty(selectedReviewCourse.code).husCommunityReview}
                   </p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-bold">
+                    🎯 <strong>Độ hợp với Phạm Ngọc Huân:</strong>{' '}
                     {getCourseDifficulty(selectedReviewCourse.code).fitWithHuan}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-xs text-zinc-500 mr-1">Xếp vào</span>
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300 mr-1">
+                    Xếp ngay vào:
+                  </span>
                   {[5, 6, 7, 8].map((sem) => {
                     const currentSem = selectedReviewCourse.in_progress
                       ? 5
@@ -1098,13 +1193,13 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                             planned_semester: sem,
                           })
                         }
-                        className={`h-8 px-3 rounded-lg text-xs font-mono font-medium transition-colors duration-150 ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
                           currentSem === sem
-                            ? 'bg-sky-600 text-white'
-                            : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+                            ? 'bg-emerald-600 text-white shadow-sm'
+                            : 'bg-white dark:bg-slate-900 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-slate-600 hover:bg-sky-100'
                         }`}
                       >
-                        K{sem}
+                        Kỳ {sem}
                       </button>
                     );
                   })}
@@ -1112,6 +1207,7 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
               </div>
             )}
 
+            {/* Grid of All Courses in Pool with Star Ratings & 1-Click Semester Assignment */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {explorerCourses.map((c) => {
                 const diff = getCourseDifficulty(c.code);
@@ -1123,44 +1219,49 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                   <div
                     key={c.code}
                     onClick={() => setSelectedReviewCourseCode(c.code)}
-                    className={`p-4 rounded-xl border transition-colors duration-150 cursor-pointer flex flex-col justify-between gap-3 ${
-                      selectedReviewCourseCode === c.code
-                        ? 'border-sky-600 bg-white dark:bg-zinc-900'
-                        : 'bg-zinc-50/50 dark:bg-zinc-800/30 border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300'
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
+                      isPlanned
+                        ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
+                        : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-sky-400'
                     }`}
                   >
                     <div className="space-y-1.5">
-                      <div className="flex items-center justify-between gap-1 text-xs">
-                        <span className="inline-flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
-                          <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                          <span>{badge.short}</span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-extrabold border ${badge.style}`}
+                        >
+                          {badge.short}
                         </span>
                         <StarRatingBadge stars={diff.stars} />
                       </div>
 
-                      <div className="flex items-center justify-between text-xs font-mono tabular-nums text-zinc-500">
-                        <span className="text-sky-700 dark:text-sky-400 font-medium">
-                          {c.code} · {c.credits} TC
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-extrabold text-xs text-sky-700 dark:text-sky-400">
+                          {c.code} ({c.credits} TC)
                         </span>
-                        <span>{diff.levelLabel}</span>
+                        <span className="text-[10px] font-bold text-slate-500">
+                          {diff.levelLabel}
+                        </span>
                       </div>
 
-                      <div className="font-medium text-xs text-zinc-900 dark:text-zinc-100">
+                      <div className="font-extrabold text-xs text-slate-900 dark:text-white">
                         {c.name_vi}
                       </div>
 
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-snug">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-snug">
                         {diff.husCommunityReview}
                       </p>
                     </div>
 
-                    <div className="pt-2.5 border-t border-zinc-200/60 dark:border-zinc-800 flex items-center justify-between text-xs">
+                    <div className="pt-2 border-t border-slate-200/70 dark:border-slate-700 flex items-center justify-between text-xs">
                       {isPlanned ? (
-                        <span className="font-mono text-emerald-700 dark:text-emerald-400 font-medium tabular-nums">
-                          Đã xếp K{assignedSem}
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[10px] font-extrabold">
+                          ✓ Đã xếp Kỳ {assignedSem}
                         </span>
                       ) : (
-                        <span className="text-zinc-400">Chưa xếp</span>
+                        <span className="text-[10px] text-slate-400 font-semibold">
+                          Chưa xếp vào lộ trình
+                        </span>
                       )}
 
                       <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -1174,10 +1275,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                                 planned_semester: sem,
                               })
                             }
-                            className={`w-6 h-6 rounded text-[11px] font-mono tabular-nums ${
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                               assignedSem === sem
                                 ? 'bg-sky-600 text-white'
-                                : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100'
+                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-sky-100'
                             }`}
                           >
                             K{sem}
@@ -1193,38 +1294,39 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
         </div>
       )}
 
-      {/* Sub-tab 3: CPA Simulator & Retake Rule */}
+      {/* SUB-TAB 3: CPA TARGET CALCULATOR & D/D+ RETAKE SIMULATOR */}
       {subTab === 'cpa_retake' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-5 bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 space-y-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                Tính điểm mục tiêu toàn khóa (129 TC)
-              </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 tabular-nums">
-                GPA cần đạt trung bình cho {simResult.remainingCredits} tín chỉ còn lại
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-sky-600" />
+                1. Bộ Tính Điểm Mục Tiêu Toàn Khóa (129 TC)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tính điểm trung bình hệ 4 cần đạt cho {simResult.remainingCredits} tín chỉ còn lại
               </p>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 block">
-                Mục tiêu CPA hệ 4.00
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 block">
+                Chọn hoặc kéo thanh CPA toàn khóa mong muốn:
               </label>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-2">
                 {[
-                  { label: '3.20 Giỏi', val: 3.2 },
-                  { label: '3.40 Mục tiêu', val: 3.4 },
-                  { label: '3.50 Giỏi cao', val: 3.5 },
-                  { label: '3.60 Xuất sắc', val: 3.6 },
+                  { label: '3.20 (Giỏi)', val: 3.2 },
+                  { label: '3.40 (Mục tiêu Excel)', val: 3.4 },
+                  { label: '3.50 (Giỏi cao)', val: 3.5 },
+                  { label: '3.60 (Xuất sắc)', val: 3.6 },
                 ].map((preset) => (
                   <button
                     key={preset.val}
                     type="button"
                     onClick={() => onChangeTargetCpa(preset.val)}
-                    className={`h-8 px-3 rounded-lg text-xs font-medium border transition-colors duration-150 tabular-nums ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
                       Math.abs(targetCpa - preset.val) < 0.005
-                        ? 'bg-sky-600 text-white border-sky-600'
-                        : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                        : 'bg-sky-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-sky-200 dark:border-slate-700 hover:bg-sky-100'
                     }`}
                   >
                     {preset.label}
@@ -1232,7 +1334,7 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                 ))}
               </div>
 
-              <div className="pt-1 flex items-center gap-3">
+              <div className="pt-2 flex items-center gap-3">
                 <input
                   type="range"
                   min="3.00"
@@ -1242,66 +1344,69 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                   onChange={(e) => onChangeTargetCpa(parseFloat(e.target.value))}
                   className="w-full accent-sky-600 cursor-pointer"
                 />
-                <span className="px-3 py-1 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-mono tabular-nums font-medium text-sm shrink-0">
+                <span className="px-3 py-1 rounded-xl bg-sky-600 text-white font-extrabold text-sm shrink-0">
                   {targetCpa.toFixed(2)}
                 </span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 tabular-nums">
-              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-800">
-                <div className="text-xs text-zinc-500">Không học cải thiện</div>
-                <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-                  CPA hiện tại: <span className="font-mono font-medium">{simResult.baseCpa4.toFixed(2)}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+                <div className="text-[11px] font-bold uppercase text-slate-400">
+                  Nếu KHÔNG Học Cải Thiện
                 </div>
-                <div className="mt-3">
-                  <div className="text-[11px] text-zinc-500">
-                    GPA cần đạt ({simResult.remainingCredits} TC)
+                <div className="mt-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  CPA hiện tại: <strong>{simResult.baseCpa4.toFixed(2)}</strong>
+                </div>
+                <div className="mt-2">
+                  <div className="text-[11px] text-slate-500">
+                    Mức GPA cần đạt cho {simResult.remainingCredits} TC còn lại:
                   </div>
                   <div
-                    className={`text-2xl font-mono font-medium mt-0.5 ${
+                    className={`text-2xl font-extrabold mt-0.5 ${
                       simResult.baseRequiredForRemaining > 4.0
                         ? 'text-rose-600'
-                        : 'text-zinc-900 dark:text-zinc-100'
+                        : 'text-slate-900 dark:text-white'
                     }`}
                   >
-                    {simResult.baseRequiredForRemaining.toFixed(2)}
+                    {simResult.baseRequiredForRemaining.toFixed(2)} / 4.00
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-sky-600/40 dark:border-sky-500/40">
-                <div className="text-xs text-sky-700 dark:text-sky-400 font-medium">
-                  Sau cải thiện ({simResult.retakeCredits} TC)
+              <div className="p-4 rounded-xl bg-sky-50/90 dark:bg-sky-950/40 border-2 border-sky-400 dark:border-sky-500">
+                <div className="text-[11px] font-bold uppercase text-sky-700 dark:text-sky-300 flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Sau Khi Cải Thiện ({simResult.retakeCredits} TC)
                 </div>
-                <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
-                  CPA mới:{' '}
-                  <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400">
+                <div className="mt-1 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                  CPA mới nhảy lên:{' '}
+                  <strong className="text-emerald-600 dark:text-emerald-400 text-sm">
                     {simResult.newCpa4.toFixed(2)}
-                  </span>{' '}
+                  </strong>{' '}
                   (+{(simResult.newCpa4 - simResult.baseCpa4).toFixed(2)})
                 </div>
-                <div className="mt-3">
-                  <div className="text-[11px] text-zinc-500">
-                    GPA cần đạt còn lại
+                <div className="mt-2">
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">
+                    Mức GPA cần đạt cho {simResult.remainingCredits} TC còn lại giảm còn:
                   </div>
-                  <div className="text-2xl font-mono font-medium mt-0.5 text-emerald-600 dark:text-emerald-400">
-                    {simResult.newRequiredForRemaining.toFixed(2)}
+                  <div className="text-2xl font-extrabold mt-0.5 text-emerald-600 dark:text-emerald-400">
+                    {simResult.newRequiredForRemaining.toFixed(2)} / 4.00
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200/80 dark:border-zinc-800 space-y-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                  <RefreshCw className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-                  <span>Mô phỏng học cải thiện theo quy chế ĐHQGHN</span>
-                </h2>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                  Chỉ các học phần đạt điểm D hoặc D+ được phép đăng ký cải thiện
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-sky-600" />
+                  2. Mô Phỏng Học Cải Thiện (Quy Chế ĐHQGHN: Chỉ Môn Điểm D / D+)
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Duy nhất môn <strong>MAT1202 - Lập trình hướng đối tượng (3 TC - D+)</strong> đủ điều kiện đăng ký học cải thiện.
                 </p>
               </div>
 
@@ -1309,16 +1414,16 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                 <button
                   type="button"
                   onClick={() => onUpdateRetakePlan({ MAT1202: 'A' })}
-                  className="h-8 px-3 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-900 dark:text-zinc-100 transition-colors duration-150"
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white hover:bg-sky-700 transition-all shadow-sm"
                 >
-                  Thử OOP lên A
+                  ⚡ Cải thiện OOP lên A (3.7)
                 </button>
                 <button
                   type="button"
                   onClick={() => onUpdateRetakePlan({ MAT1202: 'A+' })}
-                  className="h-8 px-3 rounded-lg text-xs font-medium bg-sky-600 hover:bg-sky-700 text-white transition-colors duration-150"
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
                 >
-                  Thử OOP lên A+
+                  🔥 Cải thiện OOP lên A+ (4.0)
                 </button>
               </div>
             </div>
@@ -1335,10 +1440,10 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                 return (
                   <div
                     key={course.code}
-                    className={`p-4 rounded-xl border flex flex-wrap items-center justify-between gap-3 transition-colors duration-150 ${
+                    className={`p-4 rounded-xl border-2 transition-all flex flex-wrap items-center justify-between gap-3 ${
                       isSelected
-                        ? 'bg-sky-50/40 dark:bg-sky-950/20 border-sky-600/40'
-                        : 'bg-zinc-50/70 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-800'
+                        ? 'bg-sky-50/90 dark:bg-sky-950/30 border-sky-500 dark:border-sky-400 shadow-sm'
+                        : 'bg-rose-50/50 dark:bg-slate-800/50 border-rose-200 dark:border-slate-700'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -1346,21 +1451,25 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleToggleRetake(course.code, 'A')}
-                        className="w-4 h-4 rounded accent-sky-600 cursor-pointer"
+                        className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
                       />
                       <div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="font-mono text-rose-600 dark:text-rose-400 font-medium">
-                            {course.letter} · Đủ điều kiện
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-extrabold uppercase">
+                            Được phép cải thiện (Điểm {course.letter})
                           </span>
-                          <span className="text-zinc-300">·</span>
-                          <span className="font-mono text-zinc-500">{course.code}</span>
-                          <span className="font-medium text-sm text-zinc-900 dark:text-zinc-100">
+                          <span className="font-mono font-bold text-xs text-sky-700 dark:text-sky-400">
+                            {course.code}
+                          </span>
+                          <span className="font-bold text-sm text-slate-900 dark:text-white">
                             {course.name_vi} ({course.credits} TC)
                           </span>
                         </div>
-                        <div className="text-xs text-zinc-500 mt-1 tabular-nums">
-                          Điểm hiện tại (Kỳ {course.semester}): {course.score10} ({course.score4?.toFixed(1)} hệ 4)
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          Điểm hiện tại (Kỳ {course.semester}):{' '}
+                          <strong className="text-rose-600 dark:text-rose-400">
+                            {course.letter} ({course.score4?.toFixed(1)} hệ 4 • {course.score10} hệ 10)
+                          </strong>
                         </div>
                       </div>
                     </div>
@@ -1370,18 +1479,20 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
                         value={targetLetter}
                         disabled={!isSelected}
                         onChange={(e) => handleChangeRetakeGrade(course.code, e.target.value)}
-                        className="h-8 px-2.5 rounded-lg text-xs font-mono font-medium bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                        className="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-white dark:bg-slate-900 border border-sky-300 dark:border-slate-600 text-sky-700 dark:text-sky-300"
                       >
                         <option value="A+">A+ (4.0)</option>
                         <option value="A">A (3.7)</option>
                         <option value="B+">B+ (3.5)</option>
                       </select>
 
-                      <div className="text-right min-w-[100px] tabular-nums font-mono">
-                        <div className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                          +{gainPoints} điểm
+                      <div className="text-right min-w-[110px]">
+                        <div className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+                          +{gainPoints} điểm tích lũy
                         </div>
-                        <div className="text-[11px] text-zinc-500">CPA +{singleCpaJump}</div>
+                        <div className="text-[11px] font-semibold text-sky-600 dark:text-sky-400">
+                          CPA +{singleCpaJump}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1390,21 +1501,20 @@ export const CPASimulatorPlanner: React.FC<CPASimulatorPlannerProps> = ({
             </div>
 
             {nonRetakeableLowCourses.length > 0 && (
-              <div className="pt-3 border-t border-zinc-200/70 dark:border-zinc-800 space-y-2">
-                <div className="text-xs font-medium text-zinc-500 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                  <span>Các môn điểm C / C+ (không thuộc diện học cải thiện)</span>
+              <div className="pt-3 border-t border-slate-200/80 dark:border-slate-800 space-y-2">
+                <div className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  🔒 Các môn điểm C / C+ (Đã khóa — Không được học cải thiện theo quy chế ĐHQGHN):
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {nonRetakeableLowCourses.map((c) => (
                     <div
                       key={c.code}
-                      className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between text-xs"
+                      className="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 flex items-center justify-between opacity-75 text-xs"
                     >
-                      <span className="text-zinc-600 dark:text-zinc-300 truncate">
-                        <span className="font-mono text-zinc-400">{c.code}</span> · {c.name_vi}
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {c.code} - {c.name_vi} ({c.credits} TC)
                       </span>
-                      <span className="font-mono text-zinc-500 tabular-nums shrink-0 ml-2">
+                      <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold text-[11px]">
                         {c.letter} ({c.score4?.toFixed(1)})
                       </span>
                     </div>

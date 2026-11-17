@@ -18,26 +18,35 @@ import {
 import '@xyflow/react/dist/style.css';
 import {
   CheckCircle2,
+  Sparkles,
   Lock,
   Unlock,
+  BookOpen,
+  Clock,
+  Globe2,
   GitBranch,
   Layers,
   Search,
   CheckSquare,
   Square,
   ArrowRight,
+  Eye,
+  EyeOff,
   Maximize2,
   Minimize2,
   ZoomIn,
   ZoomOut,
   Focus,
+  RotateCcw,
   LayoutGrid,
+  Compass,
   SlidersHorizontal,
   PlayCircle,
   Edit3,
   Star,
 } from 'lucide-react';
 import { Course, KnowledgeLink, CourseUserState } from '../types/academic';
+import { score10ToGrade } from '../utils/academicMath';
 import { getCourseDifficulty, getCourseCategoryMeta } from '../utils/courseReviews';
 
 interface SkillTreeGraphProps {
@@ -75,41 +84,25 @@ const SemesterHeaderNode: React.FC<NodeProps<Node<SemesterHeaderNodeData>>> = ({
   const isCurrentSem5 = data.semester === 5;
   return (
     <div
-      className={`w-[260px] rounded-xl p-3 border pointer-events-none select-none ${
+      className={`w-[260px] rounded-2xl text-white p-3 shadow-md border-2 pointer-events-none select-none ${
         isCurrentSem5
-          ? 'bg-sky-600 text-white border-sky-700'
-          : 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 shadow-sm'
+          ? 'bg-gradient-to-r from-amber-500 to-orange-500 border-amber-300'
+          : 'bg-gradient-to-r from-sky-600 to-sky-500 border-sky-300 dark:border-sky-700'
       }`}
     >
-      <div className="flex items-center justify-between text-xs tabular-nums">
-        <span
-          className={`font-mono font-medium ${
-            isCurrentSem5 ? 'text-sky-100' : 'text-zinc-500 dark:text-zinc-400'
-          }`}
-        >
-          {isCurrentSem5 ? 'Kỳ 5 · Đang học' : `Học kỳ ${data.semester}`}
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-extrabold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-lg">
+          {isCurrentSem5 ? '🔥 KỲ 5 (ĐANG HỌC)' : `CỘT HỌC KỲ ${data.semester}`}
         </span>
-        <span
-          className={`font-mono font-medium ${
-            isCurrentSem5 ? 'text-white' : 'text-zinc-700 dark:text-zinc-300'
-          }`}
-        >
-          {data.totalCredits} TC
-        </span>
+        <span className="text-xs font-bold text-white/90">{data.totalCredits} TC</span>
       </div>
-      <div className="text-sm font-semibold mt-1 leading-snug">{data.title}</div>
-      <div
-        className={`text-[11px] mt-1 flex items-center justify-between tabular-nums ${
-          isCurrentSem5 ? 'text-sky-100' : 'text-zinc-500 dark:text-zinc-400'
-        }`}
-      >
-        <span>{data.count} học phần</span>
+      <div className="text-sm font-extrabold mt-1">{data.title}</div>
+      <div className="text-[11px] text-white/90 mt-0.5 flex items-center justify-between">
+        <span>Tổng: {data.count} môn</span>
         {data.inProgressCount > 0 ? (
-          <span>Đang học: {data.inProgressCount}</span>
+          <span>Đang học: {data.inProgressCount} môn</span>
         ) : (
-          <span>
-            Hoàn thành: {data.completedCount}/{data.count}
-          </span>
+          <span>Đã xong: {data.completedCount}/{data.count}</span>
         )}
       </div>
     </div>
@@ -131,135 +124,154 @@ const CourseGraphNode: React.FC<NodeProps<Node<CustomCourseNodeData>>> = ({ data
   const isInProgress = course.in_progress && !isCompleted;
   const isReady = course.status === 'ready';
 
-  const statusBarClass = isCompleted
-    ? 'bg-emerald-600'
+  const statusStyles = isCompleted
+    ? 'bg-emerald-50/95 dark:bg-emerald-950/90 border-emerald-500 dark:border-emerald-400 text-emerald-950 dark:text-emerald-100 shadow-md shadow-emerald-500/10'
     : isInProgress
-    ? 'bg-sky-600'
+    ? 'bg-amber-50/95 dark:bg-amber-950/90 border-amber-500 dark:border-amber-400 text-amber-950 dark:text-amber-100 shadow-md shadow-amber-500/15 ring-2 ring-amber-300/60'
     : isReady
-    ? 'bg-zinc-400 dark:bg-zinc-500'
-    : 'bg-zinc-200 dark:bg-zinc-700';
+    ? 'bg-white/95 dark:bg-slate-900/95 border-sky-400 dark:border-sky-400 text-slate-800 dark:text-slate-100 ready-node-glow'
+    : 'bg-slate-100/95 dark:bg-slate-900/75 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400';
 
-  const borderStyle = selected
-    ? 'border-sky-600 ring-2 ring-sky-600/20 z-30 shadow-md'
+  const highlightStyles = selected
+    ? 'ring-4 ring-sky-500 dark:ring-sky-400 scale-[1.03] z-30 shadow-xl'
     : isConnectedToSelected
-    ? 'border-amber-500/80 ring-2 ring-amber-500/15 z-20'
-    : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700';
-
-  const dimStyle = dimmed ? 'opacity-30 hover:opacity-85' : 'opacity-100';
-
-  const cat = getCourseCategoryMeta(course);
-  const diff = getCourseDifficulty(course.code);
+    ? 'ring-2 ring-amber-400 dark:ring-amber-400 z-20 shadow-lg'
+    : dimmed
+    ? 'opacity-35 hover:opacity-90'
+    : 'opacity-100';
 
   return (
     <div
       onClick={() => onSelect(course)}
-      className={`w-[260px] rounded-xl border bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 p-3 relative overflow-hidden transition-[border-color,opacity,box-shadow] duration-150 ${
+      className={`w-[260px] rounded-2xl border-2 p-3 transition-all duration-200 ${
         isPositionLocked ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'
-      } select-none shadow-sm ${borderStyle} ${dimStyle}`}
+      } select-none backdrop-blur-md ${statusStyles} ${highlightStyles}`}
     >
-      {/* Left accent stripe indicates academic status cleanly */}
-      <div className={`absolute left-0 top-0 bottom-0 w-1 ${statusBarClass}`} />
-
       <Handle
         type="target"
         position={Position.Left}
-        className="!w-2.5 !h-2.5 !bg-zinc-400 dark:!bg-zinc-500 !border-2 !border-white dark:!border-zinc-900"
+        className="!w-3 !h-3 !bg-sky-500 !border-2 !border-white"
       />
 
-      {/* Top Row: Toggle + Monospace Code & Credits */}
-      <div className="pl-1.5 flex items-center justify-between gap-2 mb-2">
+      {/* Top row: Checkbox "Đã học" + Code + Credits */}
+      <div className="flex items-center justify-between gap-1.5 mb-1.5">
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onToggle(course.code, !isCompleted);
           }}
-          title={isCompleted ? 'Bỏ đánh dấu đã học' : 'Đánh dấu đã học'}
-          className={`nodrag h-6 px-2 rounded-md text-[11px] font-medium transition-colors duration-150 border flex items-center gap-1 cursor-pointer ${
+          title={isCompleted ? 'Bỏ tích Đã học' : 'Tích chọn Đã học môn này'}
+          className={`nodrag flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-extrabold transition-colors border shadow-sm cursor-pointer ${
             isCompleted
-              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20'
+              ? 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
               : isInProgress
-              ? 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/25'
-              : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+              ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600'
+              : 'bg-sky-50 dark:bg-slate-800 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-slate-600 hover:bg-sky-100'
           }`}
         >
           {isCompleted ? (
             <>
-              <CheckSquare className="w-3 h-3" strokeWidth={1.75} />
+              <CheckSquare className="w-3.5 h-3.5" />
               <span>Đã học</span>
             </>
           ) : isInProgress ? (
             <>
-              <PlayCircle className="w-3 h-3" strokeWidth={1.75} />
-              <span>Đang học</span>
+              <PlayCircle className="w-3.5 h-3.5" />
+              <span>Đang học K5</span>
             </>
           ) : (
             <>
-              <Square className="w-3 h-3" strokeWidth={1.75} />
+              <Square className="w-3.5 h-3.5" />
               <span>Đã học</span>
             </>
           )}
         </button>
 
-        <div className="flex items-center gap-1.5 text-[11px] font-mono tabular-nums text-zinc-500 dark:text-zinc-400">
-          <span className="font-medium text-zinc-700 dark:text-zinc-300">{course.code}</span>
-          <span>·</span>
-          <span>{course.credits} TC</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-slate-200/90 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+            {course.code}
+          </span>
+          <span className="text-xs font-bold px-1.5 py-0.5 rounded-md bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300">
+            {course.credits} TC
+          </span>
         </div>
       </div>
 
-      {/* Course Title */}
-      <div className="pl-1.5 font-medium text-[13px] leading-snug text-zinc-900 dark:text-zinc-100 line-clamp-2 min-h-[36px] mb-2">
+      {/* Course Vietnamese Title */}
+      <div className="font-extrabold text-[13px] leading-snug line-clamp-2 min-h-[34px] mb-1">
         {course.name_vi}
       </div>
 
-      {/* Category & Difficulty */}
-      <div className="pl-1.5 flex items-center justify-between gap-2 mb-2 text-[11px]">
-        <span className="text-zinc-500 dark:text-zinc-400 truncate">{cat.shortBadge}</span>
-        <span
-          className="inline-flex items-center gap-1 font-mono tabular-nums text-zinc-500 dark:text-zinc-400 shrink-0"
-          title={`Độ khó: ${diff.stars}/5 (${diff.levelLabel})`}
-        >
-          <Star className="w-3 h-3 text-amber-500 fill-amber-500" strokeWidth={1.5} />
-          <span>{diff.stars.toFixed(1)}</span>
-        </span>
-      </div>
+      {/* Category & 0-5 Star Difficulty Sub-Row */}
+      {(() => {
+        const cat = getCourseCategoryMeta(course);
+        const diff = getCourseDifficulty(course.code);
+        return (
+          <div className="flex items-center justify-between gap-1 mb-1.5">
+            <span
+              className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold border truncate ${cat.badgeBg}`}
+            >
+              {cat.shortBadge}
+            </span>
+            <span
+              className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-500 shrink-0"
+              title={`Độ khó: ${diff.stars}/5 sao (${diff.levelLabel})`}
+            >
+              {'★'.repeat(Math.round(diff.stars))}
+              <span className="text-slate-300 dark:text-slate-600">
+                {'★'.repeat(Math.max(0, 5 - Math.round(diff.stars)))}
+              </span>
+            </span>
+          </div>
+        );
+      })()}
 
-      {/* Bottom Row: Grade or Status */}
-      <div className="pl-1.5 flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800 text-[11px] tabular-nums">
+      {/* Bottom row: Grade Badge OR Status Badge */}
+      <div className="flex items-center justify-between pt-1.5 border-t border-slate-200/80 dark:border-slate-700/70">
         {isCompleted ? (
-          <>
-            <span className="text-zinc-500 dark:text-zinc-400">Kỳ {course.semester}</span>
-            <span className="font-mono font-medium text-emerald-700 dark:text-emerald-400">
-              {course.letter || 'A'} ({course.score4?.toFixed(1) ?? '3.7'}) ·{' '}
+          <div className="flex items-center justify-between w-full">
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Kỳ {course.semester}
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-emerald-600 text-white shadow-sm">
+              {course.letter || 'A'} ({course.score4?.toFixed(1) ?? '3.7'}) •{' '}
               {course.score10?.toFixed(1) ?? '8.7'}
             </span>
-          </>
+          </div>
         ) : isInProgress ? (
-          <span className="font-medium text-sky-700 dark:text-sky-400 truncate">
-            Kỳ 5 · {course.note || 'Đang học'}
-          </span>
+          <div className="flex items-center justify-between w-full">
+            <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-amber-700 dark:text-amber-300 truncate">
+              🔥 Kỳ 5: {course.note || 'Đang học'}
+            </span>
+          </div>
         ) : isReady ? (
-          <>
-            <span className="text-zinc-700 dark:text-zinc-300 font-medium">
-              Đủ tiên quyết · K{course.planned_semester || course.recommended_semester}
+          <div className="flex items-center justify-between w-full">
+            <span className="inline-flex items-center gap-1 text-xs font-extrabold text-sky-600 dark:text-sky-400">
+              <Sparkles className="w-3.5 h-3.5" />
+              Đủ TQ (Dự kiến K{course.planned_semester || course.recommended_semester})
             </span>
             {incomingKnowledgeCount > 0 && (
-              <span className="font-mono text-zinc-500">+{incomingKnowledgeCount} nền</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300">
+                +{incomingKnowledgeCount} nền
+              </span>
             )}
-          </>
+          </div>
         ) : (
-          <span className="inline-flex items-center gap-1 text-zinc-400 truncate">
-            <Lock className="w-3 h-3 shrink-0" strokeWidth={1.5} />
-            <span className="font-mono truncate">{course.prerequisites.join(', ')}</span>
-          </span>
+          <div className="flex items-center justify-between w-full">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+              <Lock className="w-3 h-3 shrink-0" />
+              Cần: {course.prerequisites.join(', ')}
+            </span>
+          </div>
         )}
       </div>
 
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-2.5 !h-2.5 !bg-zinc-400 dark:!bg-zinc-500 !border-2 !border-white dark:!border-zinc-900"
+        className="!w-3 !h-3 !bg-sky-500 !border-2 !border-white"
       />
     </div>
   );
@@ -271,14 +283,14 @@ const nodeTypes = {
 };
 
 const SEMESTER_TITLES: Record<number, string> = {
-  1: 'Nền tảng đại cương và lập trình',
-  2: 'Toán cơ sở, ĐSTT và OOP',
-  3: 'Cấu trúc DL, Toán rời rạc và GT3',
-  4: 'Xác suất, CSDL, PTVP và HĐH',
-  5: '6 học phần Kỳ 5',
-  6: 'Chuyên ngành và tự chọn AI',
-  7: 'Chuyên sâu NLP, CV và ATTT',
-  8: 'Khóa luận tốt nghiệp',
+  1: 'Nền tảng Đại cương & Lập trình',
+  2: 'Toán Cơ sở, ĐSTT & OOP',
+  3: 'Cấu trúc DL, Toán rời rạc & GT3',
+  4: 'Xác suất, CSDL, PTVP & HĐH',
+  5: '6 Môn Đang Học (16 Tín chỉ)',
+  6: 'Chuyên ngành & Tự chọn AI/Data',
+  7: 'Chuyên sâu NLP, CV & ATTT',
+  8: 'Khóa luận Tốt nghiệp (7 TC)',
 };
 
 const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
@@ -290,6 +302,7 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
 }) => {
   const reactFlowInstance = useReactFlow();
 
+  // Default to LOCKED position so clicking a node NEVER accidentally shifts its position!
   const [isPositionLocked, setIsPositionLocked] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<'canvas' | 'columns'>('canvas');
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -328,7 +341,7 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
         if (node) {
           reactFlowInstance.setCenter(node.position.x + 130, node.position.y + 80, {
             zoom: zoomLevel,
-            duration: 450,
+            duration: 600,
           });
         }
       }, 40);
@@ -342,7 +355,7 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
       if (headerNode) {
         reactFlowInstance.setCenter(headerNode.position.x + 130, headerNode.position.y + 360, {
           zoom: 0.8,
-          duration: 450,
+          duration: 600,
         });
       }
     },
@@ -428,8 +441,8 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
 
     const visibleCodes = new Set(filteredCourses.map((c) => c.code));
     const computedNodes: Node[] = [];
-    const colWidth = 340;
-    const rowHeight = 164;
+    const colWidth = 345;
+    const rowHeight = 168;
 
     Object.entries(groups).forEach(([colStr, list]) => {
       const col = Number(colStr);
@@ -502,20 +515,20 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
             source: prereqCode,
             target: targetCourse.code,
             type: 'smoothstep',
-            animated: isHighlighted,
-            label: isHighlighted ? 'Tiên quyết' : undefined,
-            labelStyle: { fill: '#0284c7', fontWeight: 500, fontSize: 11, fontFamily: 'IBM Plex Sans' },
-            labelBgStyle: { fill: '#ffffff', fillOpacity: 0.96, stroke: '#e4e4e7' },
+            animated: !prereqDone || isHighlighted,
+            label: isHighlighted ? 'Tiên quyết bắt buộc' : undefined,
+            labelStyle: { fill: '#0284c7', fontWeight: 800, fontSize: 11 },
+            labelBgStyle: { fill: '#f0f9ff', fillOpacity: 0.95 },
             style: {
-              stroke: isHighlighted ? '#0284c7' : prereqDone ? '#16a34a' : '#a1a1aa',
-              strokeWidth: isHighlighted ? 2.5 : 1.5,
-              opacity: isHighlighted ? 1 : onlyFocusSelectedLinks ? 0.15 : 0.65,
+              stroke: isHighlighted ? '#0284c7' : prereqDone ? '#10b981' : '#64748b',
+              strokeWidth: isHighlighted ? 3.5 : 2.2,
+              opacity: isHighlighted ? 1 : onlyFocusSelectedLinks ? 0.15 : 0.78,
             },
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: isHighlighted ? '#0284c7' : prereqDone ? '#16a34a' : '#a1a1aa',
-              width: 14,
-              height: 14,
+              color: isHighlighted ? '#0284c7' : prereqDone ? '#10b981' : '#64748b',
+              width: 18,
+              height: 18,
             },
           });
         });
@@ -535,21 +548,21 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
           source: kLink.source,
           target: kLink.target,
           type: 'default',
-          animated: false,
-          label: isHighlighted ? kLink.label : undefined,
-          labelStyle: { fill: '#b45309', fontWeight: 500, fontSize: 11, fontFamily: 'IBM Plex Sans' },
-          labelBgStyle: { fill: '#ffffff', fillOpacity: 0.96, stroke: '#e4e4e7' },
+          animated: isHighlighted,
+          label: isHighlighted ? `💡 ${kLink.label}` : undefined,
+          labelStyle: { fill: '#b45309', fontWeight: 800, fontSize: 11 },
+          labelBgStyle: { fill: '#fffbeb', fillOpacity: 0.96, stroke: '#f59e0b' },
           style: {
-            stroke: isHighlighted ? '#d97706' : '#d4d4d8',
-            strokeWidth: isHighlighted ? 2.2 : 1.25,
-            strokeDasharray: '5 4',
+            stroke: isHighlighted ? '#f59e0b' : '#a855f7',
+            strokeWidth: isHighlighted ? 3.2 : 1.8,
+            strokeDasharray: '6 4',
             opacity: isHighlighted ? 1 : 0.5,
           },
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: isHighlighted ? '#d97706' : '#d4d4d8',
-            width: 12,
-            height: 12,
+            color: isHighlighted ? '#f59e0b' : '#a855f7',
+            width: 16,
+            height: 16,
           },
         });
       });
@@ -599,7 +612,7 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
   const handleResetLayout = useCallback(() => {
     setCustomPositions({});
     setTimeout(() => {
-      reactFlowInstance.fitView({ padding: 0.12, duration: 400 });
+      reactFlowInstance.fitView({ padding: 0.12, duration: 500 });
     }, 60);
   }, [reactFlowInstance]);
 
@@ -635,79 +648,89 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
     <div
       className={
         isFullscreen
-          ? 'fixed inset-0 z-50 bg-zinc-50 dark:bg-zinc-950 p-4 overflow-hidden flex flex-col gap-3'
+          ? 'fixed inset-0 z-50 bg-sky-50 dark:bg-slate-950 p-4 overflow-hidden flex flex-col gap-3'
           : 'space-y-3'
       }
     >
-      {/* Calm Control Bar */}
-      <div className="bg-white dark:bg-zinc-900 rounded-xl p-2.5 border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
+      {/* STREAMLINED SINGLE-ROW CONTROL BAR (Clean, Modern, Uncluttered) */}
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl p-3 border border-sky-200 dark:border-slate-800 shadow-sm space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
+          {/* Left: View Mode + Lock Position Toggle + Semester Quick Jump */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* View Mode Toggle */}
-            <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+            {/* Switch Graph vs 8-Column Board */}
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
               <button
                 type="button"
                 onClick={() => setViewMode('canvas')}
-                className={`h-7 px-3 rounded-md text-xs font-medium transition-colors duration-150 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
                   viewMode === 'canvas'
-                    ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                    : 'text-zinc-600 dark:text-zinc-400'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                Sơ đồ đồ thị
+                Sơ đồ Cây
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('columns')}
-                className={`h-7 px-3 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors duration-150 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1 transition-all ${
                   viewMode === 'columns'
-                    ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                    : 'text-zinc-600 dark:text-zinc-400'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
-                <LayoutGrid className="w-3.5 h-3.5" strokeWidth={1.5} />
-                <span>Bảng 8 học kỳ</span>
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Bảng 8 Cột Kỳ
               </button>
             </div>
 
-            {/* Lock Position Button */}
+            {/* LOCK / UNLOCK NODE POSITIONS BUTTON */}
             {viewMode === 'canvas' && (
               <button
                 type="button"
                 onClick={() => setIsPositionLocked((v) => !v)}
-                className={`h-8 px-3 rounded-lg text-xs font-medium border transition-colors duration-150 flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all flex items-center gap-1.5 shadow-sm ${
                   isPositionLocked
-                    ? 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700'
-                    : 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/30'
+                    ? 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
+                    : 'bg-amber-500 text-white border-amber-500 hover:bg-amber-600'
                 }`}
+                title={
+                  isPositionLocked
+                    ? 'Vị trí các môn đang được KHÓA cố định để tránh bấm nhầm bị lệch. Click để mở khóa kéo thả.'
+                    : 'Đang mở khóa kéo thả vị trí môn học. Click để khóa cố định lại.'
+                }
               >
                 {isPositionLocked ? (
                   <>
-                    <Lock className="w-3.5 h-3.5 text-zinc-500" strokeWidth={1.5} />
-                    <span>Đã khóa vị trí</span>
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Đã khóa vị trí môn (Chống bấm nhầm)</span>
                   </>
                 ) : (
                   <>
-                    <Unlock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                    <span>Cho phép kéo thẻ</span>
+                    <Unlock className="w-3.5 h-3.5" />
+                    <span>Đang mở kéo vị trí (Bấm để khóa)</span>
                   </>
                 )}
               </button>
             )}
 
-            {/* Quick Jump Semester Bar */}
+            {/* Quick Jump Semester Pills */}
             {viewMode === 'canvas' && (
-              <div className="hidden xl:flex items-center gap-1 bg-zinc-50 dark:bg-zinc-800/70 px-2 py-1 rounded-lg border border-zinc-200/70 dark:border-zinc-700">
-                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 mr-1">Kỳ:</span>
+              <div className="hidden xl:flex items-center gap-1 bg-sky-50 dark:bg-slate-800 px-2 py-1 rounded-xl border border-sky-200/70 dark:border-slate-700">
+                <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300 mr-1">
+                  Tới nhanh:
+                </span>
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
                   <button
                     key={sem}
                     type="button"
                     onClick={() => focusOnSemesterColumn(sem)}
-                    className={`h-6 px-2 rounded text-[11px] font-mono tabular-nums font-medium transition-colors duration-150 ${
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-extrabold transition-all ${
                       sem === 5
-                        ? 'bg-sky-600 text-white'
-                        : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-700'
+                        ? 'bg-amber-500 text-white shadow-sm'
+                        : sem <= 4
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200'
+                        : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-sky-100'
                     }`}
                   >
                     K{sem}
@@ -717,47 +740,45 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
             )}
           </div>
 
+          {/* Right: Search + Filter Drawer Button + Fullscreen */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative">
-              <Search
-                className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2"
-                strokeWidth={1.5}
-              />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm mã hoặc tên môn"
-                className="h-8 pl-8 pr-3 rounded-lg text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-600/30 w-48"
+                placeholder="Tìm nhanh mã / tên môn..."
+                className="pl-8 pr-3 py-1.5 rounded-xl text-xs bg-sky-50/70 dark:bg-slate-800 border border-sky-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 w-48"
               />
             </div>
 
             <button
               type="button"
               onClick={() => setShowAdvancedFilters((s) => !s)}
-              className={`h-8 px-3 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-colors duration-150 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all ${
                 showAdvancedFilters
-                  ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-900'
-                  : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50'
+                  ? 'bg-sky-600 text-white border-sky-600'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-sky-200 dark:border-slate-700 hover:bg-sky-50'
               }`}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" strokeWidth={1.5} />
-              <span>Bộ lọc</span>
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Bộ lọc & Đường nối</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsFullscreen((f) => !f)}
-              className="h-8 px-3 rounded-lg text-xs font-medium bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 flex items-center gap-1.5 transition-colors duration-150"
+              className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-900 dark:bg-sky-500 text-white flex items-center gap-1.5 shadow-sm"
             >
               {isFullscreen ? (
                 <>
-                  <Minimize2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                  <Minimize2 className="w-3.5 h-3.5" />
                   <span>Thu nhỏ</span>
                 </>
               ) : (
                 <>
-                  <Maximize2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                  <Maximize2 className="w-3.5 h-3.5" />
                   <span>Toàn màn hình</span>
                 </>
               )}
@@ -765,27 +786,27 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
           </div>
         </div>
 
-        {/* Collapsible Filter Row */}
+        {/* Collapsible Secondary Filter Bar (Only shown when user clicks "Bộ lọc & Đường nối") */}
         {showAdvancedFilters && (
-          <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex flex-wrap items-center gap-1.5">
               {(
                 [
-                  { id: 'all', label: 'Tất cả' },
-                  { id: 'completed', label: 'Đã học' },
-                  { id: 'in_progress', label: 'Đang học K5' },
-                  { id: 'ready', label: 'Đủ tiên quyết' },
-                  { id: 'locked', label: 'Chưa mở khóa' },
+                  { id: 'all', label: 'Tất cả môn' },
+                  { id: 'completed', label: 'Đã học (23)' },
+                  { id: 'in_progress', label: 'Đang học Kỳ 5 (6)' },
+                  { id: 'ready', label: 'Sẵn sàng kỳ sau' },
+                  { id: 'locked', label: 'Chưa đủ TQ' },
                 ] as const
               ).map((st) => (
                 <button
                   key={st.id}
                   type="button"
                   onClick={() => setStatusFilter(st.id)}
-                  className={`h-7 px-2.5 rounded-md font-medium transition-colors duration-150 ${
+                  className={`px-2.5 py-1 rounded-lg font-bold ${
                     statusFilter === st.id
                       ? 'bg-sky-600 text-white'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {st.label}
@@ -795,17 +816,17 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
               <select
                 value={blockFilter}
                 onChange={(e) => setBlockFilter(e.target.value)}
-                className="h-7 px-2.5 rounded-md font-medium bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200"
+                className="px-2.5 py-1 rounded-lg font-bold bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-700"
               >
-                <option value="all">Tất cả 5 khối kiến thức</option>
-                <option value="I">Khối I · Kiến thức chung</option>
-                <option value="II">Khối II · Theo lĩnh vực</option>
-                <option value="III">Khối III · Theo khối ngành</option>
-                <option value="IV">Khối IV · Theo nhóm ngành</option>
-                <option value="V.1">Khối V.1 · Bắt buộc ngành</option>
-                <option value="V.2.1">Khối V.2.1 · Tự chọn Kỹ năng PM</option>
-                <option value="V.2.2">Khối V.2.2 · Tự chọn AI và PTPM</option>
-                <option value="V.3">Khối V.3 · Tốt nghiệp</option>
+                <option value="all">Tất cả 5 Khối kiến thức</option>
+                <option value="I">Khối I - Kiến thức chung</option>
+                <option value="II">Khối II - Theo lĩnh vực</option>
+                <option value="III">Khối III - Theo khối ngành</option>
+                <option value="IV">Khối IV - Theo nhóm ngành</option>
+                <option value="V.1">Khối V.1 - Bắt buộc ngành</option>
+                <option value="V.2.1">Khối V.2.1 - Tự chọn Kỹ năng PM</option>
+                <option value="V.2.2">Khối V.2.2 - Tự chọn AI & PTPM</option>
+                <option value="V.3">Khối V.3 - Tốt nghiệp</option>
               </select>
             </div>
 
@@ -813,10 +834,10 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
               <button
                 type="button"
                 onClick={() => setShowHardPrereqs((v) => !v)}
-                className={`h-7 px-2.5 rounded-md font-medium border transition-colors duration-150 ${
+                className={`px-2.5 py-1 rounded-lg font-bold border ${
                   showHardPrereqs
                     ? 'bg-sky-600 text-white border-sky-600'
-                    : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
+                    : 'bg-slate-100 text-slate-500'
                 }`}
               >
                 Tiên quyết QĐ 3568
@@ -824,32 +845,32 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
               <button
                 type="button"
                 onClick={() => setShowKnowledgeLinks((v) => !v)}
-                className={`h-7 px-2.5 rounded-md font-medium border transition-colors duration-150 ${
+                className={`px-2.5 py-1 rounded-lg font-bold border ${
                   showKnowledgeLinks
-                    ? 'bg-amber-600 text-white border-amber-600'
-                    : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
+                    ? 'bg-amber-500 text-white border-amber-500'
+                    : 'bg-slate-100 text-slate-500'
                 }`}
               >
-                Liên kết kiến thức
+                Liên kết Kiến thức (33)
               </button>
               <button
                 type="button"
                 onClick={() => setOnlyFocusSelectedLinks((v) => !v)}
-                className={`h-7 px-2.5 rounded-md font-medium border transition-colors duration-150 ${
+                className={`px-2.5 py-1 rounded-lg font-bold border ${
                   onlyFocusSelectedLinks
-                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-900'
-                    : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
+                    ? 'bg-purple-600 text-white border-purple-600'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                 }`}
               >
-                Chỉ hiện nhánh đang chọn
+                Chỉ sáng nhánh đang chọn
               </button>
               {Object.keys(customPositions).length > 0 && (
                 <button
                   type="button"
                   onClick={handleResetLayout}
-                  className="h-7 px-2.5 rounded-md bg-rose-600 text-white font-medium"
+                  className="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold"
                 >
-                  Đặt lại vị trí
+                  Khôi phục vị trí gốc
                 </button>
               )}
             </div>
@@ -857,44 +878,44 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
         )}
       </div>
 
-      {/* Main Split Workspace */}
+      {/* Main Split View: Graph/Columns (Left 8 cols) + Inspector & Direct Editor (Right 4 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
         {viewMode === 'canvas' ? (
           <div
             className={`lg:col-span-8 ${
-              isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[calc(100vh-200px)] min-h-[600px]'
-            } bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden relative`}
+              isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[calc(100vh-210px)] min-h-[600px]'
+            } bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-sky-200 dark:border-slate-800 shadow-sm overflow-hidden relative`}
           >
-            {/* Camera Quick Controls */}
-            <div className="absolute top-3 right-3 z-10 flex items-center gap-1 bg-white/95 dark:bg-zinc-900/95 p-1 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-sm text-xs">
+            {/* Floating Camera Quick Controls inside Canvas */}
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-sky-200 dark:border-slate-700 shadow-sm text-xs">
               <button
                 type="button"
-                onClick={() => reactFlowInstance.zoomIn({ duration: 200 })}
-                className="w-7 h-7 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center"
+                onClick={() => reactFlowInstance.zoomIn({ duration: 250 })}
+                className="p-1.5 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
                 title="Phóng to"
               >
-                <ZoomIn className="w-4 h-4" strokeWidth={1.5} />
+                <ZoomIn className="w-4 h-4 text-sky-600" />
               </button>
               <button
                 type="button"
-                onClick={() => reactFlowInstance.zoomOut({ duration: 200 })}
-                className="w-7 h-7 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center"
+                onClick={() => reactFlowInstance.zoomOut({ duration: 250 })}
+                className="p-1.5 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
                 title="Thu nhỏ"
               >
-                <ZoomOut className="w-4 h-4" strokeWidth={1.5} />
+                <ZoomOut className="w-4 h-4 text-sky-600" />
               </button>
               <button
                 type="button"
-                onClick={() => focusOnNode(selectedCourseCode, 1.05)}
-                className="h-7 px-2.5 rounded-md bg-sky-600 text-white font-medium hover:bg-sky-700 flex items-center gap-1 font-mono"
+                onClick={() => focusOnNode(selectedCourseCode, 1.1)}
+                className="px-2.5 py-1 rounded-lg bg-sky-600 text-white font-bold hover:bg-sky-700 flex items-center gap-1"
               >
-                <Focus className="w-3.5 h-3.5" strokeWidth={1.5} />
-                <span>{selectedCourseCode}</span>
+                <Focus className="w-3.5 h-3.5" />
+                <span>Giữa màn hình ({selectedCourseCode})</span>
               </button>
               <button
                 type="button"
-                onClick={() => reactFlowInstance.fitView({ padding: 0.12, duration: 400 })}
-                className="h-7 px-2.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium text-zinc-600 dark:text-zinc-300"
+                onClick={() => reactFlowInstance.fitView({ padding: 0.12, duration: 450 })}
+                className="px-2 py-1 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800 font-bold text-slate-600 dark:text-slate-300"
               >
                 Toàn cảnh
               </button>
@@ -914,34 +935,34 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
               nodesDraggable={!isPositionLocked}
               proOptions={{ hideAttribution: true }}
             >
-              <Background color="#d4d4d8" gap={24} size={1} />
+              <Background color="#94a3b8" gap={24} size={1.2} />
               <Controls
                 showInteractive={false}
-                className="!bg-white dark:!bg-zinc-900 !border-zinc-200 dark:!border-zinc-800 !rounded-lg !shadow-sm"
+                className="!bg-white dark:!bg-slate-800 !border-sky-200 dark:!border-slate-700 !rounded-xl !shadow-lg"
               />
               <MiniMap
                 pannable
                 zoomable
                 nodeColor={(n) => {
-                  if (n.type === 'semesterHeader') return '#52525b';
+                  if (n.type === 'semesterHeader') return '#0284c7';
                   const c = (n.data as CustomCourseNodeData)?.course;
-                  if (!c) return '#a1a1aa';
-                  if (c.completed) return '#16a34a';
-                  if (c.in_progress) return '#0284c7';
-                  if (c.status === 'ready') return '#71717a';
-                  return '#e4e4e7';
+                  if (!c) return '#94a3b8';
+                  if (c.completed) return '#10b981';
+                  if (c.in_progress) return '#f59e0b';
+                  if (c.status === 'ready') return '#38bdf8';
+                  return '#cbd5e1';
                 }}
-                maskColor="rgba(244, 244, 245, 0.65)"
-                className="!bg-white/95 dark:!bg-zinc-900/95 !border !border-zinc-200 dark:!border-zinc-800 !rounded-lg !shadow-sm cursor-pointer"
+                maskColor="rgba(224, 242, 254, 0.55)"
+                className="!bg-white/95 dark:!bg-slate-900/95 !border-2 !border-sky-300 dark:!border-slate-700 !rounded-xl !shadow-md cursor-pointer"
               />
             </ReactFlow>
           </div>
         ) : (
-          /* Mode 2: 8-Column Semester Board */
+          /* MODE 2: 8-Column Board */
           <div
             className={`lg:col-span-8 ${
-              isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[calc(100vh-200px)] min-h-[600px]'
-            } bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-4 overflow-x-auto overflow-y-auto`}
+              isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[calc(100vh-210px)] min-h-[600px]'
+            } bg-white/95 dark:bg-slate-900/95 rounded-2xl border border-sky-200 dark:border-slate-800 shadow-sm p-4 overflow-x-auto overflow-y-auto`}
           >
             <div className="flex gap-4 min-w-max pb-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
@@ -950,25 +971,25 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                 return (
                   <div
                     key={sem}
-                    className="w-[268px] shrink-0 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800 p-3 space-y-2.5"
+                    className="w-[270px] shrink-0 rounded-2xl bg-sky-50/50 dark:bg-slate-800/50 border border-sky-200/80 dark:border-slate-700 p-3 space-y-3"
                   >
                     <div
-                      className={`p-3 rounded-lg border ${
+                      className={`p-3 rounded-xl text-white shadow-sm ${
                         sem === 5
-                          ? 'bg-sky-600 text-white border-sky-700'
-                          : 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200/80 dark:border-zinc-800'
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                          : 'bg-gradient-to-r from-sky-600 to-sky-500'
                       }`}
                     >
-                      <div className="flex items-center justify-between text-xs font-mono tabular-nums">
-                        <span>{sem === 5 ? 'Kỳ 5 · Đang học' : `Học kỳ ${sem}`}</span>
+                      <div className="flex items-center justify-between text-xs font-extrabold">
+                        <span>{sem === 5 ? '🔥 KỲ 5 (ĐANG HỌC)' : `HỌC KỲ ${sem}`}</span>
                         <span>{semTc} TC</span>
                       </div>
-                      <div className="text-xs font-medium mt-1 opacity-85">
+                      <div className="text-xs font-bold text-white/90 mt-0.5">
                         {SEMESTER_TITLES[sem]}
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       {list.map((course) => {
                         const isSelected = course.code === selectedCourseCode;
                         const isConnected = connectedCodesSet.has(course.code);
@@ -976,63 +997,70 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                           <div
                             key={course.code}
                             onClick={() => setSelectedCourseCode(course.code)}
-                            className={`p-3 rounded-lg border bg-white dark:bg-zinc-900 transition-colors duration-150 cursor-pointer ${
+                            className={`p-3 rounded-xl border-2 transition-all cursor-pointer ${
+                              course.completed
+                                ? 'bg-emerald-50/90 dark:bg-emerald-950/50 border-emerald-500'
+                                : course.in_progress
+                                ? 'bg-amber-50/90 dark:bg-amber-950/50 border-amber-500'
+                                : course.status === 'ready'
+                                ? 'bg-white dark:bg-slate-900 border-sky-400 shadow-sm'
+                                : 'bg-slate-100/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 opacity-85'
+                            } ${
                               isSelected
-                                ? 'border-sky-600 ring-2 ring-sky-600/15'
+                                ? 'ring-4 ring-sky-500 scale-[1.02]'
                                 : isConnected
-                                ? 'border-amber-500/70'
-                                : 'border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300'
+                                ? 'ring-2 ring-amber-400'
+                                : ''
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <div className="flex items-center justify-between gap-1 mb-1.5">
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onToggleCourseCompleted(course.code, !course.completed);
                                 }}
-                                className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-extrabold ${
                                   course.completed
-                                    ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
+                                    ? 'bg-emerald-600 text-white'
                                     : course.in_progress
-                                    ? 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20'
-                                    : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
+                                    ? 'bg-amber-500 text-white'
+                                    : 'bg-sky-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300'
                                 }`}
                               >
                                 {course.completed ? (
-                                  <CheckSquare className="w-3 h-3" strokeWidth={1.75} />
+                                  <CheckSquare className="w-3 h-3" />
                                 ) : (
-                                  <Square className="w-3 h-3" strokeWidth={1.75} />
+                                  <Square className="w-3 h-3" />
                                 )}
-                                <span>
-                                  {course.in_progress && !course.completed ? 'Đang học' : 'Đã học'}
-                                </span>
+                                <span>{course.in_progress && !course.completed ? 'Đang học' : 'Đã học'}</span>
                               </button>
-                              <span className="font-mono text-xs text-zinc-500 tabular-nums">
-                                {course.code} · {course.credits} TC
+                              <span className="font-mono font-bold text-xs text-slate-700 dark:text-slate-300">
+                                {course.code} • {course.credits}TC
                               </span>
                             </div>
 
-                            <div className="font-medium text-xs text-zinc-900 dark:text-zinc-100 leading-snug mb-2">
+                            <div className="font-bold text-xs text-slate-900 dark:text-white leading-snug mb-2">
                               {course.name_vi}
                             </div>
 
-                            <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-zinc-100 dark:border-zinc-800 tabular-nums">
+                            <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-200/70 dark:border-slate-700">
                               {course.completed ? (
-                                <span className="font-mono font-medium text-emerald-700 dark:text-emerald-400">
-                                  {course.letter} ({course.score4?.toFixed(1)}) · {course.score10}
+                                <span className="font-extrabold text-emerald-700 dark:text-emerald-300">
+                                  Điểm: {course.letter} ({course.score4?.toFixed(1)}) •{' '}
+                                  {course.score10}
                                 </span>
                               ) : course.in_progress ? (
-                                <span className="font-medium text-sky-700 dark:text-sky-400">
-                                  Kỳ 5 · {course.note || 'Đang học'}
+                                <span className="font-extrabold text-amber-700 dark:text-amber-300">
+                                  🔥 Kỳ 5: {course.note || 'Đang học'}
                                 </span>
                               ) : course.status === 'ready' ? (
-                                <span className="text-zinc-600 dark:text-zinc-400">
-                                  Đủ tiên quyết
+                                <span className="font-extrabold text-sky-600 dark:text-sky-400">
+                                  ✨ Đủ tiên quyết học ngay
                                 </span>
                               ) : (
-                                <span className="text-zinc-400 font-mono truncate">
-                                  Cần: {course.prerequisites.join(', ')}
+                                <span className="text-slate-500">
+                                  🔒 Cần: {course.prerequisites.join(', ')}
                                 </span>
                               )}
                             </div>
@@ -1047,65 +1075,71 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
           </div>
         )}
 
-        {/* Right Side: Inspector Panel + Editor */}
+        {/* Right Side: Inspector Panel + Direct Persistent Course Editor */}
         <div
           className={`lg:col-span-4 ${
-            isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[calc(100vh-200px)] min-h-[600px]'
-          } overflow-y-auto bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 p-5 space-y-5`}
+            isFullscreen ? 'h-[calc(100vh-120px)]' : 'h-[calc(100vh-210px)] min-h-[600px]'
+          } overflow-y-auto bg-white dark:bg-slate-900 rounded-2xl border border-sky-200 dark:border-slate-800 shadow-sm p-5 space-y-4`}
         >
           {selectedCourse && inspectorDetails && (
             <>
-              <div className="pb-4 border-b border-zinc-200/80 dark:border-zinc-800 space-y-3">
-                <div className="flex items-center justify-between gap-2 text-xs font-mono tabular-nums text-zinc-500 dark:text-zinc-400">
-                  <span className="text-sky-700 dark:text-sky-400 font-medium">
-                    {selectedCourse.code} · {selectedCourse.credits} TC
+              <div className="pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-extrabold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800">
+                    {selectedCourse.code} ({selectedCourse.credits} TC)
                   </span>
-                  <span>
-                    {selectedCourse.sub_block} · {selectedCourse.type}
+                  <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    {selectedCourse.sub_block} • {selectedCourse.type}
                   </span>
                 </div>
 
-                <div>
-                  <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
-                    {selectedCourse.name_vi}
-                  </h2>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                    {selectedCourse.name_en}
-                  </p>
-                </div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug">
+                  {selectedCourse.name_vi}
+                </h3>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 italic">
+                  {selectedCourse.name_en}
+                </p>
 
-                {/* Review & Difficulty Summary */}
+                {/* Category & 0-5 Star Difficulty Review Card */}
                 {(() => {
                   const cat = getCourseCategoryMeta(selectedCourse);
                   const diff = getCourseDifficulty(selectedCourse.code);
                   return (
-                    <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/70 dark:border-zinc-800 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-zinc-600 dark:text-zinc-300 font-medium">
+                    <div className="mt-2.5 p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/70 space-y-1.5 text-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-1.5">
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${cat.badgeBg}`}
+                        >
                           {cat.badgeText}
                         </span>
-                        <span className="inline-flex items-center gap-1 font-mono tabular-nums font-medium text-zinc-900 dark:text-zinc-100 shrink-0">
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" strokeWidth={1.5} />
-                          <span>{diff.stars.toFixed(1)}/5</span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 font-extrabold text-amber-600 dark:text-amber-400">
+                          <span>{'★'.repeat(Math.round(diff.stars))}</span>
+                          <span className="text-slate-300 dark:text-slate-600">
+                            {'★'.repeat(Math.max(0, 5 - Math.round(diff.stars)))}
+                          </span>
+                          <span className="text-[10px] ml-0.5">
+                            ({diff.stars}/5 sao • {diff.levelLabel})
+                          </span>
                         </span>
                       </div>
-                      <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                        {diff.husCommunityReview}
+                      <p className="text-[11px] text-slate-700 dark:text-slate-200 leading-snug">
+                        💬 <strong>Review Góc nhìn HUS:</strong> {diff.husCommunityReview}
                       </p>
-                      <p className="text-sky-700 dark:text-sky-400 font-medium">
-                        {diff.fitWithHuan} ({diff.workload})
+                      <p className="text-[11px] font-bold text-sky-700 dark:text-sky-300">
+                        🎯 {diff.fitWithHuan} ({diff.workload})
                       </p>
                     </div>
                   );
                 })()}
 
-                {/* Direct Persistent Editor */}
-                <div className="p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 space-y-3">
-                  <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <Edit3 className="w-3.5 h-3.5 text-zinc-500" strokeWidth={1.5} />
-                    <span>Trạng thái, điểm và học kỳ</span>
+                {/* DIRECT PERSISTENT EDITOR FOR THIS COURSE */}
+                <div className="mt-3 p-3.5 rounded-xl bg-sky-50/90 dark:bg-slate-800/90 border border-sky-200 dark:border-slate-700 space-y-3">
+                  <div className="text-xs font-extrabold text-sky-800 dark:text-sky-300 flex items-center gap-1.5">
+                    <Edit3 className="w-3.5 h-3.5" />
+                    Cập nhật Trạng thái, Điểm & Học kỳ:
                   </div>
 
+                  {/* 3-State Selector: Đã có điểm / Đang học Kỳ 5 / Chưa học */}
                   <div className="grid grid-cols-3 gap-1.5">
                     <button
                       type="button"
@@ -1118,13 +1152,13 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                           score4: selectedCourse.score4 ?? 3.7,
                         })
                       }
-                      className={`h-8 px-2 rounded-md text-xs font-medium border transition-colors duration-150 ${
+                      className={`py-1.5 px-2 rounded-lg text-[11px] font-extrabold border transition-all ${
                         selectedCourse.completed
-                          ? 'bg-emerald-600 text-white border-emerald-600'
-                          : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                       }`}
                     >
-                      Hoàn thành
+                      ✓ Đã hoàn thành
                     </button>
 
                     <button
@@ -1137,13 +1171,13 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                           planned_semester: 5,
                         })
                       }
-                      className={`h-8 px-2 rounded-md text-xs font-medium border transition-colors duration-150 ${
+                      className={`py-1.5 px-2 rounded-lg text-[11px] font-extrabold border transition-all ${
                         selectedCourse.in_progress && !selectedCourse.completed
-                          ? 'bg-sky-600 text-white border-sky-600'
-                          : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
+                          ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                       }`}
                     >
-                      Đang học
+                      🔥 Đang học
                     </button>
 
                     <button
@@ -1154,20 +1188,21 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                           in_progress: false,
                         })
                       }
-                      className={`h-8 px-2 rounded-md text-xs font-medium border transition-colors duration-150 ${
+                      className={`py-1.5 px-2 rounded-lg text-[11px] font-extrabold border transition-all ${
                         !selectedCourse.completed && !selectedCourse.in_progress
-                          ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-900'
-                          : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                       }`}
                     >
-                      Dự kiến
+                      ⏳ Dự kiến học
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Semester & Score Editor */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
                     <div>
-                      <label className="text-[11px] text-zinc-500 dark:text-zinc-400 block mb-1">
-                        {selectedCourse.completed ? 'Học ở kỳ' : 'Xếp vào kỳ'}
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block mb-1">
+                        {selectedCourse.completed ? 'Học ở Kỳ:' : 'Xếp vào Học kỳ:'}
                       </label>
                       <select
                         value={
@@ -1182,7 +1217,7 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                             planned_semester: sem,
                           });
                         }}
-                        className="w-full h-8 px-2.5 rounded-md text-xs font-medium bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                        className="w-full px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 border border-sky-300 dark:border-slate-600"
                       >
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
                           <option key={s} value={s}>
@@ -1194,8 +1229,8 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
 
                     {selectedCourse.completed && selectedCourse.counts_gpa && (
                       <div>
-                        <label className="text-[11px] text-zinc-500 dark:text-zinc-400 block mb-1 tabular-nums">
-                          Điểm hệ 10 ({selectedCourse.letter} · {selectedCourse.score4})
+                        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block mb-1">
+                          Điểm hệ 10 ({selectedCourse.letter} - {selectedCourse.score4}):
                         </label>
                         <input
                           type="number"
@@ -1209,15 +1244,16 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                               onUpdateCourseScore(selectedCourse.code, val);
                             }
                           }}
-                          className="w-full h-8 px-2.5 rounded-md text-xs font-mono tabular-nums font-medium bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                          className="w-full px-2.5 py-1.5 rounded-lg text-xs font-extrabold bg-white dark:bg-slate-900 border border-sky-300 dark:border-slate-600"
                         />
                       </div>
                     )}
                   </div>
 
+                  {/* Personal Note / Teacher Note Input */}
                   <div>
-                    <label className="text-[11px] text-zinc-500 dark:text-zinc-400 block mb-1">
-                      Ghi chú môn học
+                    <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block mb-1">
+                      Ghi chú môn học / Giảng viên / Lịch học:
                     </label>
                     <input
                       type="text"
@@ -1225,43 +1261,47 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                       onChange={(e) =>
                         onUpdateCourseFullState(selectedCourse.code, { note: e.target.value })
                       }
-                      placeholder="Giảng viên hoặc lưu ý"
-                      className="w-full h-8 px-2.5 rounded-md text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700"
+                      placeholder="VD: Chăm là được / Học thầy... / Khó..."
+                      className="w-full px-2.5 py-1.5 rounded-lg text-xs bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Section 1: Hard Prerequisites */}
+              {/* Section 1: Hard Administrative Prerequisites */}
               <div className="space-y-2">
-                <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <GitBranch className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-                  <span>Môn tiên quyết bắt buộc ({inspectorDetails.hardPrereqs.length})</span>
-                </h3>
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                  <GitBranch className="w-4 h-4" />
+                  1. Môn tiên quyết bắt buộc ({inspectorDetails.hardPrereqs.length})
+                </h4>
                 {inspectorDetails.hardPrereqs.length === 0 ? (
-                  <p className="text-xs text-zinc-400">
-                    Không yêu cầu học phần tiên quyết
-                  </p>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 italic">
+                    Không yêu cầu học phần tiên quyết hành chính bắt buộc.
+                  </div>
                 ) : (
                   <div className="space-y-1.5">
                     {inspectorDetails.hardPrereqs.map((pre) => (
                       <div
                         key={pre.code}
                         onClick={() => handleSelectAndFlyTo(pre.code)}
-                        className="p-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 flex items-center justify-between cursor-pointer transition-colors duration-150 bg-zinc-50/60 dark:bg-zinc-800/40"
+                        className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-400 flex items-center justify-between cursor-pointer transition-all bg-slate-50/70 dark:bg-slate-800/50"
                       >
-                        <div className="min-w-0 truncate">
-                          <span className="font-mono text-xs text-zinc-500">{pre.code}</span>{' '}
-                          <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
-                            {pre.name_vi}
+                        <div>
+                          <span className="font-mono font-bold text-xs text-sky-700 dark:text-sky-400">
+                            {pre.code}
+                          </span>{' '}
+                          <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                            - {pre.name_vi}
                           </span>
                         </div>
                         {pre.completed ? (
-                          <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 shrink-0 tabular-nums">
-                            {pre.letter} ({pre.score10})
+                          <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                            Đã học: {pre.letter} ({pre.score10})
                           </span>
                         ) : (
-                          <span className="text-xs text-zinc-400 shrink-0">Chưa học</span>
+                          <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-700">
+                            Chưa học
+                          </span>
                         )}
                       </div>
                     ))}
@@ -1269,14 +1309,16 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                 )}
               </div>
 
-              {/* Section 2: Knowledge Links */}
+              {/* Section 2: Incoming Conceptual / Knowledge Links */}
               <div className="space-y-2">
-                <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-                  <span>Nền tảng kiến thức ({inspectorDetails.incomingKnowledge.length})</span>
-                </h3>
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <Layers className="w-4 h-4" />
+                  2. Môn nền tảng kiến thức bổ trợ ({inspectorDetails.incomingKnowledge.length})
+                </h4>
                 {inspectorDetails.incomingKnowledge.length === 0 ? (
-                  <p className="text-xs text-zinc-400">Học phần cơ sở nền tảng</p>
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 italic">
+                    Học phần gốc nền tảng cho các môn chuyên ngành phía sau.
+                  </div>
                 ) : (
                   <div className="space-y-2">
                     {inspectorDetails.incomingKnowledge.map((item, idx) => (
@@ -1285,20 +1327,23 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
                         onClick={() =>
                           item.sourceCourse && handleSelectAndFlyTo(item.sourceCourse.code)
                         }
-                        className="p-3 rounded-lg bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/70 dark:border-zinc-800 cursor-pointer hover:border-zinc-300 transition-colors duration-150"
+                        className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/70 cursor-pointer hover:border-amber-400 transition-all"
                       >
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className="font-medium text-xs text-zinc-900 dark:text-zinc-100">
-                            <span className="font-mono text-zinc-500">{item.source}</span> ·{' '}
-                            {item.sourceCourse?.name_vi}
+                          <span className="font-bold text-xs text-amber-900 dark:text-amber-200">
+                            {item.source} — {item.sourceCourse?.name_vi}
                           </span>
-                          {item.sourceCourse?.completed && (
-                            <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 shrink-0 tabular-nums">
-                              {item.sourceCourse.letter} ({item.sourceCourse.score10})
+                          {item.sourceCourse?.completed ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shrink-0">
+                              Điểm: {item.sourceCourse.letter} ({item.sourceCourse.score10})
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0">
+                              Chưa học
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -1309,27 +1354,31 @@ const SkillTreeInner: React.FC<SkillTreeGraphProps> = ({
 
               {/* Section 3: Unlocked Next Courses */}
               <div className="space-y-2">
-                <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <ArrowRight className="w-4 h-4 text-zinc-500" strokeWidth={1.5} />
-                  <span>
-                    Môn mở khóa tiếp theo ({inspectorDetails.unlockedNext.length})
-                  </span>
-                </h3>
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                  <ArrowRight className="w-4 h-4" />
+                  3. Các môn mở khóa tiếp theo (
+                  {inspectorDetails.unlockedNext.length + inspectorDetails.outgoingKnowledge.length})
+                </h4>
 
                 <div className="space-y-1.5">
                   {inspectorDetails.unlockedNext.map((nextC) => (
                     <div
                       key={`unlock-${nextC.code}`}
                       onClick={() => handleSelectAndFlyTo(nextC.code)}
-                      className="p-2.5 rounded-lg bg-zinc-50/60 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 cursor-pointer flex items-center justify-between gap-2 transition-colors duration-150"
+                      className="p-2.5 rounded-xl bg-sky-50/70 dark:bg-slate-800 border border-sky-200 dark:border-slate-700 hover:border-sky-400 cursor-pointer flex items-center justify-between"
                     >
-                      <div className="min-w-0 truncate">
-                        <span className="font-mono text-xs text-zinc-500">{nextC.code}</span>{' '}
-                        <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
-                          {nextC.name_vi}
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-600 text-white mr-1.5">
+                          Mở khóa TQ
+                        </span>
+                        <span className="font-mono font-bold text-xs text-slate-800 dark:text-slate-100">
+                          {nextC.code}
+                        </span>{' '}
+                        <span className="text-xs text-slate-600 dark:text-slate-300">
+                          - {nextC.name_vi}
                         </span>
                       </div>
-                      <span className="text-xs font-mono text-zinc-500 tabular-nums shrink-0">
+                      <span className="text-[11px] font-bold text-sky-600 dark:text-sky-400">
                         {nextC.credits} TC
                       </span>
                     </div>
