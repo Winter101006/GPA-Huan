@@ -115,8 +115,8 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
 
     return {
       remainingCredits: remCr,
-      reqForDistinction: calcRequiredAvg(3.6), // Xuất sắc (3.60)
-      reqForHonors: calcRequiredAvg(3.2), // Giỏi (3.20)
+      reqForDistinction: calcRequiredAvg(3.6),
+      reqForHonors: calcRequiredAvg(3.2),
     };
   }, [metrics.totalCompletedCredits, metrics.cpa4Exact]);
 
@@ -160,160 +160,174 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Row 1: Symmetrical 4-Column KPI Grid */}
+      {/* Row 1: Symmetrical 4-Column Gemini KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="h-full flex flex-col justify-between bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800">
+        {/* Card 1: CPA Hệ 4 (Blue/Indigo) */}
+        <div className="h-full flex flex-col justify-between bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/60 dark:from-slate-900 dark:to-indigo-950/30 rounded-2xl p-5 border border-blue-200/80 dark:border-indigo-500/25 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              CPA tích lũy (Hệ 4)
+            <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
+              CPA Tích Lũy (Hệ 4)
             </span>
-            <Award className="w-4 h-4 text-slate-400" />
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+              <Award className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tabular-nums tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold tabular-nums tracking-tight text-slate-900 dark:text-white">
               {metrics.cpa4.toFixed(2)}
             </span>
-            <span className="font-mono text-xs tabular-nums text-slate-500">
+            <span className="font-mono text-xs font-semibold tabular-nums text-slate-500">
               / 4.00 ({metrics.cpa4Exact.toFixed(4)})
             </span>
           </div>
-          <div className="mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-            Học lực: {metrics.academicRank} · Kỳ 4 đạt 3.48
+          <div className="mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            Xếp loại: {metrics.academicRank} · Kỳ 4 đạt 3.48
           </div>
         </div>
 
-        <div className="h-full flex flex-col justify-between bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800">
+        {/* Card 2: CPA Hệ 10 (Purple/Violet) */}
+        <div className="h-full flex flex-col justify-between bg-gradient-to-br from-purple-50/90 via-white to-pink-50/50 dark:from-slate-900 dark:to-purple-950/30 rounded-2xl p-5 border border-purple-200/80 dark:border-purple-500/25 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              CPA tích lũy (Hệ 10)
+            <span className="text-xs font-bold text-purple-700 dark:text-purple-300">
+              CPA Tích Lũy (Hệ 10)
             </span>
-            <TrendingUp className="w-4 h-4 text-slate-400" />
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-300 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tabular-nums tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold tabular-nums tracking-tight text-slate-900 dark:text-white">
               {metrics.cpa10.toFixed(2)}
             </span>
-            <span className="font-mono text-xs tabular-nums text-slate-500">
+            <span className="font-mono text-xs font-semibold tabular-nums text-slate-500">
               / 10.0 ({metrics.cpa10Exact.toFixed(4)})
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-            2 môn A+, 7 môn A, 6 môn B+ ({metrics.completedCount} học phần)
+          <div className="mt-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            2 môn A+, 7 môn A, 6 môn B+ ({metrics.completedCount} môn)
           </div>
         </div>
 
-        <div className="h-full flex flex-col justify-between bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800">
+        {/* Card 3: Tiến Độ Tín Chỉ (Emerald/Cyan) */}
+        <div className="h-full flex flex-col justify-between bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/50 dark:from-slate-900 dark:to-emerald-950/30 rounded-2xl p-5 border border-emerald-200/80 dark:border-emerald-500/25 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Tiến độ tín chỉ tính GPA
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+              Tiến Độ Tín Chỉ GPA
             </span>
-            <BookCheck className="w-4 h-4 text-slate-400" />
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 flex items-center justify-center">
+              <BookCheck className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tabular-nums tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold tabular-nums tracking-tight text-slate-900 dark:text-white">
               {metrics.totalCompletedCredits}
             </span>
-            <span className="font-mono text-xs tabular-nums text-slate-500">
+            <span className="font-mono text-xs font-semibold tabular-nums text-slate-500">
               / 129 TC ({metrics.completionPct}%)
             </span>
           </div>
-          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-2.5">
+          <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-2.5">
             <div
-              className="h-full bg-sky-600 dark:bg-sky-400 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 rounded-full"
               style={{ width: `${metrics.completionPct}%` }}
             />
           </div>
         </div>
 
-        <div className="h-full flex flex-col justify-between bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800">
+        {/* Card 4: Học kỳ 5 Hiện tại (Warm Amber/Rose Gradient) */}
+        <div className="h-full flex flex-col justify-between bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 text-white rounded-2xl p-5 shadow-md shadow-orange-500/20">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Học kỳ 5 hiện tại
+            <span className="text-xs font-bold text-amber-50">
+              Đang Học Tại Kỳ 5
             </span>
-            <GraduationCap className="w-4 h-4 text-slate-400" />
+            <div className="w-8 h-8 rounded-xl bg-white/20 text-white flex items-center justify-center">
+              <GraduationCap className="w-4 h-4" />
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-semibold tabular-nums tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold tabular-nums tracking-tight">
               {metrics.inProgressCredits || 16} TC
             </span>
-            <span className="font-mono text-xs tabular-nums text-slate-500">
-              ({metrics.inProgressCount || 6} học phần)
+            <span className="font-mono text-xs font-semibold tabular-nums text-amber-100">
+              ({metrics.inProgressCount || 6} môn)
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-            Sau Kỳ 5 đạt: {metrics.totalCompletedCredits + (metrics.inProgressCredits || 16)} / 129 TC
+          <div className="mt-2 text-xs font-semibold text-amber-50">
+            Xong Kỳ 5 đạt: {metrics.totalCompletedCredits + (metrics.inProgressCredits || 16)} / 129 TC
           </div>
         </div>
       </div>
 
-      {/* Row 2: Real-Time Target CPA Solver Strip */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl px-5 py-3.5 border border-slate-200/85 dark:border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs">
+      {/* Row 2: Real-Time Target CPA Solver Strip (Gemini Aurora Banner) */}
+      <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/90 dark:from-indigo-950/40 dark:via-slate-900 dark:to-purple-950/40 rounded-2xl px-5 py-3.5 border border-indigo-200/80 dark:border-indigo-500/25 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs shadow-2xs">
         <div className="flex items-center gap-2.5">
-          <Target className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
-          <span className="font-medium text-slate-800 dark:text-slate-200">
+          <Target className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+          <span className="font-bold text-slate-800 dark:text-slate-200">
             Mục tiêu điểm trung bình cho{' '}
-            <strong className="font-mono tabular-nums">{targetForecast.remainingCredits} TC</strong>{' '}
+            <strong className="font-mono tabular-nums text-indigo-700 dark:text-indigo-300">
+              {targetForecast.remainingCredits} TC
+            </strong>{' '}
             còn lại (Kỳ 5 – Kỳ 8):
           </span>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 dark:text-slate-400">Để đạt Bằng Xuất sắc (3.60):</span>
-            <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono font-semibold tabular-nums text-slate-900 dark:text-white">
+            <span className="text-slate-600 dark:text-slate-300 font-medium">Bằng Xuất sắc (3.60):</span>
+            <span className="px-2.5 py-0.5 rounded-lg bg-white dark:bg-slate-800 font-mono font-extrabold tabular-nums text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30">
               {targetForecast.reqForDistinction <= 4.0
                 ? `${targetForecast.reqForDistinction.toFixed(2)} / 4.0`
                 : '> 4.00 (Cần học cải thiện)'}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 dark:text-slate-400">Để giữ Bằng Giỏi (3.20):</span>
-            <span className="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800">
+            <span className="text-slate-600 dark:text-slate-300 font-medium">Bằng Giỏi (3.20):</span>
+            <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/15 font-mono font-extrabold tabular-nums text-emerald-700 dark:text-emerald-300 border border-emerald-300/70 dark:border-emerald-500/30">
               {Math.max(targetForecast.reqForHonors, 2.0).toFixed(2)} / 4.0
             </span>
           </div>
         </div>
       </div>
 
-      {/* Sub-navigation bar */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl p-1.5 border border-slate-200/85 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1">
+      {/* Sub-navigation bar (Gemini Gradient Active Pill!) */}
+      <div className="bg-white/95 dark:bg-slate-900/95 rounded-2xl p-2 border border-indigo-100/90 dark:border-indigo-500/20 shadow-xs flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setSubTab('overview_charts')}
-            className={`h-8 px-3.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
               subTab === 'overview_charts'
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800'
             }`}
           >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>1. Xu hướng GPA &amp; Phân phối điểm chữ</span>
+            <BarChart3 className="w-4 h-4" />
+            <span>1. Biểu Đồ Xu Hướng GPA &amp; Phân Phối Điểm Chữ</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSubTab('blocks_audit')}
-            className={`h-8 px-3.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
               subTab === 'blocks_audit'
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800'
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>2. Kiểm toán 5 khối kiến thức &amp; Học phần điều kiện</span>
+            <Layers className="w-4 h-4" />
+            <span>2. Tiến Độ 5 Khối Kiến Thức &amp; Học Phần Điều Kiện</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSubTab('transcript_editor')}
-            className={`h-8 px-3.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all ${
               subTab === 'transcript_editor'
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800'
             }`}
           >
-            <Table className="w-3.5 h-3.5" />
-            <span>3. Bảng điểm chi tiết &amp; Cập nhật điểm</span>
+            <Table className="w-4 h-4" />
+            <span>3. Bảng Điểm Trực Tiếp &amp; Cập Nhật Điểm</span>
           </button>
         </div>
       </div>
@@ -321,18 +335,19 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
       {/* SUB-TAB 1: CHARTS */}
       {subTab === 'overview_charts' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800">
+          <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-indigo-100 dark:border-slate-800 shadow-xs">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Xu hướng GPA từng kỳ &amp; CPA tích lũy
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-indigo-600" />
+                  Biểu đồ Xu hướng GPA &amp; CPA qua các Học kỳ
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Kỳ 1 (3.31) → Kỳ 2 (2.96) → Kỳ 3 (3.30) → Kỳ 4 (3.48)
                 </p>
               </div>
-              <span className="px-2.5 py-1 rounded-lg font-mono text-xs font-medium tabular-nums bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
-                +0.52 GPA vs Kỳ 2
+              <span className="px-2.5 py-1 rounded-xl font-mono text-xs font-bold tabular-nums bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                +0.52 GPA từ Kỳ 2 lên Kỳ 4
               </span>
             </div>
 
@@ -344,41 +359,40 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                 >
                   <defs>
                     <linearGradient id="colorGpa4" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0284c7" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#0284c7" stopOpacity={0.01} />
+                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.32} />
+                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="colorCpa4" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.01} />
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                  <XAxis dataKey="label" tick={{ fontSize: 12, fontWeight: 600 }} />
                   <YAxis domain={[2.4, 4.0]} tick={{ fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{
-                      borderRadius: '10px',
-                      border: '1px solid #e2e8f0',
-                      fontSize: '12px',
+                      borderRadius: '12px',
+                      border: '1px solid #c7d2fe',
                     }}
                   />
                   <Legend />
                   <Area
                     type="monotone"
                     dataKey="gpa4"
-                    name="GPA từng kỳ (Hệ 4)"
-                    stroke="#0284c7"
-                    strokeWidth={2.5}
+                    name="GPA Từng Kỳ (Hệ 4)"
+                    stroke="#4f46e5"
+                    strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#colorGpa4)"
-                    activeDot={{ r: 5 }}
+                    activeDot={{ r: 6 }}
                   />
                   <Area
                     type="monotone"
                     dataKey="cpa4"
-                    name="CPA tích lũy (Hệ 4)"
+                    name="CPA Tích Lũy (Hệ 4)"
                     stroke="#10b981"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     strokeDasharray="5 3"
                     fillOpacity={1}
                     fill="url(#colorCpa4)"
@@ -388,14 +402,15 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800 flex flex-col justify-between">
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-indigo-100 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div>
               <div className="mb-4">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Phân phối điểm chữ ({metrics.completedCount} học phần)
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Award className="w-5 h-5 text-indigo-600" />
+                  Phân phối Điểm chữ ({metrics.completedCount} môn đã có điểm)
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Tỷ lệ môn đạt từ B+ trở lên: 15 / {metrics.completedCount} môn
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  A+ (2), A (7), B+ (6), B (3), C+ (3), C (1), D+ (1)
                 </p>
               </div>
 
@@ -403,13 +418,13 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={gradeChartData} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                    <XAxis dataKey="letter" tick={{ fontSize: 12 }} />
+                    <XAxis dataKey="letter" tick={{ fontSize: 12, fontWeight: 700 }} />
                     <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                     <Tooltip
-                      formatter={(value: number) => [`${value} học phần`, 'Số lượng']}
-                      contentStyle={{ borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '12px' }}
+                      formatter={(value: number) => [`${value} môn học`, 'Số lượng']}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid #c7d2fe' }}
                     />
-                    <Bar dataKey="count" name="Số học phần" radius={[6, 6, 0, 0]}>
+                    <Bar dataKey="count" name="Số môn học" radius={[8, 8, 0, 0]}>
                       {gradeChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
@@ -419,16 +434,16 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
+            <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
               {gradeChartData.map((g) => (
                 <div
                   key={g.letter}
-                  className="px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700 font-mono text-xs tabular-nums"
+                  className="px-2 py-1 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700 font-mono text-xs tabular-nums"
                 >
-                  <span className="font-semibold" style={{ color: g.color }}>
+                  <span className="font-extrabold" style={{ color: g.color }}>
                     {g.letter}:
                   </span>{' '}
-                  <span className="text-slate-700 dark:text-slate-200">{g.count}</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-200">{g.count}</span>
                 </div>
               ))}
             </div>
@@ -439,13 +454,14 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
       {/* SUB-TAB 2: 5 BLOCKS AUDIT & CONDITIONAL CHECKLIST */}
       {subTab === 'blocks_audit' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800 space-y-4">
+          <div className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-indigo-100 dark:border-slate-800 shadow-xs space-y-3.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                Tiến độ 5 khối kiến thức (Chuẩn QĐ 3568/QĐ-ĐHKHTN)
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <Layers className="w-5 h-5 text-indigo-600" />
+                Kiểm toán Tiến độ 5 Khối Kiến Thức (Chuẩn QĐ 3568/QĐ-ĐHKHTN)
               </h3>
-              <span className="px-2.5 py-1 rounded-lg font-mono text-xs font-medium tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                {metrics.totalCompletedCredits} / 129 TC
+              <span className="px-3 py-1 rounded-xl font-mono text-xs font-extrabold tabular-nums bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                Đã xong: {metrics.totalCompletedCredits} / 129 TC
               </span>
             </div>
 
@@ -456,38 +472,46 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                 return (
                   <div
                     key={blk.id}
-                    className={`p-4 rounded-xl border transition-colors ${
+                    className={`p-4 rounded-2xl border transition-all ${
                       isDone
-                        ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-800/60'
-                        : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800'
+                        ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
+                        : 'bg-indigo-50/30 dark:bg-slate-800/50 border-indigo-100 dark:border-slate-700'
                     }`}
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-2">
                         {isDone ? (
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                         ) : (
-                          <AlertCircle className="w-4 h-4 text-sky-600 shrink-0" />
+                          <AlertCircle className="w-4 h-4 text-indigo-600 shrink-0" />
                         )}
-                        <span className="font-medium text-sm text-slate-900 dark:text-slate-100">
+                        <span className="font-bold text-sm text-slate-800 dark:text-slate-100">
                           {blk.name}
                         </span>
                       </div>
-                      <span className="font-mono text-xs font-medium tabular-nums text-slate-700 dark:text-slate-300">
+                      <span
+                        className={`font-mono text-xs font-extrabold tabular-nums px-2.5 py-0.5 rounded-full ${
+                          isDone
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                        }`}
+                      >
                         {blk.completed} / {blk.required} TC ({pct}%)
                       </span>
                     </div>
 
-                    <div className="w-full h-1.5 bg-slate-200/80 dark:bg-slate-700 rounded-full overflow-hidden mb-2">
+                    <div className="w-full h-2 bg-slate-200/80 dark:bg-slate-700 rounded-full overflow-hidden mb-1.5">
                       <div
                         className={`h-full rounded-full ${
-                          isDone ? 'bg-emerald-600' : 'bg-sky-600'
+                          isDone
+                            ? 'bg-emerald-500'
+                            : 'bg-gradient-to-r from-blue-500 via-indigo-500 to-sky-400'
                         }`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                    <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
                       {blk.missingNote}
                     </p>
                   </div>
@@ -497,10 +521,10 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
           </div>
 
           <div className="lg:col-span-4 space-y-4">
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800 space-y-3">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-slate-500" />
-                Học phần điều kiện (15 TC ngoài GPA)
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-indigo-100 dark:border-slate-800 shadow-xs space-y-3">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                Checklist Học phần Điều kiện (15 TC ngoài GPA)
               </h3>
               <div className="space-y-2.5">
                 {conditionalCourses.map((cc) => {
@@ -508,10 +532,10 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                   return (
                     <label
                       key={cc.code}
-                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${
+                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
                         checked
-                          ? 'bg-emerald-50/50 dark:bg-emerald-950/25 border-emerald-200 dark:border-emerald-800'
-                          : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700'
+                          ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800'
+                          : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -522,8 +546,8 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                           className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
                         />
                         <div>
-                          <div className="text-xs font-medium text-slate-900 dark:text-slate-100">
-                            {cc.code} · {cc.name_vi}
+                          <div className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                            {cc.code} - {cc.name_vi}
                           </div>
                           <div className="text-[11px] text-slate-500">
                             {cc.credits} tín chỉ điều kiện
@@ -531,7 +555,7 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                         </div>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${
                           checked
                             ? 'bg-emerald-600 text-white'
                             : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
@@ -554,18 +578,18 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
           {/* Quick Add/Update Course Score Bar */}
           <form
             onSubmit={handleQuickSaveScore}
-            className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200/85 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3"
+            className="bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-sky-50/90 dark:bg-slate-900 rounded-2xl p-4 border border-indigo-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3"
           >
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300">
-              <PlusCircle className="w-4 h-4 text-sky-600" />
-              <span>Cập nhật nhanh điểm học phần:</span>
+            <div className="flex items-center gap-2 text-xs font-extrabold text-indigo-800 dark:text-indigo-300">
+              <PlusCircle className="w-4 h-4 text-indigo-600" />
+              <span>Nhập nhanh điểm môn mới hoặc môn vừa có điểm:</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <select
                 value={quickCourseCode}
                 onChange={(e) => setQuickCourseCode(e.target.value)}
-                className="h-8 px-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium"
+                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 font-bold"
               >
                 {courses
                   .filter((c) => c.counts_gpa)
@@ -580,7 +604,7 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
               <select
                 value={quickCourseSem}
                 onChange={(e) => setQuickCourseSem(Number(e.target.value))}
-                className="h-8 px-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium"
+                className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 font-bold"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
                   <option key={s} value={s}>
@@ -597,41 +621,41 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                 value={quickCourseScore}
                 onChange={(e) => setQuickCourseScore(e.target.value)}
                 placeholder="Điểm 10"
-                className="h-8 w-20 px-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-medium tabular-nums text-center"
+                className="w-24 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 font-mono font-extrabold tabular-nums text-center"
               />
 
               <button
                 type="submit"
-                className="h-8 px-3.5 rounded-lg bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-medium transition-colors"
+                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:brightness-105 text-white font-extrabold shadow-sm"
               >
-                Lưu điểm
+                Lưu vào Bảng điểm
               </button>
             </div>
           </form>
 
           {/* Transcript Table */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/85 dark:border-slate-800">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Bảng điểm học phần ({filteredTranscriptCourses.length} môn)
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-indigo-100 dark:border-slate-800 shadow-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Table className="w-5 h-5 text-indigo-600" />
+                  Bảng Điểm &amp; Trạng Thái Học Phần ({filteredTranscriptCourses.length} môn)
                 </h3>
 
-                {/* Quick Search Input */}
                 <div className="relative w-56 sm:w-64">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 text-indigo-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Tìm mã môn, tên, điểm chữ..."
-                    className="h-8 w-full pl-8 pr-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs outline-none focus:border-slate-400"
+                    className="h-8 w-full pl-8 pr-7 rounded-xl border border-indigo-100 dark:border-slate-700 bg-indigo-50/40 dark:bg-slate-800 text-xs outline-none focus:border-indigo-400"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -639,7 +663,7 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1 bg-slate-100/80 dark:bg-slate-800 p-1 rounded-lg border border-slate-200/70 dark:border-slate-700">
+              <div className="flex flex-wrap items-center gap-1 bg-indigo-50/70 dark:bg-slate-800 p-1 rounded-xl border border-indigo-100 dark:border-slate-700">
                 {(
                   [
                     { id: 'all', label: 'Tất cả' },
@@ -653,10 +677,10 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                   <button
                     key={String(tab.id)}
                     onClick={() => setSelectedSemTab(tab.id)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                       selectedSemTab === tab.id
-                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-indigo-100/60'
                     }`}
                   >
                     {tab.label}
@@ -665,37 +689,35 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
               </div>
             </div>
 
-            <div className="overflow-x-auto max-h-[440px] overflow-y-auto">
+            <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead className="sticky top-0 z-10">
-                  <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium">
+                  <tr className="border-b border-indigo-100 dark:border-slate-700 bg-indigo-50/60 dark:bg-slate-800 text-indigo-800 dark:text-slate-300 font-bold">
                     <th className="py-2.5 px-3">#</th>
                     <th className="py-2.5 px-3">Học kỳ</th>
                     <th className="py-2.5 px-3">Mã HP</th>
                     <th className="py-2.5 px-3">Tên học phần</th>
                     <th className="py-2.5 px-3">Ghi chú cá nhân</th>
-                    <th className="py-2.5 px-3 text-right">TC</th>
+                    <th className="py-2.5 px-3 text-center">TC</th>
                     <th className="py-2.5 px-3 text-center">Điểm hệ 10</th>
                     <th className="py-2.5 px-3 text-center">Điểm chữ</th>
-                    <th className="py-2.5 px-3 text-right">Hệ 4</th>
+                    <th className="py-2.5 px-3 text-center">Hệ 4</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredTranscriptCourses.map((c, idx) => (
                     <tr
                       key={c.code}
-                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                      className="hover:bg-indigo-50/40 dark:hover:bg-slate-800/40 transition-colors"
                     >
-                      <td className="py-2.5 px-3 font-mono tabular-nums text-slate-400">
-                        {idx + 1}
-                      </td>
-                      <td className="py-2.5 px-3 font-medium text-slate-600 dark:text-slate-300">
+                      <td className="py-2.5 px-3 font-mono tabular-nums text-slate-400">{idx + 1}</td>
+                      <td className="py-2.5 px-3 font-bold text-indigo-600 dark:text-indigo-400">
                         Kỳ {c.semester}
                       </td>
-                      <td className="py-2.5 px-3 font-mono font-medium text-slate-800 dark:text-slate-200">
+                      <td className="py-2.5 px-3 font-mono font-bold text-slate-800 dark:text-slate-200">
                         {c.code}
                       </td>
-                      <td className="py-2.5 px-3 font-medium text-slate-900 dark:text-white">
+                      <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-white">
                         {c.name_vi}
                       </td>
                       <td className="py-2.5 px-3">
@@ -705,13 +727,11 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                           onChange={(e) =>
                             onUpdateCourseFullState(c.code, { note: e.target.value })
                           }
-                          placeholder="Ghi chú..."
-                          className="w-full px-2 py-0.5 rounded border border-transparent hover:border-slate-200 focus:border-slate-400 bg-transparent text-xs outline-none"
+                          placeholder="Thêm ghi chú..."
+                          className="w-full px-2 py-0.5 rounded border border-transparent hover:border-indigo-200 focus:border-indigo-400 bg-transparent text-xs outline-none"
                         />
                       </td>
-                      <td className="py-2.5 px-3 text-right font-mono tabular-nums font-medium">
-                        {c.credits}
-                      </td>
+                      <td className="py-2.5 px-3 text-center font-mono tabular-nums font-bold">{c.credits}</td>
                       <td className="py-2.5 px-3 text-center">
                         {c.completed ? (
                           <input
@@ -726,10 +746,10 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                                 onUpdateCourseScore(c.code, val);
                               }
                             }}
-                            className="w-16 text-center py-0.5 px-1.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono tabular-nums font-medium"
+                            className="w-16 text-center py-0.5 px-1.5 rounded-lg border border-indigo-200 dark:border-slate-700 bg-indigo-50/40 dark:bg-slate-800 font-mono tabular-nums font-bold"
                           />
                         ) : (
-                          <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800 font-medium text-[11px]">
+                          <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-[11px]">
                             Đang học K5
                           </span>
                         )}
@@ -737,7 +757,7 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                       <td className="py-2.5 px-3 text-center">
                         {c.completed ? (
                           <span
-                            className="inline-block w-8 py-0.5 rounded text-[11px] font-mono font-semibold text-white text-center"
+                            className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold text-white"
                             style={{ backgroundColor: GRADE_COLORS[c.letter || 'A'] || '#0284c7' }}
                           >
                             {c.letter}
@@ -746,7 +766,7 @@ export const DegreeAuditDashboard: React.FC<DegreeAuditDashboardProps> = ({
                           '—'
                         )}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-mono tabular-nums font-semibold">
+                      <td className="py-2.5 px-3 text-center font-mono tabular-nums font-extrabold">
                         {c.completed ? c.score4?.toFixed(1) : '—'}
                       </td>
                     </tr>

@@ -10,7 +10,7 @@ import {
   Upload,
   Download,
   RotateCcw,
-  CheckCircle2,
+  Sparkles,
   Clock,
   BookOpen,
   FileJson,
@@ -65,7 +65,7 @@ export function App() {
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 3200);
   };
 
   useEffect(() => {
@@ -451,12 +451,12 @@ export function App() {
 
   if (!db || !progress) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0B0F19]">
-        <div className="text-center space-y-2">
-          <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center mx-auto">
-            <GraduationCap className="w-5 h-5" />
+      <div className="min-h-screen flex items-center justify-center bg-[#F3F7FC] dark:bg-[#0B0F19]">
+        <div className="text-center space-y-2.5">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-500 to-sky-400 text-white flex items-center justify-center mx-auto shadow-md shadow-indigo-500/20">
+            <GraduationCap className="w-6 h-6" />
           </div>
-          <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             Đang tải dữ liệu học thuật VNU-HUS...
           </div>
         </div>
@@ -474,102 +474,109 @@ export function App() {
     {
       id: 'skill_tree',
       shortcut: '1',
-      label: 'Cây môn học',
+      label: 'Cây Môn Học',
       icon: Network,
       badge: '61 HP',
     },
     {
       id: 'current_semester',
       shortcut: '2',
-      label: 'Sổ tay Kỳ 5 & NLP',
+      label: 'Sổ Tay Kỳ 5 & NLP',
       icon: BookOpen,
       badge: '16 TC',
     },
     {
       id: 'simulator',
       shortcut: '3',
-      label: 'Lộ trình Kỳ 6–8 & CPA',
+      label: 'Lộ Trình Kỳ 6–8 & CPA',
       icon: Clock,
+      badge: '0–5 Sao',
     },
     {
       id: 'dashboard',
       shortcut: '4',
-      label: 'Bảng điểm & Kiểm toán',
+      label: 'Dashboard & Bảng Điểm',
       icon: BarChart3,
-      badge: `${overallMetrics.totalCompletedCredits}/129`,
+      badge: `${overallMetrics.totalCompletedCredits}/129 TC`,
     },
     {
       id: 'career',
       shortcut: '5',
-      label: 'Định hướng nghề nghiệp',
+      label: 'Định Hướng Nghề Nghiệp',
       icon: Compass,
     },
     {
       id: 'ai_advisor',
       shortcut: '6',
-      label: 'Cố vấn học tập AI',
+      label: 'Cố Vấn Học Tập AI',
       icon: Bot,
+      badge: 'Gemini AI',
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-sky-50/70 via-white to-indigo-50/40 dark:from-[#0B0F19] dark:via-[#0E1424] dark:to-[#0B0F19] text-slate-800 dark:text-slate-100">
       {toast && (
-        <div className="fixed bottom-12 right-6 z-50 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium shadow-lg border border-slate-700 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-12 right-6 z-50 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs font-bold shadow-xl flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-sky-200 shrink-0" />
           <span>{toast}</span>
         </div>
       )}
 
-      {/* SYMMETRICAL TWO-TIER ACADEMIC HEADER */}
-      <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
+      {/* GEMINI-STYLED SYMMETRICAL ACADEMIC HEADER (Zero Black Blocks!) */}
+      <header className="sticky top-0 z-30 bg-white/90 dark:bg-[#0E1424]/90 backdrop-blur-xl border-b border-indigo-100/80 dark:border-indigo-500/20 shadow-xs">
         <div className="max-w-[1480px] mx-auto px-4 sm:px-6">
-          {/* Row 1: Brand + Tabular Summary Strip + Actions */}
-          <div className="h-14 flex items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800/70">
+          {/* Row 1: Brand + Colorful Tabular Summary Strip + Actions */}
+          <div className="py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100/60 dark:border-indigo-500/15">
             {/* Left: Brand Identity */}
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-500 to-sky-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20">
+                <GraduationCap className="w-5 h-5" />
               </div>
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white truncate">
-                  HUS CIS Roadmap
-                </span>
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700">
-                  Phạm Ngọc Huân · K69
-                </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-sky-400 dark:via-indigo-300 dark:to-purple-400 truncate">
+                    HUS CIS NAVIGATOR
+                  </span>
+                  <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-400/25">
+                    Phạm Ngọc Huân · K69
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden md:block">
+                  Khoa học Máy tính &amp; Thông tin (QĐ 3568) · Trường ĐH Khoa học Tự nhiên
+                </div>
               </div>
             </div>
 
-            {/* Center: Symmetrical 4-Column Tabular Academic Summary */}
-            <div className="hidden xl:grid grid-cols-4 divide-x divide-slate-200 dark:divide-slate-800 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 text-xs">
-              <div className="px-3.5 py-1 flex items-center gap-2">
-                <span className="text-slate-500 dark:text-slate-400">CPA Hệ 4</span>
-                <span className="font-mono font-semibold tabular-nums text-slate-900 dark:text-white">
+            {/* Center: Symmetrical 4-Pill Gemini Metric Bar */}
+            <div className="hidden xl:flex items-center gap-2 text-xs">
+              <div className="px-3 py-1.5 rounded-xl bg-blue-50/80 dark:bg-blue-500/10 border border-blue-200/70 dark:border-blue-400/20 flex items-center gap-2">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">CPA Hệ 4:</span>
+                <span className="font-mono font-extrabold tabular-nums text-blue-700 dark:text-blue-300">
                   {overallMetrics.cpa4.toFixed(2)}
                 </span>
               </div>
-              <div className="px-3.5 py-1 flex items-center gap-2">
-                <span className="text-slate-500 dark:text-slate-400">CPA Hệ 10</span>
-                <span className="font-mono font-semibold tabular-nums text-slate-900 dark:text-white">
+              <div className="px-3 py-1.5 rounded-xl bg-purple-50/80 dark:bg-purple-500/10 border border-purple-200/70 dark:border-purple-400/20 flex items-center gap-2">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">CPA Hệ 10:</span>
+                <span className="font-mono font-extrabold tabular-nums text-purple-700 dark:text-purple-300">
                   {overallMetrics.cpa10.toFixed(2)}
                 </span>
               </div>
-              <div className="px-3.5 py-1 flex items-center gap-2">
-                <span className="text-slate-500 dark:text-slate-400">Tích lũy</span>
-                <span className="font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-500/10 border border-emerald-200/70 dark:border-emerald-400/20 flex items-center gap-2">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Tích lũy:</span>
+                <span className="font-mono font-extrabold tabular-nums text-emerald-700 dark:text-emerald-300">
                   {overallMetrics.totalCompletedCredits}/129 TC
                 </span>
               </div>
-              <div className="px-3.5 py-1 flex items-center gap-2">
-                <span className="text-slate-500 dark:text-slate-400">Học kỳ 5</span>
-                <span className="font-mono font-semibold tabular-nums text-sky-700 dark:text-sky-400">
+              <div className="px-3 py-1.5 rounded-xl bg-amber-50/80 dark:bg-amber-500/10 border border-amber-200/70 dark:border-amber-400/20 flex items-center gap-2">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Học kỳ 5:</span>
+                <span className="font-mono font-extrabold tabular-nums text-amber-700 dark:text-amber-300">
                   {overallMetrics.inProgressCredits} TC ({overallMetrics.inProgressCount} môn)
                 </span>
               </div>
             </div>
 
-            {/* Right: Uniform Action Bar (all h-8 = 32px) */}
+            {/* Right: Smooth Rounded Action Bar */}
             <div className="flex items-center gap-1.5 shrink-0">
               <input
                 ref={fileInputRef}
@@ -581,37 +588,37 @@ export function App() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="h-8 px-2.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700 flex items-center gap-1.5 transition-colors"
+                className="h-8 px-3 rounded-xl text-xs font-bold bg-sky-50 dark:bg-slate-800 hover:bg-sky-100 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-slate-700 flex items-center gap-1.5 transition"
                 title="Nhập file Excel bảng điểm"
               >
-                <Upload className="w-3.5 h-3.5 text-slate-500" />
-                <span className="hidden md:inline">Nhập Excel</span>
+                <Upload className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Excel</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleExportJsonBackup}
-                className="h-8 px-2.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700 flex items-center gap-1.5 transition-colors"
+                className="h-8 px-3 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-slate-700 flex items-center gap-1.5 transition"
                 title="Sao lưu dữ liệu tiến độ (JSON)"
               >
-                <FileJson className="w-3.5 h-3.5 text-slate-500" />
-                <span className="hidden md:inline">Sao lưu JSON</span>
+                <FileJson className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">JSON</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleExportAcademicReport}
-                className="h-8 px-3 rounded-lg text-xs font-medium bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 flex items-center gap-1.5 transition-colors"
+                className="h-8 px-3.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:brightness-105 text-white shadow-sm shadow-indigo-500/20 flex items-center gap-1.5 transition"
                 title="Xuất báo cáo tiến độ học tập"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Xuất báo cáo</span>
+                <span className="hidden sm:inline">Báo cáo</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleResetGroundTruth}
-                className="h-8 w-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700 flex items-center justify-center transition-colors"
+                className="h-8 w-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition"
                 title="Khôi phục dữ liệu gốc"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -620,7 +627,7 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setDarkMode((d) => !d)}
-                className="h-8 w-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700 flex items-center justify-center transition-colors"
+                className="h-8 w-8 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-amber-300 border border-indigo-200/80 dark:border-slate-700 flex items-center justify-center transition"
                 title="Chuyển giao diện Sáng / Tối"
               >
                 {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
@@ -628,8 +635,8 @@ export function App() {
             </div>
           </div>
 
-          {/* Row 2: Symmetrical 6-Module Navigation Bar */}
-          <nav className="h-11 flex items-center gap-1.5 overflow-x-auto">
+          {/* Row 2: Symmetrical 6-Module Navigation Bar (Gemini Gradient Active Pill!) */}
+          <nav className="py-2 flex items-center gap-1.5 overflow-x-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -638,34 +645,25 @@ export function App() {
                   key={item.id}
                   type="button"
                   onClick={() => setActiveTab(item.id)}
-                  className={`h-8 px-3 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shrink-0 ${
+                  className={`h-9 px-3.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 ${
                     isActive
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 text-white shadow-md shadow-indigo-500/20'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-indigo-50/80 dark:hover:bg-slate-800/80 hover:text-indigo-600'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span>{item.label}</span>
                   {item.badge && (
                     <span
-                      className={`px-1.5 py-0.2 rounded font-mono text-[10px] tabular-nums ${
+                      className={`px-1.5 py-0.5 rounded-md font-mono text-[10px] font-bold tabular-nums ${
                         isActive
-                          ? 'bg-white/20 dark:bg-slate-900/15 text-white dark:text-slate-900'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          ? 'bg-white/25 text-white'
+                          : 'bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-300'
                       }`}
                     >
                       {item.badge}
                     </span>
                   )}
-                  <kbd
-                    className={`hidden lg:inline-block px-1 rounded font-mono text-[10px] ${
-                      isActive
-                        ? 'text-slate-300 dark:text-slate-600'
-                        : 'text-slate-400 dark:text-slate-500'
-                    }`}
-                  >
-                    {item.shortcut}
-                  </kbd>
                 </button>
               );
             })}
@@ -674,7 +672,7 @@ export function App() {
       </header>
 
       {/* Main Content Container */}
-      <main className="flex-1 max-w-[1480px] w-full mx-auto px-4 sm:px-6 py-5">
+      <main className="flex-1 max-w-[1480px] w-full mx-auto px-4 sm:px-6 py-4">
         {activeTab === 'skill_tree' && (
           <SkillTreeGraph
             courses={mergedCourses}
@@ -766,15 +764,15 @@ export function App() {
         )}
       </main>
 
-      {/* Clean Minimalist Footer */}
-      <footer className="mt-auto bg-white dark:bg-[#0F172A] border-t border-slate-200/80 dark:border-slate-800 py-3 px-4 sm:px-6">
-        <div className="max-w-[1480px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
-            <GraduationCap className="w-4 h-4 text-slate-500" />
+      {/* Footer */}
+      <footer className="mt-auto bg-white/90 dark:bg-[#0E1424]/90 backdrop-blur-md border-t border-indigo-100/80 dark:border-indigo-500/15 py-3 px-4 sm:px-6">
+        <div className="max-w-[1480px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 font-bold text-indigo-600 dark:text-indigo-300">
+            <GraduationCap className="w-4 h-4" />
             <span>Phạm Ngọc Huân · VNU-HUS Computer &amp; Information Science (K69)</span>
           </div>
-          <div className="font-mono text-[11px]">
-            Chương trình chuẩn QĐ 3568/QĐ-ĐHKHTN · Phím 1–6 chuyển phân hệ
+          <div className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+            Chương trình chuẩn QĐ 3568/QĐ-ĐHKHTN · Phím 1–6 chuyển nhanh phân hệ
           </div>
         </div>
       </footer>

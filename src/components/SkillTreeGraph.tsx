@@ -84,33 +84,27 @@ const SemesterHeaderNode: React.FC<NodeProps<Node<SemesterHeaderNodeData>>> = ({
   const isCurrentSem5 = data.semester === 5;
   return (
     <div
-      className={`w-[260px] rounded-xl p-3.5 shadow-sm border pointer-events-none select-none ${
+      className={`w-[260px] rounded-2xl text-white p-3.5 shadow-md border-2 pointer-events-none select-none ${
         isCurrentSem5
-          ? 'bg-slate-900 dark:bg-sky-950 text-white border-slate-800 dark:border-sky-700'
-          : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-slate-200/90 dark:border-slate-800'
+          ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 border-amber-300'
+          : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 border-indigo-300 dark:border-indigo-700'
       }`}
     >
       <div className="flex items-center justify-between">
-        <span
-          className={`text-xs font-medium px-2 py-0.5 rounded-md ${
-            isCurrentSem5
-              ? 'bg-white/15 text-white'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-          }`}
-        >
-          {isCurrentSem5 ? 'Học kỳ 5 · Đang học' : `Học kỳ ${data.semester}`}
+        <span className="text-xs font-extrabold bg-white/20 px-2.5 py-0.5 rounded-lg">
+          {isCurrentSem5 ? '🔥 KỲ 5 (ĐANG HỌC)' : `HỌC KỲ ${data.semester}`}
         </span>
-        <span className="font-mono text-xs font-semibold tabular-nums opacity-85">
+        <span className="font-mono text-xs font-bold tabular-nums text-white/95">
           {data.totalCredits} TC
         </span>
       </div>
-      <div className="text-sm font-semibold mt-1.5">{data.title}</div>
-      <div className="font-mono text-[11px] tabular-nums opacity-75 mt-1 flex items-center justify-between">
-        <span>{data.count} học phần</span>
+      <div className="text-sm font-extrabold mt-1.5">{data.title}</div>
+      <div className="font-mono text-[11px] tabular-nums text-white/90 mt-1 flex items-center justify-between">
+        <span>Tổng: {data.count} môn</span>
         {data.inProgressCount > 0 ? (
-          <span>Đang học: {data.inProgressCount}</span>
+          <span>Đang học: {data.inProgressCount} môn</span>
         ) : (
-          <span>Hoàn thành: {data.completedCount}/{data.count}</span>
+          <span>Đã xong: {data.completedCount}/{data.count}</span>
         )}
       </div>
     </div>
