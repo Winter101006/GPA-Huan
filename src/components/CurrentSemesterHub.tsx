@@ -107,6 +107,22 @@ const COURSE_TIMETABLE_STYLES: Record<
   },
 };
 
+const EXAM_SCHEDULE: { code: string; name: string; date: string; slot: string; format: string }[] = [
+  { code: 'MAT3505', name: 'Kiến trúc máy tính', date: '2026-12-26', slot: 'Ca 2 (08:30)', format: 'Vấn đáp' },
+  { code: 'MAT3519', name: 'Ngôn ngữ lập trình thứ hai', date: '2026-12-31', slot: 'Ca 4 (13:00)', format: 'Thuyết trình' },
+  { code: 'MAT3506', name: 'Mạng máy tính', date: '2027-01-03', slot: 'Ca 4 (13:00)', format: 'Thuyết trình' },
+  { code: 'MAT3533', name: 'Học máy', date: '2027-01-08', slot: 'Ca 4 (13:00)', format: 'Thuyết trình' },
+  { code: 'THL1057', name: 'Nhà nước và pháp luật đại cương', date: '', slot: 'Chưa có ca', format: 'Trên máy' },
+  { code: 'MAT1206E', name: 'Nhập môn Trí tuệ nhân tạo', date: '', slot: 'Chưa có ca', format: 'Tiểu luận' },
+];
+
+function examDaysLeft(date: string): number {
+  const d = new Date(date + 'T00:00:00');
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return Math.round((d.getTime() - now.getTime()) / 86400000);
+}
+
 function normalizeUrl(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) return '';
@@ -1211,6 +1227,46 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
               </div>
             )}
           </section>
+        </div>
+      )}
+
+      {/* EXAM SCHEDULE */}
+      {viewMode === 'timetable' && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-rose-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+              <Clock className="w-5 h-5 text-rose-600" />
+              Lịch Thi Học Kỳ I (2026-2027) – 6 kỳ thi
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Mã SV 24002015 · Ca 2: 08h30 · Ca 4: 13h00 · Môn chưa có lịch sẽ được cập nhật sau
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {EXAM_SCHEDULE.map((ex) => {
+              const style = COURSE_TIMETABLE_STYLES[ex.code];
+              const days = ex.date ? examDaysLeft(ex.date) : null;
+              return (
+                <div
+                  key={ex.code}
+                  className={`rounded-xl border p-3 ${style ? `${style.bg} ${style.border} ${style.text}` : 'bg-slate-50 border-slate-200'}`}
+                >
+                  <div className="text-sm font-extrabold">{ex.name}</div>
+                  <div className="text-[11px] opacity-80 font-bold">{ex.code}</div>
+                  <div className="mt-2 text-xs font-bold space-y-0.5">
+                    <div>📅 {ex.date ? ex.date.split('-').reverse().join('/') : 'Chưa có lịch'}</div>
+                    <div>⏰ {ex.slot}</div>
+                    <div>📝 {ex.format}</div>
+                  </div>
+                  {days !== null && (
+                    <div className="mt-2 inline-block px-2 py-0.5 rounded-full bg-black/15 text-[11px] font-extrabold">
+                      {days > 0 ? `Còn ${days} ngày` : days === 0 ? 'Hôm nay!' : 'Đã thi'}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
