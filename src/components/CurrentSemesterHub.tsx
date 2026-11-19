@@ -65,47 +65,107 @@ const DAYS_OF_WEEK = [
   { day: 7, label: 'Thứ Bảy' },
 ];
 
+type CourseTheme = {
+  short: string;
+  icon: string;
+  grad: string;
+  glow: string;
+  soft: string;
+  text: string;
+  border: string;
+};
+
+const COURSE_THEME: Record<string, CourseTheme> = {
+  MAT1206E: {
+    short: 'Trí tuệ NT',
+    icon: '🤖',
+    grad: 'from-violet-500 to-purple-700',
+    glow: 'shadow-violet-500/40',
+    soft: 'bg-violet-50 dark:bg-violet-950/30',
+    text: 'text-violet-600 dark:text-violet-300',
+    border: 'border-violet-300 dark:border-violet-800',
+  },
+  MAT3519: {
+    short: 'NNLT 2',
+    icon: '💻',
+    grad: 'from-cyan-400 to-sky-600',
+    glow: 'shadow-cyan-500/40',
+    soft: 'bg-cyan-50 dark:bg-cyan-950/30',
+    text: 'text-cyan-600 dark:text-cyan-300',
+    border: 'border-cyan-300 dark:border-cyan-800',
+  },
+  MAT3533: {
+    short: 'Học máy',
+    icon: '🧠',
+    grad: 'from-pink-500 to-fuchsia-600',
+    glow: 'shadow-pink-500/40',
+    soft: 'bg-pink-50 dark:bg-pink-950/30',
+    text: 'text-pink-600 dark:text-pink-300',
+    border: 'border-pink-300 dark:border-pink-800',
+  },
+  THL1057: {
+    short: 'Pháp luật',
+    icon: '⚖️',
+    grad: 'from-amber-400 to-orange-600',
+    glow: 'shadow-orange-500/40',
+    soft: 'bg-orange-50 dark:bg-orange-950/30',
+    text: 'text-orange-600 dark:text-orange-300',
+    border: 'border-orange-300 dark:border-orange-800',
+  },
+  MAT3506: {
+    short: 'Mạng MT',
+    icon: '🌐',
+    grad: 'from-emerald-400 to-teal-600',
+    glow: 'shadow-emerald-500/40',
+    soft: 'bg-emerald-50 dark:bg-emerald-950/30',
+    text: 'text-emerald-600 dark:text-emerald-300',
+    border: 'border-emerald-300 dark:border-emerald-800',
+  },
+  MAT3505: {
+    short: 'Kiến trúc',
+    icon: '🖥️',
+    grad: 'from-blue-500 to-indigo-700',
+    glow: 'shadow-blue-500/40',
+    soft: 'bg-blue-50 dark:bg-blue-950/30',
+    text: 'text-blue-600 dark:text-blue-300',
+    border: 'border-blue-300 dark:border-blue-800',
+  },
+};
+
+const NCKH_THEME: CourseTheme = {
+  short: 'NCKH',
+  icon: '🔬',
+  grad: 'from-indigo-500 to-slate-800',
+  glow: 'shadow-indigo-500/40',
+  soft: 'bg-indigo-50 dark:bg-indigo-950/30',
+  text: 'text-indigo-600 dark:text-indigo-300',
+  border: 'border-indigo-300 dark:border-indigo-800',
+};
+
+const CHUNG_THEME: CourseTheme = {
+  short: 'Chung',
+  icon: '📌',
+  grad: 'from-slate-600 to-slate-900',
+  glow: 'shadow-slate-500/40',
+  soft: 'bg-slate-50 dark:bg-slate-800/40',
+  text: 'text-slate-600 dark:text-slate-300',
+  border: 'border-slate-300 dark:border-slate-700',
+};
+
+function themeOf(key: string): CourseTheme {
+  if (COURSE_THEME[key]) return COURSE_THEME[key];
+  return key === 'NCKH_NLP' ? NCKH_THEME : CHUNG_THEME;
+}
+
 const COURSE_TIMETABLE_STYLES: Record<
   string,
   { bg: string; border: string; text: string; pill: string }
-> = {
-  MAT1206E: {
-    bg: 'bg-gradient-to-br from-sky-500 to-sky-600',
-    border: 'border-sky-700',
-    text: 'text-white',
-    pill: 'bg-white/20 text-white',
-  },
-  MAT3519: {
-    bg: 'bg-gradient-to-br from-cyan-100 to-sky-200 dark:from-cyan-950 dark:to-cyan-900',
-    border: 'border-cyan-400 dark:border-cyan-700',
-    text: 'text-cyan-950 dark:text-cyan-100',
-    pill: 'bg-cyan-600/15 text-cyan-900 dark:text-cyan-200',
-  },
-  MAT3533: {
-    bg: 'bg-gradient-to-br from-pink-100 to-rose-200 dark:from-pink-950 dark:to-rose-900',
-    border: 'border-pink-400 dark:border-pink-700',
-    text: 'text-pink-950 dark:text-pink-100',
-    pill: 'bg-pink-600/15 text-pink-900 dark:text-pink-200',
-  },
-  THL1057: {
-    bg: 'bg-gradient-to-br from-orange-100 to-amber-200 dark:from-orange-950 dark:to-amber-900',
-    border: 'border-orange-400 dark:border-orange-700',
-    text: 'text-orange-950 dark:text-orange-100',
-    pill: 'bg-orange-600/15 text-orange-900 dark:text-orange-200',
-  },
-  MAT3506: {
-    bg: 'bg-gradient-to-br from-emerald-100 to-teal-200 dark:from-emerald-950 dark:to-teal-900',
-    border: 'border-emerald-400 dark:border-emerald-700',
-    text: 'text-emerald-950 dark:text-emerald-100',
-    pill: 'bg-emerald-600/15 text-emerald-900 dark:text-emerald-200',
-  },
-  MAT3505: {
-    bg: 'bg-gradient-to-br from-lime-500 to-emerald-600',
-    border: 'border-lime-700',
-    text: 'text-white',
-    pill: 'bg-white/25 text-white',
-  },
-};
+> = Object.fromEntries(
+  Object.entries(COURSE_THEME).map(([k, t]) => [
+    k,
+    { bg: `bg-gradient-to-br ${t.grad}`, border: t.border, text: 'text-white', pill: 'bg-white/20 text-white' },
+  ])
+);
 
 const EXAM_SCHEDULE: { code: string; name: string; date: string; slot: string; format: string }[] = [
   { code: 'MAT3505', name: 'Kiến trúc máy tính', date: '2026-12-26', slot: 'Ca 2 (08:30)', format: 'Vấn đáp' },
@@ -205,13 +265,14 @@ function ExamCalendar(_props: { timetable?: TimetableSession[] }) {
                   const date = ymd(y, m, d);
                   const exams = examsOn(date);
                   const isToday = date === todayStr;
+                  const th = exams.length ? themeOf(exams[0].code) : null;
                   return (
                     <div
                       key={date}
                       title={exams.map((e) => `${e.name} – ${e.slot} – ${e.format}`).join('\n') || undefined}
                       className={`aspect-square rounded-xl flex flex-col items-center justify-center text-sm font-extrabold transition-all ${
                         exams.length
-                          ? 'bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-lg shadow-rose-500/30 scale-105'
+                          ? `bg-gradient-to-br ${th!.grad} text-white shadow-lg ${th!.glow} scale-105`
                           : i % 7 === 6
                           ? 'text-rose-400'
                           : 'text-slate-600 dark:text-slate-300'
@@ -219,7 +280,7 @@ function ExamCalendar(_props: { timetable?: TimetableSession[] }) {
                     >
                       <span>{d}</span>
                       {exams.length > 0 && (
-                        <span className="text-[9px] font-bold opacity-95 leading-none mt-0.5">THI</span>
+                        <span className="text-[8px] font-extrabold leading-none mt-0.5 px-0.5 max-w-full truncate">{th!.short}</span>
                       )}
                     </div>
                   );
@@ -240,7 +301,7 @@ function ExamCalendar(_props: { timetable?: TimetableSession[] }) {
             const [yy, mm, dd] = ex.date.split('-');
             return (
               <div key={ex.code} className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10">
-                <div className="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-rose-600 to-orange-500 flex flex-col items-center justify-center leading-none">
+                <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${themeOf(ex.code).grad} shadow-lg ${themeOf(ex.code).glow} flex flex-col items-center justify-center leading-none`}>
                   <span className="text-lg font-extrabold">{dd}</span>
                   <span className="text-[9px] font-bold opacity-90">T{Number(mm)}/{yy.slice(2)}</span>
                 </div>
@@ -562,7 +623,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
       {/* Compact Clean Top Bar */}
       <div className="bg-white/95 dark:bg-slate-900/95 rounded-2xl px-4 py-3 border border-sky-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-sky-600 text-white shadow-sm">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white shadow-lg shadow-sky-500/40">
             <NotebookPen className="w-5 h-5" />
           </div>
           <div>
@@ -582,7 +643,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
             onClick={() => setViewMode('overview')}
             className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
               viewMode === 'overview'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/40'
                 : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
             }`}
           >
@@ -593,7 +654,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
             type="button"
             onClick={() => setViewMode('notebook')}            className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
               viewMode === 'notebook'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/40'
                 : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
             }`}
           >
@@ -603,737 +664,409 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
         </div>
       </div>
 
-      {/* MODE 1: CLEAN 2-COLUMN NOTEBOOK */}
-      {viewMode === 'notebook' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-          {/* LEFT SIDEBAR: Easy-to-click Subject List */}
-          <aside className="lg:col-span-4 space-y-2.5">
-            {/* Pinned: NCKH NLP */}
-            {(() => {
-              const { pendingTodos, linksCount } = getPageCounts('NCKH_NLP');
-              const isSelected = selectedKey === 'NCKH_NLP';
-              return (
-                <button
-                  type="button"
-                  onClick={() => handleSelectPage('NCKH_NLP')}
-                  className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start justify-between gap-2 ${
-                    isSelected
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-indigo-600 shadow-md'
-                      : 'bg-white dark:bg-slate-900 border-indigo-200 dark:border-indigo-900/60 hover:border-indigo-400 text-slate-900 dark:text-white'
-                  }`}
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 font-extrabold text-sm">
-                      <BrainCircuit className="w-4 h-4 shrink-0" />
-                      <span className="truncate">NCKH NLP</span>
-                    </div>
-                    <p
-                      className={`text-xs mt-1 truncate ${
-                        isSelected ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'
+      {/* MODE 1: NOTEBOOK */}
+      {viewMode === 'notebook' &&
+        (() => {
+          const th = themeOf(selectedKey);
+          const exam = EXAM_SCHEDULE.find((x) => x.code === selectedKey);
+          const examLeft = exam?.date ? examDaysLeft(exam.date) : null;
+          const isCourse = selectedKey !== 'NCKH_NLP' && selectedKey !== 'CHUNG';
+          const pageTitle =
+            selectedKey === 'NCKH_NLP'
+              ? 'NCKH NLP'
+              : selectedKey === 'CHUNG'
+              ? 'Ghi chú chung Học kỳ 5'
+              : currentCourseMeta?.name_vi || selectedKey;
+          const pages = [
+            ...inProgressCourses.map((c) => ({ key: c.code, title: c.name_vi, sub: `${c.code} · ${c.credits} TC` })),
+            { key: 'NCKH_NLP', title: 'NCKH NLP', sub: nlpResearch.topic_title || 'Nghiên cứu NLP' },
+            { key: 'CHUNG', title: 'Ghi chú chung', sub: 'Link lớp, việc chung' },
+          ];
+          const linkList: { id: string; title: string; url: string | null; onDelete: () => void }[] =
+            selectedKey === 'NCKH_NLP'
+              ? (nlpResearch.paper_links || []).map((raw, idx) => {
+                  const p = parseNlpLinkString(raw);
+                  return { id: `n${idx}`, title: p.title, url: p.url, onDelete: () => handleDeleteNlpLink(idx) };
+                })
+              : (currentCourseState?.links || []).map((lk) => ({
+                  id: lk.id,
+                  title: lk.title,
+                  url: /^https?:\/\//i.test(lk.url) ? lk.url : null,
+                  onDelete: () => handleDeleteCourseLink(lk.id),
+                }));
+          const save = () =>
+            flushSave(selectedKey, noteDraft, quickAttentionDraft, scheduleDraft, nlpTopicDraft, nlpAdvisorDraft, nlpModelsDraft);
+          const glassInput =
+            'w-full px-4 py-2.5 rounded-xl bg-white/15 backdrop-blur border border-white/25 placeholder-white/70 text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-white/60';
+          const pending = pageTasks.filter((t) => !t.completed).length;
+
+          return (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+              {/* LEFT: subject list */}
+              <aside className="lg:col-span-3 space-y-2 lg:sticky lg:top-4">
+                {pages.map((p) => {
+                  const t = themeOf(p.key);
+                  const sel = selectedKey === p.key;
+                  const { pendingTodos } = getPageCounts(p.key);
+                  return (
+                    <button
+                      key={p.key}
+                      type="button"
+                      onClick={() => handleSelectPage(p.key)}
+                      className={`relative w-full text-left p-3 rounded-2xl border transition-all duration-300 flex items-center gap-3 overflow-hidden ${
+                        sel
+                          ? `bg-gradient-to-r ${t.grad} text-white border-transparent shadow-lg ${t.glow} scale-[1.02]`
+                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-md hover:-translate-y-0.5 text-slate-900 dark:text-white'
                       }`}
                     >
-                      {nlpResearch.topic_title || 'Nghiên cứu Xử lý ngôn ngữ tự nhiên'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0 text-[10px] font-bold">
-                    {linksCount > 0 && (
+                      {sel && <span className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-white/25 blur-2xl" />}
                       <span
-                        className={`px-2 py-0.5 rounded-full ${
-                          isSelected
-                            ? 'bg-white/20 text-white'
-                            : 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
+                        className={`relative w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-lg ${
+                          sel ? 'bg-white/20' : `bg-gradient-to-br ${t.grad} shadow-md ${t.glow}`
                         }`}
                       >
-                        🔗 {linksCount}
+                        {t.icon}
                       </span>
-                    )}
-                    {pendingTodos > 0 && (
-                      <span
-                        className={`px-2 py-0.5 rounded-full ${
-                          isSelected
-                            ? 'bg-amber-300 text-slate-900'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        {pendingTodos} việc
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })()}
-
-            <div className="px-2 pt-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Các môn đang học Kỳ 5 ({inProgressCourses.length})
-            </div>
-
-            {/* 6 Semester 5 Course Items */}
-            <div className="space-y-2">
-              {inProgressCourses.map((c) => {
-                const st = coursesState[c.code];
-                const { pendingTodos, linksCount } = getPageCounts(c.code);
-                const isSelected = selectedKey === c.code;
-                return (
-                  <button
-                    key={c.code}
-                    type="button"
-                    onClick={() => handleSelectPage(c.code)}
-                    className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start justify-between gap-2 ${
-                      isSelected
-                        ? 'bg-sky-600 text-white border-sky-600 shadow-md'
-                        : 'bg-white dark:bg-slate-900 border-sky-100 dark:border-slate-800 hover:border-sky-300 hover:bg-sky-50/40 dark:hover:bg-slate-800/70 text-slate-900 dark:text-white'
-                    }`}
-                  >
-                    <div className="min-w-0">
-                      <div className="font-extrabold text-sm leading-snug">{c.name_vi}</div>
-                      <div
-                        className={`text-[11px] font-semibold mt-0.5 flex flex-wrap items-center gap-1.5 ${
-                          isSelected ? 'text-sky-100' : 'text-slate-500 dark:text-slate-400'
-                        }`}
-                      >
-                        <span className="font-mono">{c.code}</span>
-                        <span>•</span>
-                        <span>{c.credits} TC</span>
-                        {st?.note && (
-                          <span
-                            className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
-                              isSelected
-                                ? 'bg-white/20 text-white'
-                                : 'bg-sky-100/80 dark:bg-slate-800 text-sky-700 dark:text-sky-300'
-                            }`}
-                          >
-                            {st.note}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-1 shrink-0 text-[10px] font-bold">
-                      {linksCount > 0 && (
-                        <span
-                          className={`px-2 py-0.5 rounded-full ${
-                            isSelected
-                              ? 'bg-white/20 text-white'
-                              : 'bg-sky-50 dark:bg-slate-800 text-sky-700 dark:text-sky-300'
-                          }`}
-                        >
-                          🔗 {linksCount}
+                      <span className="relative min-w-0 flex-1">
+                        <span className="block text-sm font-extrabold truncate">{p.title}</span>
+                        <span className={`block text-[11px] font-semibold truncate ${sel ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}`}>
+                          {p.sub}
                         </span>
-                      )}
+                      </span>
                       {pendingTodos > 0 && (
                         <span
-                          className={`px-2 py-0.5 rounded-full ${
-                            isSelected
-                              ? 'bg-amber-300 text-slate-900'
-                              : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
+                          className={`relative px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
+                            sel ? 'bg-white text-slate-900' : 'bg-rose-500 text-white shadow shadow-rose-500/40'
                           }`}
                         >
-                          {pendingTodos} việc
+                          {pendingTodos}
                         </span>
                       )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </aside>
 
-            {/* General Notes Item */}
-            {(() => {
-              const { pendingTodos, linksCount } = getPageCounts('CHUNG');
-              const isSelected = selectedKey === 'CHUNG';
-              return (
-                <button
-                  type="button"
-                  onClick={() => handleSelectPage('CHUNG')}
-                  className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-2 ${
-                    isSelected
-                      ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 shadow-md'
-                      : 'bg-slate-50/80 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-800 dark:text-slate-200'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <StickyNote className="w-4 h-4 shrink-0 text-amber-500" />
-                    <div className="min-w-0">
-                      <div className="font-extrabold text-sm">Ghi chú chung Kỳ 5</div>
-                      <div
-                        className={`text-[11px] truncate ${
-                          isSelected ? 'text-slate-300' : 'text-slate-500'
-                        }`}
-                      >
-                        Link nhóm lớp, cổng đào tạo, việc chung
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0 text-[10px] font-bold">
-                    {linksCount > 0 && <span className="px-2 py-0.5 rounded-full bg-white/15">🔗 {linksCount}</span>}
-                    {pendingTodos > 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-300 text-slate-900">
-                        {pendingTodos} việc
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })()}
-          </aside>
-
-          {/* RIGHT MAIN PAGE: Focused, Clean Notebook Sheet */}
-          <section className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-sky-200 dark:border-slate-800 shadow-sm p-5 sm:p-6 space-y-6">
-            {/* A. NOTEBOOK PAGE HEADER */}
-            {selectedKey === 'NCKH_NLP' ? (
-              <div className="space-y-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-xs font-extrabold flex items-center gap-1.5">
-                    <BrainCircuit className="w-3.5 h-3.5" />
-                    Sổ Tay Nghiên Cứu Khoa Học (NCKH NLP)
-                  </span>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                    Tên đề tài đang làm:
-                  </label>
-                  <input
-                    type="text"
-                    value={nlpTopicDraft}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setNlpTopicDraft(val);
-                      scheduleAutoSave(
-                        noteDraft,
-                        quickAttentionDraft,
-                        scheduleDraft,
-                        val,
-                        nlpAdvisorDraft,
-                        nlpModelsDraft
-                      );
+              {/* RIGHT: page */}
+              <section className="lg:col-span-9 space-y-4">
+                {/* Hero header */}
+                <div className={`relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br ${th.grad} text-white shadow-xl ${th.glow}`}>
+                  <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-white/20 blur-3xl animate-pulse" />
+                  <div className="absolute -bottom-24 -left-10 w-56 h-56 rounded-full bg-black/15 blur-3xl" />
+                  <div
+                    className="absolute inset-0 opacity-[0.07]"
+                    style={{
+                      backgroundImage:
+                        'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
+                      backgroundSize: '22px 22px',
                     }}
-                    onBlur={() =>
-                      flushSave(
-                        selectedKey,
-                        noteDraft,
-                        quickAttentionDraft,
-                        scheduleDraft,
-                        nlpTopicDraft,
-                        nlpAdvisorDraft,
-                        nlpModelsDraft
-                      )
-                    }
-                    className="w-full text-lg font-extrabold text-slate-900 dark:text-white bg-slate-50/70 dark:bg-slate-800/70 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Nhập tên đề tài NCKH..."
                   />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">
-                      Giảng viên hướng dẫn:
-                    </label>
-                    <input
-                      type="text"
-                      value={nlpAdvisorDraft}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setNlpAdvisorDraft(val);
-                        scheduleAutoSave(
-                          noteDraft,
-                          quickAttentionDraft,
-                          scheduleDraft,
-                          nlpTopicDraft,
-                          val,
-                          nlpModelsDraft
-                        );
-                      }}
-                      onBlur={() =>
-                        flushSave(
-                          selectedKey,
-                          noteDraft,
-                          quickAttentionDraft,
-                          scheduleDraft,
-                          nlpTopicDraft,
-                          nlpAdvisorDraft,
-                          nlpModelsDraft
-                        )
-                      }
-                      className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-500 dark:text-slate-400 block mb-1">
-                      Mô hình / Dataset dùng:
-                    </label>
-                    <input
-                      type="text"
-                      value={nlpModelsDraft}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setNlpModelsDraft(val);
-                        scheduleAutoSave(
-                          noteDraft,
-                          quickAttentionDraft,
-                          scheduleDraft,
-                          nlpTopicDraft,
-                          nlpAdvisorDraft,
-                          val
-                        );
-                      }}
-                      onBlur={() =>
-                        flushSave(
-                          selectedKey,
-                          noteDraft,
-                          quickAttentionDraft,
-                          scheduleDraft,
-                          nlpTopicDraft,
-                          nlpAdvisorDraft,
-                          nlpModelsDraft
-                        )
-                      }
-                      className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : selectedKey === 'CHUNG' ? (
-              <div className="pb-4 border-b border-slate-100 dark:border-slate-800">
-                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span>📌 Ghi chú chung Học kỳ 5</span>
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Nơi lưu link Cổng đào tạo, link nhóm lớp, quy định điểm danh hoặc những nhắc nhở chung cho cả kỳ.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-xs font-extrabold">
-                        {currentCourseMeta?.code || selectedKey}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold">
-                        {currentCourseMeta?.credits || 3} Tín chỉ • {currentCourseMeta?.type || 'Bắt buộc'}
-                      </span>
+                  <div className="relative flex flex-wrap items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white/85">
+                        {th.icon}{' '}
+                        {isCourse
+                          ? `${currentCourseMeta?.code || selectedKey} · ${currentCourseMeta?.credits ?? ''} tín chỉ · ${currentCourseMeta?.type || ''}`
+                          : selectedKey === 'NCKH_NLP'
+                          ? 'Sổ tay nghiên cứu khoa học'
+                          : 'Link cổng đào tạo, nhóm lớp, nhắc nhở chung'}
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-extrabold mt-1 drop-shadow">{pageTitle}</h3>
                     </div>
-                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-1.5">
-                      {currentCourseMeta?.name_vi || selectedKey}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Schedule & Quick Attention */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-2.5 rounded-xl bg-sky-50/70 dark:bg-slate-800/60 border border-sky-100 dark:border-slate-700">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-sky-700 dark:text-sky-300 mb-1">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        Lịch học & Phòng học:
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setEditingSchedule((v) => !v)}
-                        className="underline text-[10px] hover:text-sky-900"
-                      >
-                        {editingSchedule ? 'Xong' : 'Sửa'}
-                      </button>
-                    </div>
-                    {editingSchedule ? (
-                      <input
-                        type="text"
-                        value={scheduleDraft}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setScheduleDraft(val);
-                          scheduleAutoSave(noteDraft, quickAttentionDraft, val);
-                        }}
-                        onBlur={() => flushSave(selectedKey, noteDraft, quickAttentionDraft, scheduleDraft)}
-                        placeholder="VD: Thứ 2 (Tiết 9-10, 101T5)"
-                        className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-sky-300 text-xs font-semibold"
-                      />
-                    ) : (
-                      <div className="text-slate-700 dark:text-slate-200 font-semibold">
-                        {scheduleDraft || 'Chưa ghi lịch học (bấm Sửa để thêm)'}
+                    {exam && (
+                      <div className="px-4 py-3 rounded-2xl bg-white/15 backdrop-blur border border-white/25 shadow-lg">
+                        <div className="text-[10px] font-extrabold text-white/80">LỊCH THI · {exam.format.toUpperCase()}</div>
+                        <div className="text-sm font-extrabold">
+                          {exam.date ? `${exam.date.split('-').reverse().join('/')} · ${exam.slot}` : 'Chưa có lịch'}
+                        </div>
+                        {examLeft !== null && (
+                          <div className="text-lg font-extrabold leading-tight">
+                            {examLeft > 0 ? `⏳ Còn ${examLeft} ngày` : examLeft === 0 ? '🔥 Hôm nay' : '✓ Đã thi'}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/50">
-                    <label className="text-[11px] font-bold text-amber-800 dark:text-amber-300 block mb-1">
-                      ⚡ Chú ý ngắn (hiển thị ngoài danh sách):
-                    </label>
+                  {isCourse && (
                     <input
                       type="text"
                       value={quickAttentionDraft}
                       onChange={(e) => {
-                        const val = e.target.value;
-                        setQuickAttentionDraft(val);
-                        scheduleAutoSave(noteDraft, val, scheduleDraft);
+                        setQuickAttentionDraft(e.target.value);
+                        scheduleAutoSave(noteDraft, e.target.value, scheduleDraft);
                       }}
-                      onBlur={() => flushSave(selectedKey, noteDraft, quickAttentionDraft, scheduleDraft)}
-                      placeholder="VD: Hơi khó, cố gắng học / Làm web thôi..."
-                      className="w-full px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      onBlur={save}
+                      placeholder="⚡ Chú ý nhanh (VD: hơi khó, cố gắng học / thầy điểm danh...)"
+                      className={`relative mt-5 ${glassInput}`}
                     />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* B. SECTION 1: MAIN NOTEBOOK EDITOR */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span>📝 Ghi chú & Điều cần lưu ý</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  {saveStatus === 'saving' ? (
-                    <span className="text-[11px] font-bold text-amber-600">Đang lưu...</span>
-                  ) : (
-                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" />
-                      Đã tự động lưu
-                    </span>
                   )}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      flushSave(
-                        selectedKey,
-                        noteDraft,
-                        quickAttentionDraft,
-                        scheduleDraft,
-                        nlpTopicDraft,
-                        nlpAdvisorDraft,
-                        nlpModelsDraft
-                      )
-                    }
-                    className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 text-xs font-bold flex items-center gap-1 border border-sky-200 dark:border-slate-700"
-                  >
-                    <Save className="w-3 h-3" />
-                    <span>Lưu</span>
-                  </button>
+
+                  {selectedKey === 'NCKH_NLP' && (
+                    <div className="relative mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <input
+                        type="text"
+                        value={nlpTopicDraft}
+                        onChange={(e) => {
+                          setNlpTopicDraft(e.target.value);
+                          scheduleAutoSave(noteDraft, quickAttentionDraft, scheduleDraft, e.target.value, nlpAdvisorDraft, nlpModelsDraft);
+                        }}
+                        onBlur={save}
+                        placeholder="Tên đề tài"
+                        className={glassInput}
+                      />
+                      <input
+                        type="text"
+                        value={nlpAdvisorDraft}
+                        onChange={(e) => {
+                          setNlpAdvisorDraft(e.target.value);
+                          scheduleAutoSave(noteDraft, quickAttentionDraft, scheduleDraft, nlpTopicDraft, e.target.value, nlpModelsDraft);
+                        }}
+                        onBlur={save}
+                        placeholder="Giảng viên hướng dẫn"
+                        className={glassInput}
+                      />
+                      <input
+                        type="text"
+                        value={nlpModelsDraft}
+                        onChange={(e) => {
+                          setNlpModelsDraft(e.target.value);
+                          scheduleAutoSave(noteDraft, quickAttentionDraft, scheduleDraft, nlpTopicDraft, nlpAdvisorDraft, e.target.value);
+                        }}
+                        onBlur={save}
+                        placeholder="Mô hình / Dataset"
+                        className={glassInput}
+                      />
+                    </div>
+                  )}
                 </div>
-              </div>
 
-              <textarea
-                rows={6}
-                value={noteDraft}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setNoteDraft(val);
-                  scheduleAutoSave(
-                    val,
-                    quickAttentionDraft,
-                    scheduleDraft,
-                    nlpTopicDraft,
-                    nlpAdvisorDraft,
-                    nlpModelsDraft
-                  );
-                }}
-                onBlur={() =>
-                  flushSave(
-                    selectedKey,
-                    noteDraft,
-                    quickAttentionDraft,
-                    scheduleDraft,
-                    nlpTopicDraft,
-                    nlpAdvisorDraft,
-                    nlpModelsDraft
-                  )
-                }
-                placeholder={
-                  selectedKey === 'NCKH_NLP'
-                    ? 'Ghi lại kết quả thực nghiệm, điểm số mô hình (VD: 0.87 task 1a), lời khuyên của cô Linh & anh An, hướng cải tiến tiếp theo...'
-                    : 'Ghi mọi điều quan trọng của môn này tại đây: thầy cô dặn gì, phần nào trọng tâm thi giữa kỳ/cuối kỳ, cách tính điểm thành phần...'
-                }
-                className="w-full p-4 rounded-2xl bg-sky-50/40 dark:bg-slate-800/70 border border-sky-200 dark:border-slate-700 text-sm leading-relaxed text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-y"
-              />
-            </div>
-
-            {/* C. SECTION 2: RELATED LINKS */}
-            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Link2 className="w-4 h-4 text-sky-600" />
-                  <span>Link tài liệu & Liên kết quan trọng</span>
-                </h4>
-              </div>
-
-              {/* Saved Links List */}
-              <div className="space-y-2">
-                {selectedKey === 'NCKH_NLP' ? (
-                  (nlpResearch.paper_links || []).length === 0 ? (
-                    <p className="text-xs text-slate-400 italic py-1">
-                      Chưa có link nào. Hãy dán link Paper, GitHub, Overleaf, Drive ở ô bên dưới để lưu nhanh.
-                    </p>
-                  ) : (
-                    (nlpResearch.paper_links || []).map((rawItem, idx) => {
-                      const parsed = parseNlpLinkString(rawItem);
-                      return (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors"
-                        >
-                          {parsed.url ? (
-                            <a
-                              href={parsed.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2.5 min-w-0 flex-1 text-sky-700 dark:text-sky-300 hover:underline font-bold text-xs sm:text-sm"
-                            >
-                              <ExternalLink className="w-4 h-4 shrink-0 text-sky-500" />
-                              <span className="truncate">{parsed.title}</span>
-                              {parsed.title !== parsed.url && (
-                                <span className="text-[11px] font-normal text-slate-400 truncate hidden sm:inline">
-                                  ({parsed.url})
-                                </span>
-                              )}
-                            </a>
-                          ) : (
-                            <div className="flex items-center gap-2.5 min-w-0 flex-1 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm">
-                              <Link2 className="w-4 h-4 shrink-0 text-slate-400" />
-                              <span className="truncate">{parsed.title}</span>
-                            </div>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteNlpLink(idx)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors shrink-0"
-                            title="Xóa link này"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      );
-                    })
-                  )
-                ) : (currentCourseState?.links || []).length === 0 ? (
-                  <p className="text-xs text-slate-400 italic py-1">
-                    Chưa có link nào cho môn này (Slide bài giảng, Google Drive, Classroom, GitHub...). Thêm ngay bên dưới!
-                  </p>
-                ) : (
-                  (currentCourseState?.links || []).map((lk) => {
-                    const hasHref = /^https?:\/\//i.test(lk.url);
-                    return (
-                      <div
-                        key={lk.id}
-                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-colors"
-                      >
-                        {hasHref ? (
-                          <a
-                            href={lk.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2.5 min-w-0 flex-1 text-sky-700 dark:text-sky-300 hover:underline font-bold text-xs sm:text-sm"
-                          >
-                            <ExternalLink className="w-4 h-4 shrink-0 text-sky-500" />
-                            <span className="truncate">{lk.title}</span>
-                            {lk.title !== lk.url && (
-                              <span className="text-[11px] font-normal text-slate-400 truncate hidden sm:inline">
-                                ({lk.url})
-                              </span>
-                            )}
-                          </a>
+                <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 items-start">
+                  {/* Notes */}
+                  <div className="xl:col-span-3 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div className={`h-1.5 bg-gradient-to-r ${th.grad}`} />
+                    <div className="p-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                          <NotebookPen className={`w-5 h-5 ${th.text}`} /> Ghi chú
+                        </h4>
+                        {saveStatus === 'saving' ? (
+                          <span className="text-[11px] font-bold text-amber-500 flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" /> Đang lưu...
+                          </span>
                         ) : (
-                          <div className="flex items-center gap-2.5 min-w-0 flex-1 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm">
-                            <Link2 className="w-4 h-4 shrink-0 text-slate-400" />
-                            <span className="truncate">{lk.title}</span>
-                          </div>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCourseLink(lk.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors shrink-0"
-                          title="Xóa link này"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Super Simple 1-Row Add Link Bar */}
-              <form onSubmit={handleAddLink} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                <input
-                  type="text"
-                  value={linkTitleInput}
-                  onChange={(e) => setLinkTitleInput(e.target.value)}
-                  placeholder="Tên link (VD: Slide, Drive, GitHub...)"
-                  className="sm:col-span-5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <input
-                  type="text"
-                  value={linkUrlInput}
-                  onChange={(e) => setLinkUrlInput(e.target.value)}
-                  placeholder="Dán đường dẫn URL (https://...)"
-                  className="sm:col-span-5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <button
-                  type="submit"
-                  className="sm:col-span-2 py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold flex items-center justify-center gap-1 shadow-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Lưu Link</span>
-                </button>
-              </form>
-            </div>
-
-            {/* D. SECTION 3: SIMPLE TODO / DEADLINE CHECKLIST FOR THIS SUBJECT */}
-            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <h4 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Việc cần làm / Lịch kiểm tra</span>
-                {pageTasks.length > 0 && (
-                  <span className="text-xs font-bold text-slate-400">
-                    ({pageTasks.filter((t) => !t.completed).length} chưa xong)
-                  </span>
-                )}
-              </h4>
-
-              <div className="space-y-2">
-                {pageTasks.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic py-1">
-                    Chưa có việc cần làm nào cho mục này.
-                  </p>
-                ) : (
-                  pageTasks.map((t) => (
-                    <div
-                      key={t.id}
-                      className={`flex items-center justify-between gap-3 p-3 rounded-xl border transition-all ${
-                        t.completed
-                          ? 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-800 opacity-65'
-                          : 'bg-white dark:bg-slate-800 border-sky-100 dark:border-slate-700 hover:border-sky-300'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleToggleTodo(t.id)}
-                        className="flex items-start gap-3 flex-1 text-left min-w-0"
-                      >
-                        {t.completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <div
-                            className={`text-xs sm:text-sm font-bold ${
-                              t.completed
-                                ? 'line-through text-slate-400'
-                                : 'text-slate-800 dark:text-slate-100'
-                            }`}
-                          >
-                            {t.title}
-                          </div>
-                          {t.details && (
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                              {t.details}
-                            </div>
-                          )}
-                        </div>
-                      </button>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        {t.due_date && (
-                          <span className="px-2 py-0.5 rounded-md bg-sky-50 dark:bg-slate-700 text-sky-700 dark:text-sky-300 text-[11px] font-bold">
-                            {t.due_date}
+                          <span className="text-[11px] font-bold text-emerald-500 flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> Đã lưu
                           </span>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteTodo(t.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
-                          title="Xóa việc này"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
+                      <textarea
+                        rows={16}
+                        value={noteDraft}
+                        onChange={(e) => {
+                          setNoteDraft(e.target.value);
+                          scheduleAutoSave(e.target.value, quickAttentionDraft, scheduleDraft, nlpTopicDraft, nlpAdvisorDraft, nlpModelsDraft);
+                        }}
+                        onBlur={save}
+                        placeholder={
+                          selectedKey === 'NCKH_NLP'
+                            ? 'Kết quả thực nghiệm, lời khuyên của người hướng dẫn, hướng cải tiến tiếp theo...'
+                            : 'Thầy cô dặn gì, phần trọng tâm thi, cách tính điểm thành phần, kinh nghiệm làm bài...'
+                        }
+                        style={{
+                          backgroundImage:
+                            'repeating-linear-gradient(transparent, transparent 27px, rgba(148,163,184,0.22) 27px, rgba(148,163,184,0.22) 28px)',
+                          lineHeight: '28px',
+                          backgroundAttachment: 'local',
+                        }}
+                        className="w-full px-4 py-1 rounded-2xl bg-slate-50/60 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400 resize-y"
+                      />
                     </div>
-                  ))
-                )}
-              </div>
+                  </div>
 
-              {/* Super Simple 1-Row Add Todo Bar */}
-              <form onSubmit={handleAddTodo} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                <input
-                  type="text"
-                  value={todoTitleInput}
-                  onChange={(e) => setTodoTitleInput(e.target.value)}
-                  placeholder="Gõ việc cần làm / hạn nộp bài / lịch thi..."
-                  className="sm:col-span-7 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <input
-                  type="text"
-                  value={todoDueInput}
-                  onChange={(e) => setTodoDueInput(e.target.value)}
-                  placeholder="Ngày / Hạn (VD: 25/11)"
-                  className="sm:col-span-3 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <button
-                  type="submit"
-                  className="sm:col-span-2 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center justify-center gap-1 shadow-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Thêm</span>
-                </button>
-              </form>
-            </div>
-
-            {/* E. CLEAN COMPACT MILESTONES STRIP (Only on NCKH NLP page) */}
-            {selectedKey === 'NCKH_NLP' && (nlpResearch.milestones || []).length > 0 && (
-              <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
-                    🗺️ Tiến độ 4 Giai đoạn NCKH (Bấm để đổi trạng thái)
-                  </h4>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {(nlpResearch.milestones || []).map((m) => {
-                    const isDone = m.status === 'completed';
-                    const isProg = m.status === 'in_progress';
-                    return (
-                      <button
-                        key={m.id}
-                        type="button"
-                        onClick={() => handleCycleMilestone(m.id)}
-                        className={`text-left p-3 rounded-xl border transition-all flex items-start justify-between gap-2 ${
-                          isDone
-                            ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900'
-                            : isProg
-                            ? 'bg-amber-50/70 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900'
-                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
-                        }`}
-                      >
-                        <div className="min-w-0">
-                          <div className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400">
-                            {m.phase}
+                  <div className="xl:col-span-2 space-y-4">
+                    {/* Links */}
+                    <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
+                      <h4 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Link2 className={`w-5 h-5 ${th.text}`} /> Link tài liệu
+                        <span className="text-xs font-bold text-slate-400">({linkList.length})</span>
+                      </h4>
+                      <div className="space-y-1.5">
+                        {linkList.length === 0 && (
+                          <p className="text-xs text-slate-400 py-2">Chưa có link. Dán slide, Drive, Classroom... bên dưới.</p>
+                        )}
+                        {linkList.map((lk) => (
+                          <div
+                            key={lk.id}
+                            className={`group flex items-center gap-2.5 p-2 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all`}
+                          >
+                            <span className={`w-8 h-8 shrink-0 rounded-lg flex items-center justify-center bg-gradient-to-br ${th.grad} text-white shadow ${th.glow}`}>
+                              <ExternalLink className="w-4 h-4" />
+                            </span>
+                            {lk.url ? (
+                              <a
+                                href={lk.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="min-w-0 flex-1 text-sm font-bold text-slate-800 dark:text-slate-100 hover:underline truncate"
+                                title={lk.url}
+                              >
+                                {lk.title}
+                              </a>
+                            ) : (
+                              <span className="min-w-0 flex-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{lk.title}</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={lk.onDelete}
+                              className="p-1.5 rounded-lg text-slate-300 opacity-0 group-hover:opacity-100 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-all"
+                              title="Xóa"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
-                          <div className="text-xs font-bold text-slate-800 dark:text-slate-100 mt-0.5 line-clamp-2">
-                            {m.title}
-                          </div>
+                        ))}
+                      </div>
+                      <form onSubmit={handleAddLink} className="space-y-2 pt-1">
+                        <input
+                          type="text"
+                          value={linkTitleInput}
+                          onChange={(e) => setLinkTitleInput(e.target.value)}
+                          placeholder="Tên link (Slide, Drive...)"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={linkUrlInput}
+                            onChange={(e) => setLinkUrlInput(e.target.value)}
+                            placeholder="https://..."
+                            className="min-w-0 flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-sky-400"
+                          />
+                          <button
+                            type="submit"
+                            className={`px-3 rounded-xl bg-gradient-to-r ${th.grad} text-white shadow-md ${th.glow} hover:brightness-110 transition-all`}
+                            title="Thêm link"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
                         </div>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
-                            isDone
-                              ? 'bg-emerald-600 text-white'
-                              : isProg
-                              ? 'bg-amber-500 text-white'
-                              : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                          }`}
+                      </form>
+                    </div>
+
+                    {/* Todos */}
+                    <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
+                      <h4 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <CheckCircle2 className={`w-5 h-5 ${th.text}`} /> Việc cần làm
+                        {pending > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold shadow shadow-rose-500/40">
+                            {pending}
+                          </span>
+                        )}
+                      </h4>
+                      <div className="space-y-1.5">
+                        {pageTasks.length === 0 && <p className="text-xs text-slate-400 py-2">Chưa có việc nào.</p>}
+                        {pageTasks.map((t) => (
+                          <div
+                            key={t.id}
+                            className={`group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all ${
+                              t.completed ? 'opacity-50' : ''
+                            }`}
+                          >
+                            <button type="button" onClick={() => handleToggleTodo(t.id)} className="shrink-0">
+                              {t.completed ? (
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                              ) : (
+                                <Circle className={`w-5 h-5 ${th.text}`} />
+                              )}
+                            </button>
+                            <span
+                              className={`min-w-0 flex-1 text-sm font-semibold ${
+                                t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'
+                              }`}
+                            >
+                              {t.title}
+                            </span>
+                            {t.due_date && (
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold ${th.soft} ${th.text}`}>{t.due_date}</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTodo(t.id)}
+                              className="p-1 rounded-lg text-slate-300 opacity-0 group-hover:opacity-100 hover:text-rose-600 transition-all"
+                              title="Xóa"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <form onSubmit={handleAddTodo} className="flex gap-2 pt-1">
+                        <input
+                          type="text"
+                          value={todoTitleInput}
+                          onChange={(e) => setTodoTitleInput(e.target.value)}
+                          placeholder="Việc cần làm..."
+                          className="min-w-0 flex-1 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        />
+                        <input
+                          type="text"
+                          value={todoDueInput}
+                          onChange={(e) => setTodoDueInput(e.target.value)}
+                          placeholder="Hạn"
+                          className="w-16 px-2 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        />
+                        <button
+                          type="submit"
+                          className={`px-3 rounded-xl bg-gradient-to-r ${th.grad} text-white shadow-md ${th.glow} hover:brightness-110 transition-all`}
+                          title="Thêm việc"
                         >
-                          {isDone ? 'Xong' : isProg ? 'Đang làm' : 'Chưa tới'}
-                        </span>
-                      </button>
-                    );
-                  })}
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
-          </section>
-        </div>
-      )}
+
+                {selectedKey === 'NCKH_NLP' && (nlpResearch.milestones || []).length > 0 && (
+                  <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
+                    <h4 className="text-base font-extrabold text-slate-900 dark:text-white">🗺️ Tiến độ NCKH (bấm để đổi trạng thái)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                      {(nlpResearch.milestones || []).map((m) => {
+                        const isDone = m.status === 'completed';
+                        const isProg = m.status === 'in_progress';
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => handleCycleMilestone(m.id)}
+                            className={`text-left p-3 rounded-2xl border transition-all ${
+                              isDone
+                                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800'
+                                : isProg
+                                ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 shadow-md shadow-amber-500/20'
+                                : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            <div className="text-[10px] font-extrabold text-slate-500">{m.phase}</div>
+                            <div className="text-xs font-bold text-slate-800 dark:text-slate-100 mt-0.5 line-clamp-2">{m.title}</div>
+                            <div
+                              className={`mt-2 inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                                isDone ? 'bg-emerald-500 text-white' : isProg ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                              }`}
+                            >
+                              {isDone ? 'Xong' : isProg ? 'Đang làm' : 'Chưa tới'}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
+          );
+        })()}
 
       {/* MODE 0: OVERVIEW DASHBOARD (default) */}
       {viewMode === 'overview' && (
@@ -1379,7 +1112,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                 return (
                   <div
                     key={ex.code}
-                    className="rounded-2xl bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-800 shadow-sm overflow-hidden"
+                    className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                   >
                     <div className={`px-4 py-3 ${style ? `${style.bg} ${style.text}` : 'bg-sky-100'}`}>
                       <div className="flex items-start justify-between gap-2">
