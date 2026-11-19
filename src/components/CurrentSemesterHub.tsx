@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   BookOpen,
   BrainCircuit,
@@ -162,106 +162,214 @@ function parseNlpLinkString(raw: string): { title: string; url: string | null } 
   return { title: trimmed, url: null };
 }
 
-function ExamCalendar({
-  timetable,
-}: {
-  timetable: TimetableSession[];
-}) {
-  const months = [
-    { y: 2026, m: 10 },
-    { y: 2026, m: 11 },
-    { y: 2027, m: 0 },
-  ];
-  const today = new Date();
-  const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
-  const examByKey: Record<string, { code: string; name: string; slot: string }[]> = {};
-  EXAM_SCHEDULE.forEach((ex) => {
-    if (!ex.date) return;
-    const [y, mo, d] = ex.date.split('-').map(Number);
-    const k = `${y}-${mo - 1}-${d}`;
-    (examByKey[k] = examByKey[k] || []).push(ex);
-  });
-  const dots = (dow: number) =>
-    Array.from(new Set(timetable.filter((s) => s.day_of_week === dow).map((s) => s.course_code)));
-  const dotColor: Record<string, string> = {
-    MAT1206E: 'bg-sky-500',
-    MAT3519: 'bg-cyan-500',
-    MAT3533: 'bg-pink-500',
-    THL1057: 'bg-orange-500',
-    MAT3506: 'bg-emerald-500',
-    MAT3505: 'bg-lime-500',
+const COURSE_SHORT: Record<string, { short: string; chip: string; bar: string }> = {
+  MAT1206E: { short: 'Trí tuệ NT', chip: 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/40', bar: 'bg-sky-500' },
+  MAT3519: { short: 'NNLT 2', chip: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/40', bar: 'bg-cyan-500' },
+  MAT3533: { short: 'Học máy', chip: 'bg-pink-500/15 text-pink-700 dark:text-pink-300 border-pink-500/40', bar: 'bg-pink-500' },
+  THL1057: { short: 'Pháp luật', chip: 'bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/40', bar: 'bg-orange-500' },
+  MAT3506: { short: 'Mạng MT', chip: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40', bar: 'bg-emerald-500' },
+  MAT3505: { short: 'Kiến trúc MT', chip: 'bg-lime-500/15 text-lime-700 dark:text-lime-300 border-lime-500/40', bar: 'bg-lime-500' },
+};
+// Classes are shown up to the day before the first exam
+const CLASS_END_DATE = '2026-12-25';
+
+function ymd(y: number, m: number, d: number) {
+  return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+function ExamCalendar({ timetable }: { timetable: TimetableSession[] }) {
+  const now = new Date();
+  const todayStr = ymd(now.getFullYear(), now.getMonth(), now.getDate());
+  const [cursor, setCursor] = useState({ y: now.getFullYear(), m: now.getMonth() });
+  const [selected, setSelected] = useState(todayStr);
+
+  const examsOn = (date: string) => EXAM_SCHEDULE.filter((x) => x.date === date);
+  const classesOn = (date: string) => {
+    if (date > CLASS_END_DATE) return [];
+    const dt = new Date(date + 'T00:00:00');
+    const dow = dt.getDay() === 0 ? 8 : dt.getDay() + 1;
+    return timetable
+      .filter((s) => s.day_of_week === dow)
+      .sort((a, b) => a.start_period - b.start_period);
   };
-  const heads = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+
+  const first = new Date(cursor.y, cursor.m, 1);
+  const offset = (first.getDay() + 6) % 7;
+  const daysIn = new Date(cursor.y, cursor.m + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(offset).fill(null),
+    ...Array.from({ length: daysIn }, (_, i) => i + 1),
+  ];
+  while (cells.length % 7) cells.push(null);
+
+  const shift = (delta: number) => {
+    const d = new Date(cursor.y, cursor.m + delta, 1);
+    setCursor({ y: d.getFullYear(), m: d.getMonth() });
+  };
+
+  const selExams = examsOn(selected);
+  const selClasses = classesOn(selected);
+  const selDate = new Date(selected + 'T00:00:00');
+  const weekdayVi = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+  const nextExams = EXAM_SCHEDULE.filter((x) => x.date && x.date >= todayStr).sort((a, b) =>
+    a.date.localeCompare(b.date)
+  );
+
   return (
-    <div className="rounded-3xl p-4 sm:p-5 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 text-white shadow-lg border border-sky-500/30 space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-base font-extrabold flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-sky-400" />
-          Lịch Tháng 11/2026 – 1/2027
-        </h3>
-        <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-300">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-rose-500" /> Ngày thi</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-sky-400" /> Có buổi học</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded border-2 border-amber-400" /> Hôm nay</span>
+    <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+      {/* MONTH GRID */}
+      <div className="xl:col-span-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-slate-900 via-slate-800 to-sky-900 text-white">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-white/10 border border-white/15">
+              <Calendar className="w-5 h-5 text-sky-300" />
+            </div>
+            <div>
+              <div className="text-lg font-extrabold tracking-tight">Tháng {cursor.m + 1}, {cursor.y}</div>
+              <div className="text-[11px] text-slate-300 font-semibold">Bấm vào một ngày để xem chi tiết</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button type="button" onClick={() => shift(-1)} className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 font-extrabold">‹</button>
+            <button
+              type="button"
+              onClick={() => { setCursor({ y: now.getFullYear(), m: now.getMonth() }); setSelected(todayStr); }}
+              className="px-3 h-9 rounded-xl bg-sky-500 hover:bg-sky-400 text-xs font-extrabold"
+            >
+              Hôm nay
+            </button>
+            <button type="button" onClick={() => shift(1)} className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 font-extrabold">›</button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+          {['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'].map((h, i) => (
+            <div key={h} className={`py-2 text-center text-[11px] font-extrabold uppercase ${i === 6 ? 'text-rose-500' : 'text-slate-500 dark:text-slate-400'}`}>
+              {h}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7">
+          {cells.map((d, i) => {
+            if (d === null)
+              return <div key={`e${i}`} className="min-h-[96px] border-b border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40" />;
+            const date = ymd(cursor.y, cursor.m, d);
+            const exams = examsOn(date);
+            const classes = classesOn(date);
+            const isToday = date === todayStr;
+            const isSel = date === selected;
+            const isPast = date < todayStr;
+            return (
+              <button
+                type="button"
+                key={date}
+                onClick={() => setSelected(date)}
+                className={`min-h-[96px] p-1.5 text-left border-b border-r border-slate-100 dark:border-slate-800 flex flex-col gap-1 transition-colors ${
+                  exams.length
+                    ? 'bg-rose-50 dark:bg-rose-950/30'
+                    : 'hover:bg-sky-50/60 dark:hover:bg-slate-800/60'
+                } ${isSel ? 'ring-2 ring-inset ring-sky-500' : ''} ${isPast ? 'opacity-60' : ''}`}
+              >
+                <span
+                  className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-extrabold ${
+                    isToday ? 'bg-sky-600 text-white shadow' : i % 7 === 6 ? 'text-rose-500' : 'text-slate-700 dark:text-slate-200'
+                  }`}
+                >
+                  {d}
+                </span>
+                {exams.map((ex) => (
+                  <span key={ex.code} className="w-full px-1.5 py-1 rounded-md bg-gradient-to-r from-rose-600 to-orange-500 text-white text-[10px] font-extrabold leading-tight shadow-sm">
+                    🎯 THI {COURSE_SHORT[ex.code]?.short || ex.name}
+                  </span>
+                ))}
+                {classes.slice(0, exams.length ? 1 : 3).map((s) => (
+                  <span
+                    key={s.id}
+                    className={`w-full px-1.5 py-0.5 rounded-md border text-[10px] font-bold leading-tight truncate ${COURSE_SHORT[s.course_code]?.chip || 'bg-slate-100 text-slate-700 border-slate-300'}`}
+                  >
+                    {COURSE_SHORT[s.course_code]?.short || s.course_name}
+                  </span>
+                ))}
+                {classes.length > (exams.length ? 1 : 3) && (
+                  <span className="text-[10px] font-bold text-slate-400">+{classes.length - (exams.length ? 1 : 3)} môn</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {months.map(({ y, m }) => {
-          const first = new Date(y, m, 1);
-          const offset = (first.getDay() + 6) % 7;
-          const daysIn = new Date(y, m + 1, 0).getDate();
-          const cells: (number | null)[] = [
-            ...Array(offset).fill(null),
-            ...Array.from({ length: daysIn }, (_, i) => i + 1),
-          ];
-          return (
-            <div key={`${y}-${m}`} className="rounded-2xl bg-white/5 border border-white/10 p-3">
-              <div className="text-sm font-extrabold text-sky-300 mb-2">Tháng {m + 1}/{y}</div>
-              <div className="grid grid-cols-7 gap-1 text-center">
-                {heads.map((h) => (
-                  <div key={h} className="text-[10px] font-extrabold text-slate-400 pb-1">{h}</div>
-                ))}
-                {cells.map((d, i) => {
-                  if (d === null) return <div key={`e${i}`} />;
-                  const key = `${y}-${m}-${d}`;
-                  const exams = examByKey[key];
-                  const isToday = key === todayKey;
-                  const dow = ((offset + d - 1) % 7) + 2; // 2..8 (8 = CN)
-                  const cls = dow <= 7 ? dots(dow) : [];
-                  return (
-                    <div
-                      key={key}
-                      title={exams ? exams.map((e) => `${e.name} – ${e.slot}`).join('\n') : undefined}
-                      className={`min-h-[44px] rounded-lg p-1 flex flex-col items-center justify-between text-[11px] font-bold ${
-                        exams
-                          ? 'bg-rose-500 text-white shadow-md shadow-rose-500/30'
-                          : 'bg-white/5 text-slate-200'
-                      } ${isToday ? 'ring-2 ring-amber-400' : ''}`}
-                    >
-                      <span>{d}</span>
-                      {exams ? (
-                        <span className="text-[8px] leading-tight font-extrabold truncate max-w-full">
-                          {exams[0].code.replace(/^MAT|^THL/, '')}
-                        </span>
-                      ) : (
-                        <span className="flex gap-0.5 flex-wrap justify-center">
-                          {cls.map((code) => (
-                            <span key={code} className={`w-1.5 h-1.5 rounded-full ${dotColor[code] || 'bg-sky-400'}`} />
-                          ))}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
+
+      {/* SIDE PANEL */}
+      <div className="xl:col-span-4 space-y-4">
+        <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-5">
+          <div className="text-xs font-extrabold text-sky-600 uppercase">{weekdayVi[selDate.getDay()]}</div>
+          <div className="text-2xl font-extrabold text-slate-900 dark:text-white">
+            {selDate.getDate()}/{selDate.getMonth() + 1}/{selDate.getFullYear()}
+          </div>
+          <div className="mt-4 space-y-2">
+            {selExams.length === 0 && selClasses.length === 0 && (
+              <div className="text-sm text-slate-400 font-semibold py-6 text-center">Ngày trống – không có lịch 🎉</div>
+            )}
+            {selExams.map((ex) => (
+              <div key={ex.code} className="p-3 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-md">
+                <div className="text-[11px] font-extrabold opacity-90">LỊCH THI · {ex.slot}</div>
+                <div className="text-sm font-extrabold">{ex.name}</div>
+                <div className="text-[11px] font-bold opacity-90">{ex.code} · {ex.format}</div>
               </div>
-            </div>
-          );
-        })}
+            ))}
+            {selClasses.map((s) => (
+              <div key={s.id} className="flex gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <div className={`w-1.5 rounded-full ${COURSE_SHORT[s.course_code]?.bar || 'bg-slate-400'}`} />
+                <div className="min-w-0">
+                  <div className="text-sm font-extrabold text-slate-900 dark:text-white">{s.course_name}</div>
+                  <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    Tiết {s.start_period}-{s.end_period} · {PERIOD_TIMES[s.start_period]?.split(' - ')[0]} – {PERIOD_TIMES[s.end_period]?.split(' - ')[1]}
+                  </div>
+                  <div className="text-xs font-bold text-slate-600 dark:text-slate-300">📍 {s.room}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-gradient-to-br from-slate-900 to-sky-950 text-white shadow-sm p-5">
+          <div className="text-sm font-extrabold mb-3 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-rose-400" /> Đếm ngược kỳ thi
+          </div>
+          <div className="space-y-2">
+            {nextExams.map((ex) => {
+              const left = examDaysLeft(ex.date);
+              return (
+                <button
+                  type="button"
+                  key={ex.code}
+                  onClick={() => {
+                    const [y, m] = ex.date.split('-').map(Number);
+                    setCursor({ y, m: m - 1 });
+                    setSelected(ex.date);
+                  }}
+                  className="w-full flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left"
+                >
+                  <div className="min-w-0">
+                    <div className="text-xs font-extrabold truncate">{ex.name}</div>
+                    <div className="text-[11px] text-slate-300 font-semibold">
+                      {ex.date.split('-').reverse().join('/')} · {ex.slot}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-xl font-extrabold text-rose-400 leading-none">{left}</div>
+                    <div className="text-[10px] text-slate-400 font-bold">ngày</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
 export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
   courses,
   coursesState,
