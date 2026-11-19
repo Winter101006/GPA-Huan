@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   BookOpen,
   BrainCircuit,
@@ -162,6 +162,106 @@ function parseNlpLinkString(raw: string): { title: string; url: string | null } 
   return { title: trimmed, url: null };
 }
 
+function ExamCalendar({
+  timetable,
+}: {
+  timetable: TimetableSession[];
+}) {
+  const months = [
+    { y: 2026, m: 10 },
+    { y: 2026, m: 11 },
+    { y: 2027, m: 0 },
+  ];
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+  const examByKey: Record<string, { code: string; name: string; slot: string }[]> = {};
+  EXAM_SCHEDULE.forEach((ex) => {
+    if (!ex.date) return;
+    const [y, mo, d] = ex.date.split('-').map(Number);
+    const k = `${y}-${mo - 1}-${d}`;
+    (examByKey[k] = examByKey[k] || []).push(ex);
+  });
+  const dots = (dow: number) =>
+    Array.from(new Set(timetable.filter((s) => s.day_of_week === dow).map((s) => s.course_code)));
+  const dotColor: Record<string, string> = {
+    MAT1206E: 'bg-sky-500',
+    MAT3519: 'bg-cyan-500',
+    MAT3533: 'bg-pink-500',
+    THL1057: 'bg-orange-500',
+    MAT3506: 'bg-emerald-500',
+    MAT3505: 'bg-lime-500',
+  };
+  const heads = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  return (
+    <div className="rounded-3xl p-4 sm:p-5 bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 text-white shadow-lg border border-sky-500/30 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-base font-extrabold flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-sky-400" />
+          Lịch Tháng 11/2026 – 1/2027
+        </h3>
+        <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-300">
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-rose-500" /> Ngày thi</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-sky-400" /> Có buổi học</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded border-2 border-amber-400" /> Hôm nay</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {months.map(({ y, m }) => {
+          const first = new Date(y, m, 1);
+          const offset = (first.getDay() + 6) % 7;
+          const daysIn = new Date(y, m + 1, 0).getDate();
+          const cells: (number | null)[] = [
+            ...Array(offset).fill(null),
+            ...Array.from({ length: daysIn }, (_, i) => i + 1),
+          ];
+          return (
+            <div key={`${y}-${m}`} className="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div className="text-sm font-extrabold text-sky-300 mb-2">Tháng {m + 1}/{y}</div>
+              <div className="grid grid-cols-7 gap-1 text-center">
+                {heads.map((h) => (
+                  <div key={h} className="text-[10px] font-extrabold text-slate-400 pb-1">{h}</div>
+                ))}
+                {cells.map((d, i) => {
+                  if (d === null) return <div key={`e${i}`} />;
+                  const key = `${y}-${m}-${d}`;
+                  const exams = examByKey[key];
+                  const isToday = key === todayKey;
+                  const dow = ((offset + d - 1) % 7) + 2; // 2..8 (8 = CN)
+                  const cls = dow <= 7 ? dots(dow) : [];
+                  return (
+                    <div
+                      key={key}
+                      title={exams ? exams.map((e) => `${e.name} – ${e.slot}`).join('\n') : undefined}
+                      className={`min-h-[44px] rounded-lg p-1 flex flex-col items-center justify-between text-[11px] font-bold ${
+                        exams
+                          ? 'bg-rose-500 text-white shadow-md shadow-rose-500/30'
+                          : 'bg-white/5 text-slate-200'
+                      } ${isToday ? 'ring-2 ring-amber-400' : ''}`}
+                    >
+                      <span>{d}</span>
+                      {exams ? (
+                        <span className="text-[8px] leading-tight font-extrabold truncate max-w-full">
+                          {exams[0].code.replace(/^MAT|^THL/, '')}
+                        </span>
+                      ) : (
+                        <span className="flex gap-0.5 flex-wrap justify-center">
+                          {cls.map((code) => (
+                            <span key={code} className={`w-1.5 h-1.5 rounded-full ${dotColor[code] || 'bg-sky-400'}`} />
+                          ))}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
   courses,
   coursesState,
@@ -174,7 +274,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
   onUpdateNlpResearch,
 }) => {
   // Two clean top-level modes: Notebook (default) & Weekly Timetable
-  const [viewMode, setViewMode] = useState<'overview' | 'notebook' | 'timetable'>('overview');
+  const [viewMode, setViewMode] = useState<'overview' | 'notebook'>('overview');
 
   const inProgressCourses = courses.filter((c) => c.in_progress && !c.completed);
   const inProgressCredits = inProgressCourses.reduce((s, c) => s + c.credits, 0);
@@ -492,19 +592,6 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
           >
             <BookOpen className="w-4 h-4" />
             <span>Sổ Ghi Chú Từng Môn</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setViewMode('timetable')}
-            className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
-              viewMode === 'timetable'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Thời Khóa Biểu Tuần</span>
           </button>
         </div>
       </div>
@@ -1244,6 +1331,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
       {/* MODE 0: OVERVIEW DASHBOARD (default) */}
       {viewMode === 'overview' && (
         <div className="space-y-4">
+          <ExamCalendar timetable={timetable} />
           {(() => {
             const upcoming = EXAM_SCHEDULE.filter((x) => x.date && examDaysLeft(x.date) >= 0)
               .sort((a, b) => a.date.localeCompare(b.date))[0];
@@ -1289,7 +1377,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                     <div className={`px-4 py-3 ${style ? `${style.bg} ${style.text}` : 'bg-sky-100'}`}>
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="text-base font-extrabold">{course?.name || ex.name}</div>
+                          <div className="text-base font-extrabold">{course?.name_vi || ex.name}</div>
                           <div className="text-[11px] font-bold opacity-80">
                             {ex.code}{course ? ` · ${course.credits} tín chỉ` : ''}
                           </div>
@@ -1338,237 +1426,6 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
                   </div>
                 );
               })}
-          </div>
-        </div>
-      )}
-      {/* MODE 2: CLEAN WEEKLY TIMETABLE */}
-      {viewMode === 'timetable' && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-sky-600" />
-                Thời Khóa Biểu Kỳ 5 (Bấm vào môn học để mở nhanh Sổ Note)
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Hiển thị trực quan lịch học từ Tiết 1 đến Tiết 12 kèm phòng học
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowAddSession((v) => !v)}
-              className="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Thêm ca học</span>
-            </button>
-          </div>
-
-          {showAddSession && (
-            <form
-              onSubmit={handleAddTimetableSession}
-              className="p-4 rounded-xl bg-sky-50 dark:bg-slate-800 border border-sky-200 dark:border-slate-700 grid grid-cols-2 sm:grid-cols-7 gap-2.5 text-xs"
-            >
-              <input
-                type="text"
-                value={newSessCourseCode}
-                onChange={(e) => setNewSessCourseCode(e.target.value)}
-                placeholder="Mã môn (MAT3533)"
-                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700 font-bold"
-              />
-              <input
-                type="text"
-                value={newSessClassCode}
-                onChange={(e) => setNewSessClassCode(e.target.value)}
-                placeholder="Mã lớp"
-                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700"
-              />
-              <input
-                type="text"
-                value={newSessName}
-                onChange={(e) => setNewSessName(e.target.value)}
-                placeholder="Tên môn"
-                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700 font-bold"
-              />
-              <select
-                value={newSessDay}
-                onChange={(e) => setNewSessDay(Number(e.target.value))}
-                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700 font-bold"
-              >
-                {DAYS_OF_WEEK.map((d) => (
-                  <option key={d.day} value={d.day}>
-                    {d.label}
-                  </option>
-                ))}
-              </select>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={newSessStart}
-                  onChange={(e) => setNewSessStart(Number(e.target.value))}
-                  className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 text-center font-bold"
-                />
-                <span>-</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={newSessEnd}
-                  onChange={(e) => setNewSessEnd(Number(e.target.value))}
-                  className="w-full px-2 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 text-center font-bold"
-                />
-              </div>
-              <input
-                type="text"
-                value={newSessRoom}
-                onChange={(e) => setNewSessRoom(e.target.value)}
-                placeholder="Phòng (102T5)"
-                className="px-2.5 py-2 rounded-lg bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-700"
-              />
-              <button
-                type="submit"
-                className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold"
-              >
-                Lưu ca
-              </button>
-            </form>
-          )}
-
-          <div className="overflow-x-auto rounded-xl border border-sky-200 dark:border-slate-700">
-            <table className="w-full min-w-[920px] table-fixed border-collapse text-xs">
-              <thead>
-                <tr className="bg-gradient-to-r from-sky-600 to-sky-500 text-white">
-                  <th className="w-[56px] py-2.5 px-2 border border-sky-500/40 text-center font-extrabold">
-                    Tiết
-                  </th>
-                  <th className="w-[112px] py-2.5 px-2 border border-sky-500/40 text-center font-extrabold">
-                    Thời gian
-                  </th>
-                  {DAYS_OF_WEEK.map((d) => (
-                    <th
-                      key={d.day}
-                      className="py-2.5 px-2 border border-sky-500/40 text-center font-extrabold"
-                    >
-                      {d.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((period) => {
-                  const isSkippedByRowSpan = (day: number) =>
-                    timetable.some(
-                      (s) =>
-                        s.day_of_week === day &&
-                        s.start_period < period &&
-                        s.end_period >= period
-                    );
-
-                  const findStartingSession = (day: number) =>
-                    timetable.find((s) => s.day_of_week === day && s.start_period === period);
-
-                  return (
-                    <React.Fragment key={period}>
-                      {period === 7 && (
-                        <tr className="bg-sky-100/80 dark:bg-slate-800 text-sky-900 dark:text-sky-200 font-extrabold">
-                          <td className="py-1.5 px-2 border border-sky-200 dark:border-slate-700 text-center">
-                            Trưa
-                          </td>
-                          <td className="py-1.5 px-2 border border-sky-200 dark:border-slate-700 text-center">
-                            12h30 - 13h00
-                          </td>
-                          <td
-                            colSpan={6}
-                            className="py-1.5 px-3 border border-sky-200 dark:border-slate-700 text-center tracking-wider uppercase text-[11px]"
-                          >
-                            Nghỉ trưa
-                          </td>
-                        </tr>
-                      )}
-
-                      <tr className="h-[54px]">
-                        <td className="border border-slate-200 dark:border-slate-800 bg-sky-50/70 dark:bg-slate-800/80 text-center font-extrabold text-slate-700 dark:text-slate-200">
-                          {period}
-                        </td>
-                        <td className="border border-slate-200 dark:border-slate-800 bg-sky-50/40 dark:bg-slate-800/50 text-center font-semibold text-[11px] text-slate-600 dark:text-slate-300">
-                          {PERIOD_TIMES[period]}
-                        </td>
-
-                        {DAYS_OF_WEEK.map((d) => {
-                          if (isSkippedByRowSpan(d.day)) return null;
-                          const sess = findStartingSession(d.day);
-                          if (!sess) {
-                            return (
-                              <td
-                                key={d.day}
-                                className="border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900"
-                              />
-                            );
-                          }
-
-                          const span = Math.max(1, sess.end_period - sess.start_period + 1);
-                          const palette = COURSE_TIMETABLE_STYLES[sess.course_code] || {
-                            bg: 'bg-sky-500',
-                            border: 'border-sky-600',
-                            text: 'text-white',
-                            pill: 'bg-white/20 text-white',
-                          };
-
-                          return (
-                            <td
-                              key={d.day}
-                              rowSpan={span}
-                              className="p-1 border border-slate-200 dark:border-slate-800 align-stretch"
-                            >
-                              <div
-                                onClick={() => {
-                                  setSelectedKey(sess.course_code);
-                                  setViewMode('notebook');
-                                }}
-                                title="Bấm để mở Sổ ghi chú môn này"
-                                className={`h-full w-full rounded-xl p-2 border ${palette.bg} ${palette.border} ${palette.text} shadow-sm flex flex-col justify-between relative group cursor-pointer hover:brightness-95 transition-all`}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRemoveTimetableSession(sess.id);
-                                  }}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-1 right-1 w-5 h-5 rounded-full bg-black/25 hover:bg-rose-600 text-white flex items-center justify-center text-[10px]"
-                                  title="Xóa ca học này"
-                                >
-                                  ×
-                                </button>
-
-                                <div>
-                                  <div className="font-extrabold text-xs leading-snug break-words pr-4">
-                                    {sess.course_name}
-                                  </div>
-                                  <div className="text-[10px] font-mono font-bold opacity-90 mt-0.5">
-                                    {sess.class_code}
-                                  </div>
-                                </div>
-
-                                <div className="flex flex-wrap items-center justify-between gap-1 mt-1.5 pt-1 border-t border-current/15 text-[10px] font-bold">
-                                  <span className={`px-1.5 py-0.5 rounded ${palette.pill}`}>
-                                    📍 {sess.room}
-                                  </span>
-                                  <span>
-                                    Tiết {sess.start_period}-{sess.end_period}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         </div>
       )}
