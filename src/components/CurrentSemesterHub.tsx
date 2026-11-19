@@ -174,7 +174,7 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
   onUpdateNlpResearch,
 }) => {
   // Two clean top-level modes: Notebook (default) & Weekly Timetable
-  const [viewMode, setViewMode] = useState<'notebook' | 'timetable'>('notebook');
+  const [viewMode, setViewMode] = useState<'overview' | 'notebook' | 'timetable'>('overview');
 
   const inProgressCourses = courses.filter((c) => c.in_progress && !c.completed);
   const inProgressCredits = inProgressCourses.reduce((s, c) => s + c.credits, 0);
@@ -472,8 +472,19 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
         <div className="flex items-center gap-1.5 bg-sky-50 dark:bg-slate-800 p-1 rounded-xl border border-sky-200 dark:border-slate-700">
           <button
             type="button"
-            onClick={() => setViewMode('notebook')}
+            onClick={() => setViewMode('overview')}
             className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
+              viewMode === 'overview'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
+            }`}
+          >
+            <Clock className="w-4 h-4" />
+            <span>Tổng Quan & Lịch Thi</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('notebook')}            className={`px-4 py-2 rounded-lg text-xs font-extrabold flex items-center gap-2 transition-all ${
               viewMode === 'notebook'
                 ? 'bg-sky-600 text-white shadow-sm'
                 : 'text-slate-600 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-700'
@@ -1230,46 +1241,106 @@ export const CurrentSemesterHub: React.FC<CurrentSemesterHubProps> = ({
         </div>
       )}
 
-      {/* EXAM SCHEDULE */}
-      {viewMode === 'timetable' && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-rose-200 dark:border-slate-800 shadow-sm space-y-3">
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <Clock className="w-5 h-5 text-rose-600" />
-              Lịch Thi Học Kỳ I (2026-2027) – 6 kỳ thi
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Mã SV 24002015 · Ca 2: 08h30 · Ca 4: 13h00 · Môn chưa có lịch sẽ được cập nhật sau
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {EXAM_SCHEDULE.map((ex) => {
-              const style = COURSE_TIMETABLE_STYLES[ex.code];
-              const days = ex.date ? examDaysLeft(ex.date) : null;
-              return (
-                <div
-                  key={ex.code}
-                  className={`rounded-xl border p-3 ${style ? `${style.bg} ${style.border} ${style.text}` : 'bg-slate-50 border-slate-200'}`}
-                >
-                  <div className="text-sm font-extrabold">{ex.name}</div>
-                  <div className="text-[11px] opacity-80 font-bold">{ex.code}</div>
-                  <div className="mt-2 text-xs font-bold space-y-0.5">
-                    <div>📅 {ex.date ? ex.date.split('-').reverse().join('/') : 'Chưa có lịch'}</div>
-                    <div>⏰ {ex.slot}</div>
-                    <div>📝 {ex.format}</div>
+      {/* MODE 0: OVERVIEW DASHBOARD (default) */}
+      {viewMode === 'overview' && (
+        <div className="space-y-4">
+          {(() => {
+            const upcoming = EXAM_SCHEDULE.filter((x) => x.date && examDaysLeft(x.date) >= 0)
+              .sort((a, b) => a.date.localeCompare(b.date))[0];
+            const pendingAll = tasks.filter((t) => !t.completed);
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm">
+                  <div className="text-xs font-bold opacity-90">Kỳ thi gần nhất</div>
+                  <div className="text-lg font-extrabold mt-1">{upcoming ? upcoming.name : 'Chưa có'}</div>
+                  <div className="text-xs font-bold mt-1">
+                    {upcoming ? `${upcoming.date.split('-').reverse().join('/')} · ${upcoming.slot} · còn ${examDaysLeft(upcoming.date)} ngày` : ''}
                   </div>
-                  {days !== null && (
-                    <div className="mt-2 inline-block px-2 py-0.5 rounded-full bg-black/15 text-[11px] font-extrabold">
-                      {days > 0 ? `Còn ${days} ngày` : days === 0 ? 'Hôm nay!' : 'Đã thi'}
-                    </div>
-                  )}
                 </div>
-              );
-            })}
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-sky-500 to-indigo-500 text-white shadow-sm">
+                  <div className="text-xs font-bold opacity-90">Đang học</div>
+                  <div className="text-lg font-extrabold mt-1">{inProgressCourses.length} môn · {inProgressCredits} tín chỉ</div>
+                  <div className="text-xs font-bold mt-1">Học kỳ I 2026-2027</div>
+                </div>
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
+                  <div className="text-xs font-bold opacity-90">Việc cần làm</div>
+                  <div className="text-lg font-extrabold mt-1">{pendingAll.length} việc chưa xong</div>
+                  <div className="text-xs font-bold mt-1">Thêm việc trong sổ từng môn</div>
+                </div>
+              </div>
+            );
+          })()}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[...EXAM_SCHEDULE]
+              .sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'))
+              .map((ex) => {
+                const style = COURSE_TIMETABLE_STYLES[ex.code];
+                const course = courses.find((c) => c.code === ex.code);
+                const st = coursesState[ex.code];
+                const days = ex.date ? examDaysLeft(ex.date) : null;
+                const sessions = timetable.filter((s) => s.course_code === ex.code);
+                const counts = getPageCounts(ex.code);
+                return (
+                  <div
+                    key={ex.code}
+                    className="rounded-2xl bg-white dark:bg-slate-900 border border-sky-200 dark:border-slate-800 shadow-sm overflow-hidden"
+                  >
+                    <div className={`px-4 py-3 ${style ? `${style.bg} ${style.text}` : 'bg-sky-100'}`}>
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="text-base font-extrabold">{course?.name || ex.name}</div>
+                          <div className="text-[11px] font-bold opacity-80">
+                            {ex.code}{course ? ` · ${course.credits} tín chỉ` : ''}
+                          </div>
+                        </div>
+                        {days !== null && (
+                          <span className="px-2 py-0.5 rounded-full bg-black/20 text-[11px] font-extrabold shrink-0">
+                            {days > 0 ? `Còn ${days} ngày` : days === 0 ? 'Hôm nay!' : 'Đã thi'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-2 text-xs text-slate-700 dark:text-slate-200">
+                      <div>
+                        <span className="font-extrabold">📝 Thi: </span>
+                        {ex.date ? `${ex.date.split('-').reverse().join('/')} · ${ex.slot}` : 'Chưa có lịch'} · {ex.format}
+                      </div>
+                      <div>
+                        <span className="font-extrabold">🏫 Lịch học: </span>
+                        {sessions.length > 0
+                          ? sessions
+                              .map((s) => `Thứ ${s.day_of_week} (tiết ${s.start_period}-${s.end_period}, ${s.room})`)
+                              .join(' · ')
+                          : st?.schedule_info || 'Chưa có'}
+                      </div>
+                      {st?.note && (
+                        <div className="px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 font-bold">
+                          ⚠️ {st.note}
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] font-bold text-slate-500">
+                          {counts.pendingTodos} việc chưa xong · {counts.linksCount} link
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSelectPage(ex.code);
+                            setViewMode('notebook');
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-sky-600 hover:bg-sky-700 text-white"
+                        >
+                          Mở sổ ghi chú
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}
-
       {/* MODE 2: CLEAN WEEKLY TIMETABLE */}
       {viewMode === 'timetable' && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-sky-200 dark:border-slate-800 shadow-sm space-y-4">
